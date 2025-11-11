@@ -4,11 +4,6 @@ This folder contains prompts for establishing and maintaining efficient developm
 
 ## Available Prompts
 
-### 🔄 Automated Development Workflow
-**File**: `automated-development.md`
-
-**Purpose**: Establishes a fully automated development workflow that maintains high quality while requiring minimal human intervention.
-
 ### 🧪 Test Suite Generator
 **File**: `test-suite-generator.md`
 
@@ -18,41 +13,6 @@ This folder contains prompts for establishing and maintaining efficient developm
 **File**: `code-refactoring-plan.md`
 
 **Purpose**: Analyzes codebases to identify code smells, technical debt, and architectural issues, then generates a prioritized, actionable refactoring roadmap.
-
-**Key Features**:
-- Automated CI/CD monitoring and PR merging
-- Continuous refactoring and cleanup activities
-- Automated documentation updates
-- Quality gate enforcement
-- Focus on product understanding over pure coding
-- Learning-oriented development approach
-
-**Automation Capabilities**:
-- **Code Quality**: Automated formatting, linting, and testing
-- **Integration**: Automatic PR merging when all checks pass
-- **Documentation**: Real-time updates as code changes
-- **Security**: Continuous vulnerability scanning and remediation
-- **Refactoring**: Systematic code improvement and cleanup
-- **Release Management**: Automated versioning and deployment
-
-**Learning Focus Areas**:
-- **Product Understanding**: Requirements analysis and user experience
-- **Better Requirements**: Clear acceptance criteria and edge cases
-- **Holistic Development**: Architecture decisions and long-term maintainability
-- **Collaboration**: Effective team coordination and knowledge sharing
-
-**Best For**:
-- Large refactoring projects requiring sustained effort
-- Teams wanting to focus on product development over process management
-- Maintaining momentum on complex, long-term improvements
-- Learning product development skills while ensuring code quality
-- Establishing sustainable development practices
-
-**Usage Tips**:
-- Ensure robust testing infrastructure before enabling full automation
-- Start with lower-risk projects to validate the workflow
-- Maintain clear boundaries between automated and human-reviewed changes
-- Use for sustained periods to see the full benefits of automation
 
 ---
 
@@ -133,65 +93,19 @@ This folder contains prompts for establishing and maintaining efficient developm
 ## When to Use Development Workflow Prompts
 
 Use these prompts when:
-- Managing large-scale refactoring or cleanup efforts
-- Wanting to maintain development velocity without constant oversight
-- Learning product development while ensuring quality
-- Establishing sustainable development practices for teams
-- Reducing manual overhead in routine development tasks
-- Focusing team attention on high-value product decisions
+- Adding comprehensive test coverage to projects
+- Conducting code quality audits and refactoring
+- Establishing sustainable development practices
+- Managing technical debt systematically
+- Improving developer velocity through better code quality
 
 ## Integration with Other Prompts
 
 Development workflow prompts work well with:
-- **Project Management**: Use assessments to guide automated improvements
-- **DevOps Automation**: Leverage robust CI/CD for workflow automation
-- **Documentation**: Automate documentation updates as part of the workflow
-
-## Workflow Philosophy
-
-This approach emphasizes:
-- **Product Over Process**: Focus human attention on product decisions
-- **Quality Automation**: Ensure quality through automated checks rather than manual review
-- **Continuous Learning**: Use development time for skill building and understanding
-- **Sustainable Pace**: Maintain consistent progress without burnout
-- **Incremental Improvement**: Make small, continuous improvements rather than large overhauls
-
-## Automation Boundaries
-
-### Fully Automated
-- Code formatting and style enforcement
-- Test execution and basic quality checks
-- Documentation generation and updates
-- Routine refactoring and cleanup tasks
-- Security vulnerability scanning
-- Dependency updates with validation
-
-### Human Review Required
-- Major architectural changes
-- Breaking API modifications
-- New feature specifications
-- Security policy updates
-- External service integrations
-- Business logic changes
-
-## Success Metrics
-
-Track progress using:
-- **Code Quality**: Improving metrics over time
-- **Development Velocity**: Consistent feature delivery
-- **Bug Rates**: Decreasing production issues
-- **Test Coverage**: Increasing automated test coverage
-- **Technical Debt**: Systematic reduction over time
-- **Team Learning**: Growing product and requirements analysis skills
-
-## Customization Guidelines
-
-When adapting these prompts:
-1. **Automation Scope**: Define what can be safely automated in your context
-2. **Quality Gates**: Set appropriate thresholds for automated decisions
-3. **Learning Objectives**: Customize focus areas for your team's growth needs
-4. **Review Triggers**: Define when human intervention is required
-5. **Metrics**: Choose success indicators relevant to your project goals
+- **Project Management**: Use project reassessment to identify areas needing tests or refactoring
+- **DevOps Automation**: Integrate test execution and quality checks into CI/CD pipelines
+- **Documentation**: Document test strategies and refactoring plans in `/docs/`
+- **Security**: Include security testing and secure refactoring practices
 
 ## Prerequisites
 

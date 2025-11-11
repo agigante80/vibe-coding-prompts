@@ -52,12 +52,14 @@ This repository uses **meta-prompts** — prompts that don't just solve one spec
 | **Learn about meta-prompts** | [Universal Meta-Prompt System](./docs/universal-meta-Level-prompt-system.md) | 📚 Concepts |
 | **Create your own prompt** | [Prompt Creation Guide](./PROMPT_CREATION_GUIDE.md) | 📚 Guides |
 | Set up project documentation | [Documentation Standardization](./documentation/documentation-standardization.md) | 📖 Documentation |
+| Create/update README | [README Generator](./documentation/readme-generator.md) | 📖 Documentation |
+| Update Docker descriptions | [README Generator](./documentation/readme-generator.md) | 📖 Documentation |
 | Create CI/CD pipeline | [GitHub Actions CI/CD Generator](./devops-automation/github-actions-cicd-generator.md) | 🚀 DevOps |
 | Audit project security | [Security Audit Generator](./security/security-audit-generator.md) | 🔐 Security |
 | Update dependencies safely | [Dependency Update Manager](./security/dependency-update-manager.md) | 🔐 Security |
 | Assess existing project | [Project Reassessment](./project-management/project-reassessment.md) | 📊 Management |
+| Prepare for GitHub | [GitHub Ready Preparation](./project-management/github-ready-preparation.md) | 📊 Management |
 | Add comprehensive tests | [Test Suite Generator](./development-workflow/test-suite-generator.md) | 🔄 Workflow |
-| Automate development process | [Automated Development Workflow](./development-workflow/automated-development.md) | 🔄 Workflow |
 | Fix skipped/failing tests | [Test Suite Generator](./development-workflow/test-suite-generator.md) | 🔄 Workflow |
 | Improve code quality | [Code Refactoring Plan Generator](./development-workflow/code-refactoring-plan.md) | 🔄 Workflow |
 | Analyze technical debt | [Code Refactoring Plan Generator](./development-workflow/code-refactoring-plan.md) | 🔄 Workflow |
@@ -81,6 +83,22 @@ This repository uses **meta-prompts** — prompts that don't just solve one spec
 - ✅ Establishing living documentation that evolves with code
 
 **Outputs**: 9 standardized documentation files, automation rules, quality gates, agent task flows
+
+#### [README Generator](./documentation/readme-generator.md)
+**Word Count**: ~2065 words | **Platform**: ChatGPT, Claude, Gemini (use Copilot Chat)
+
+**What it does**: Generates or updates comprehensive, professional README.md files following industry best practices, including Docker Hub descriptions.
+
+**Ideal for**:
+- ✅ Creating professional READMEs for new projects
+- ✅ Updating outdated or incomplete documentation
+- ✅ Preparing for public release or open source
+- ✅ Generating Docker Hub short (≤100 chars) and long descriptions
+- ✅ Preserving existing screenshots and images while updating content
+- ✅ Improving project discoverability and SEO
+- ✅ Meeting documentation standards for professional projects
+
+**Outputs**: Complete README.md with 16 sections, badges, Docker descriptions (short ≤100 chars, long markdown), preserved images/screenshots, character count validation
 
 ---
 
@@ -120,22 +138,23 @@ This repository uses **meta-prompts** — prompts that don't just solve one spec
 
 **Outputs**: Assessment report, updated documentation, test results, prioritized action plan
 
----
+#### [GitHub Ready Preparation](./project-management/github-ready-preparation.md)
+**Word Count**: ~2610 words | **Platform**: ChatGPT, Claude, Gemini (use Copilot Chat)
 
-### 🔄 Development Workflow
-
-#### [Automated Development Workflow](./development-workflow/automated-development.md)
-**Word Count**: ~460 words | **Platform**: All
-
-**What it does**: Establishes fully automated development workflow with minimal human intervention.
+**What it does**: Prepares projects for professional GitHub publication with proper structure, documentation, automation, security, and community guidelines.
 
 **Ideal for**:
-- ✅ Large refactoring projects requiring sustained effort
-- ✅ Maintaining development velocity without bottlenecks
-- ✅ Learning product development while ensuring code quality
-- ✅ Establishing sustainable development practices
-- ✅ Continuous improvement cycles on long-term projects
-- ✅ Teams wanting to focus on product over process
+- ✅ First-time public GitHub release preparation
+- ✅ Converting private repositories to public
+- ✅ Open source project setup and best practices
+- ✅ Job application portfolio preparation
+- ✅ Pre-release quality and security audits
+- ✅ Establishing community contribution guidelines
+- ✅ CI/CD and automation setup for GitHub
+
+**Outputs**: Essential files (LICENSE, .gitignore, README, CONTRIBUTING), CI/CD workflows, security configuration, issue/PR templates, comprehensive documentation, GitHub-ready structure
+
+---
 
 ### 🔄 Development Workflow
 
