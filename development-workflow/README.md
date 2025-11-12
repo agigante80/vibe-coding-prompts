@@ -24,12 +24,14 @@ This folder contains prompts for establishing and maintaining efficient developm
 - Provides pre-commit hooks for automatic testing
 - Coverage reporting and quality gates
 - Test documentation and maintenance guidelines
+- **Comprehensive variable validation testing** (defaults, valid values, error handling)
 
 **Test Coverage**:
 - **Unit Tests**: 80%+ code coverage target
 - **Integration Tests**: Critical workflows and component interactions
 - **E2E Tests**: Core user journeys and system behavior
 - **Performance Tests**: Key operations and bottleneck identification
+- **Variable Validation**: Every configuration variable tested (defaults, valid values, invalid values with errors)
 
 **Best For**:
 - Adding tests to legacy projects without coverage
@@ -45,7 +47,8 @@ This folder contains prompts for establishing and maintaining efficient developm
 - Integrate test execution into your development workflow
 - Use generated fixtures as templates for additional test data
 - For projects with many skipped tests, pay special attention to the remediation strategy
-- ✅ **Platform-friendly**: At ~1570 words, works great with ChatGPT, Claude, and Gemini. For Copilot, use Copilot Chat
+- Ensure all configuration variables are validated (default values, valid values, invalid values with clear errors)
+- ✅ **Platform-friendly**: At ~2561 words, works great with ChatGPT, Claude, and Gemini. For Copilot, use Copilot Chat
 
 ---
 
