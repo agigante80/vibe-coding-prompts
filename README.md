@@ -66,6 +66,53 @@ This repository uses **meta-prompts** — prompts that don't just solve one spec
 
 ---
 
+## 🔄 Recommended Workflow & Re-run Cadence
+
+### For New Projects (Initial Setup)
+
+| Order | Prompt | When to Run | Re-run Frequency | Purpose |
+|-------|--------|-------------|------------------|---------|
+| **1** | [Documentation Standardization](./documentation/documentation-standardization.md) | Project start | Once (then maintain) | Establish documentation foundation |
+| **2** | [README Generator](./documentation/readme-generator.md) | After initial structure | On major changes | Professional project introduction |
+| **3** | [Test Suite Generator](./development-workflow/test-suite-generator.md) | After core features | When adding features | Ensure code reliability |
+| **4** | [GitHub Actions CI/CD Generator](./devops-automation/github-actions-cicd-generator.md) | After tests pass | On workflow changes | Automate testing & deployment |
+| **5** | [Security Audit Generator](./security/security-audit-generator.md) | Before first release | Monthly / Pre-release | Identify vulnerabilities |
+| **6** | [GitHub Ready Preparation](./project-management/github-ready-preparation.md) | Before going public | Before each release | Final polish & compliance |
+
+### For Existing Projects (Maintenance & Improvement)
+
+| Order | Prompt | When to Run | Re-run Frequency | Purpose |
+|-------|--------|-------------|------------------|---------|
+| **1** | [Project Reassessment](./project-management/project-reassessment.md) | Taking over project / Major milestone | Monthly or Quarterly | Comprehensive health check |
+| **2** | [Security Audit Generator](./security/security-audit-generator.md) | After reassessment | Monthly / After incidents | Security posture validation |
+| **3** | [Dependency Update Manager](./security/dependency-update-manager.md) | After security audit | Weekly or Monthly | Keep dependencies current |
+| **4** | [Code Refactoring Plan Generator](./development-workflow/code-refactoring-plan.md) | When tech debt accumulates | Quarterly | Improve code quality |
+| **5** | [Test Suite Generator](./development-workflow/test-suite-generator.md) | After refactoring | After major changes | Update test coverage |
+| **6** | [README Generator](./documentation/readme-generator.md) | After significant changes | On feature releases | Keep documentation current |
+
+### Periodic Maintenance Schedule
+
+| Frequency | Prompts to Run | Reason |
+|-----------|---------------|---------|
+| **Weekly** | [Dependency Update Manager](./security/dependency-update-manager.md) | Stay current with security patches |
+| **Monthly** | [Security Audit Generator](./security/security-audit-generator.md)<br>[Project Reassessment](./project-management/project-reassessment.md) | Regular security & health checks |
+| **Quarterly** | [Code Refactoring Plan Generator](./development-workflow/code-refactoring-plan.md)<br>[Documentation Standardization](./documentation/documentation-standardization.md) | Address technical debt & doc drift |
+| **Pre-Release** | [GitHub Ready Preparation](./project-management/github-ready-preparation.md)<br>[Security Audit Generator](./security/security-audit-generator.md)<br>[Test Suite Generator](./development-workflow/test-suite-generator.md) | Ensure release quality |
+| **As Needed** | [README Generator](./documentation/readme-generator.md)<br>[GitHub Actions CI/CD Generator](./devops-automation/github-actions-cicd-generator.md) | When documentation or workflows need updates |
+
+### Quick Reference by Scenario
+
+| Scenario | Prompts to Run (in order) |
+|----------|---------------------------|
+| **🚀 Starting brand new project** | Documentation Standardization → README Generator → Test Suite Generator → CI/CD Generator |
+| **📦 Inheriting existing project** | Project Reassessment → Security Audit → Dependency Update → Code Refactoring Plan |
+| **🔐 Security incident response** | Security Audit Generator → Dependency Update Manager → Project Reassessment |
+| **📢 Preparing public release** | GitHub Ready Preparation → Security Audit → README Generator → Test Suite Generator |
+| **🔧 Major refactoring planned** | Project Reassessment → Code Refactoring Plan → Test Suite Generator → Documentation Update |
+| **📈 Quarterly maintenance** | Project Reassessment → Security Audit → Code Refactoring Plan → Dependency Update |
+
+---
+
 ## � Available Prompts
 
 ### 📖 Documentation
