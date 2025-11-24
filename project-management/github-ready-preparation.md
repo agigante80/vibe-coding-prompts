@@ -117,6 +117,99 @@ find . -type f -name "config*" | wc -l  # Multiple config files?
 - Files with unclear names should be renamed or have explanation added
 - Deprecated files should be removed, not just commented out or renamed
 
+### 3.1. **Documentation Sanitization & Standardization**
+
+**Problem**: After active development, `/docs` often accumulates duplicate, outdated, or contradictory documentation files that confuse contributors.
+
+**Sanitization Process**:
+
+**Step 1: Audit & Inventory**
+```bash
+# List all documentation files with sizes and dates
+find docs/ -type f -name "*.md" -exec ls -lh {} \;
+
+# Check for potential duplicates by name similarity
+find docs/ -name "*.md" | sort
+```
+
+**Step 2: Identify Issues**
+- [ ] **Duplicate Topics**: Multiple files covering the same subject (e.g., `SETUP.md`, `INSTALLATION.md`, `GETTING_STARTED.md`)
+- [ ] **Contradictory Information**: Different documents stating conflicting facts
+- [ ] **Outdated Content**: Documentation not reflecting current codebase
+- [ ] **Orphaned Files**: Docs not linked from anywhere, serving no clear purpose
+- [ ] **Inconsistent Naming**: Mixed conventions (lowercase, uppercase, underscores, hyphens)
+- [ ] **Scattered Information**: Related content split across multiple files
+
+**Step 3: Conflict Detection**
+```bash
+# Search for version mentions across docs (should be consistent)
+grep -r "version" docs/ --include="*.md"
+
+# Find architectural descriptions (should align)
+grep -r "architecture\|framework\|stack" docs/ --include="*.md"
+
+# Check for conflicting setup instructions
+grep -r "install\|setup\|configure" docs/ --include="*.md"
+```
+
+**Step 4: Standardization Requirements**
+
+**Enforce Standard Document Set** (align with Documentation Standardization prompt):
+- ✅ `PROJECT_OVERVIEW.md` - Single source for project description
+- ✅ `ARCHITECTURE.md` - Authoritative architecture documentation
+- ✅ `API_DOCUMENTATION.md` - Centralized API reference
+- ✅ `DEVELOPMENT_WORKFLOW.md` - Developer guidelines
+- ✅ `TESTING_AND_RELIABILITY.md` - Testing standards
+- ✅ `SECURITY_AND_PRIVACY.md` - Security policies
+- ✅ `AI_INTERACTION_GUIDE.md` - Agent automation rules
+- ✅ `IMPROVEMENT_AREAS.md` - Technical debt tracking
+- ✅ `REFACTORING_PLAN.md` - Refactoring roadmap
+
+**Consolidation Strategy**:
+1. **Choose Authoritative Source**: For each topic, select the most complete/accurate document
+2. **Merge Content**: Consolidate unique information from duplicates
+3. **Remove Duplicates**: Delete redundant files after merging
+4. **Update Cross-References**: Fix links to removed documents
+5. **Document Removals**: Note removed files in `docs/README.md` or changelog
+
+**Naming Convention** (enforce consistency):
+- Use `UPPERCASE_WITH_UNDERSCORES.md` for standard docs
+- Use `lowercase-with-dashes.md` for supplementary guides
+- Avoid version numbers in filenames (use Git tags instead)
+- No spaces in filenames
+
+**Step 5: Validation Checks**
+- [ ] Each topic has ONE authoritative document
+- [ ] No contradictory statements across documents
+- [ ] All internal links (`[link](../docs/FILE.md)`) are valid
+- [ ] Consistent terminology used throughout
+- [ ] All documents reflect current codebase version
+- [ ] Cross-references between docs are bidirectional
+- [ ] Document hierarchy is clear (README → specific docs)
+- [ ] No orphaned documents (all referenced from somewhere)
+- [ ] Consistent formatting and structure
+
+**Common Contradictions to Resolve**:
+- Version numbers (project version, dependency versions)
+- Technology choices (database, framework, libraries)
+- Configuration defaults (ports, timeouts, limits)
+- Workflow descriptions (branching, deployment, testing)
+- Feature status (planned vs. implemented vs. deprecated)
+- API endpoints and parameters
+- Environment variable names and purposes
+
+**Quality Gates**:
+```bash
+# Verify no broken internal links
+markdown-link-check docs/**/*.md
+
+# Check for TODO/FIXME markers
+grep -r "TODO\|FIXME\|XXX\|HACK" docs/
+
+# Validate consistent terminology
+# (manual review of key terms: API, endpoint, service, module, etc.)
+```
+
 ### 4. **Dependency Management Check**
 
 **Verify Package Management**:
@@ -288,7 +381,9 @@ jobs:
 | Priority | Item | Description | Status |
 |----------|------|-------------|--------|
 | **Critical** | `README.md` | Comprehensive project documentation | ⬜ |
+| **Critical** | `/docs/` sanitization | Remove duplicates, resolve contradictions, standardize | ⬜ |
 | **Recommended** | `/docs/` folder | Additional guides, API reference, architecture | ⬜ |
+| **Recommended** | Standard doc set | 9 core documents from Documentation Standardization | ⬜ |
 | **Recommended** | Inline comments | Explain non-obvious logic | ⬜ |
 | **Recommended** | API documentation | OpenAPI/Swagger for APIs | ⬜ |
 | **Optional** | Doc generator | Sphinx, JSDoc, Docusaurus, etc. | ⬜ |

@@ -22,6 +22,76 @@ Perform a full reassessment of the current repository against its documentation 
 * Verify that feature documentation reflects actual implementation
 * Update dependency lists and configuration examples
 
+### 2.1. **Documentation Sanitization & Conflict Resolution**
+
+**Audit All `/docs` Files**:
+- List all documentation files and their stated purposes
+- Identify duplicate documentation covering the same topics
+- Flag contradictory information across different documents
+- Find outdated documentation that no longer reflects current code
+
+**Standardization Requirements**:
+- **Single Source of Truth**: Each topic should have ONE authoritative document
+- **Clear Ownership**: Each document should have a clearly defined scope
+- **Consistent Naming**: Follow standardized naming conventions (`UPPERCASE_WITH_UNDERSCORES.md`)
+- **Cross-Reference Validation**: Ensure all internal links between docs are valid
+- **Version Consistency**: All docs should reflect the same version of the project
+
+**Conflict Resolution Process**:
+```bash
+# Find duplicate or similar documentation
+find docs/ -name "*.md" -exec basename {} \; | sort | uniq -d
+
+# Check for contradictory statements (manual review needed)
+grep -r "architecture" docs/
+grep -r "framework" docs/
+grep -r "version" docs/
+```
+
+**Common Conflict Patterns to Resolve**:
+- **Architecture Descriptions**: Multiple files describing system architecture differently
+- **API Documentation**: Scattered endpoint documentation vs. centralized API docs
+- **Setup Instructions**: Conflicting installation/configuration steps in different files
+- **Feature Lists**: Inconsistent feature status (planned vs. implemented)
+- **Configuration**: Different default values or settings documented in multiple places
+- **Dependencies**: Conflicting version requirements or package lists
+
+**Consolidation Strategy**:
+1. **Identify Authoritative Document**: Choose the most complete, accurate, and current version
+2. **Merge Information**: Consolidate unique information from duplicates into authoritative doc
+3. **Remove Duplicates**: Delete redundant files after merging content
+4. **Update References**: Fix any links pointing to removed documents
+5. **Add Redirects**: If needed, add notes in README about removed docs
+
+**Required Standard Documents** (from Documentation Standardization prompt):
+- `PROJECT_OVERVIEW.md` - High-level project description and status
+- `ARCHITECTURE.md` - System architecture and design decisions
+- `API_DOCUMENTATION.md` - API endpoints, authentication, examples
+- `DEVELOPMENT_WORKFLOW.md` - Development process and guidelines
+- `TESTING_AND_RELIABILITY.md` - Testing strategy and quality gates
+- `SECURITY_AND_PRIVACY.md` - Security policies and data protection
+- `AI_INTERACTION_GUIDE.md` - Agent behavior and automation rules
+- `IMPROVEMENT_AREAS.md` - Technical debt and areas needing work
+- `REFACTORING_PLAN.md` - Planned code improvements and roadmap
+
+**Detect Contradictions**:
+- Compare version numbers across all docs
+- Check for conflicting technology choices (e.g., "we use MySQL" vs. "we use PostgreSQL")
+- Identify inconsistent terminology or naming conventions
+- Flag different workflow descriptions (e.g., conflicting branching strategies)
+- Find contradictory configuration instructions
+
+**Documentation Quality Checks**:
+- [ ] No duplicate files covering the same topic
+- [ ] No contradictory information across documents
+- [ ] All cross-references and internal links are valid
+- [ ] Consistent terminology and naming conventions
+- [ ] All docs reflect current codebase (no outdated information)
+- [ ] Clear document hierarchy and organization
+- [ ] Each document has a clear, unique purpose
+- [ ] Standard documents from Documentation Standardization prompt exist
+- [ ] Deprecated documents are removed or clearly marked
+
 ### 3. **Quality Assurance**
 
 * Run all tests and security checks locally
@@ -92,18 +162,20 @@ Maintain strict compliance with:
 5. Performance benchmarks and bottlenecks
 6. `.gitignore` audit results with recommended changes
 7. File organization analysis with flagged obsolete files
+8. **Documentation sanitization report** - Duplicates removed, contradictions resolved, standard docs enforced
 
 ### **Updated Documentation**
-8. All `/docs` files synchronized with current codebase
-9. Architecture documentation reflecting actual structure
-10. Updated feature list and capabilities
-11. Current dependency list and versions
+9. All `/docs` files synchronized with current codebase
+10. Consolidated documentation with conflicts resolved
+11. Architecture documentation reflecting actual structure
+12. Updated feature list and capabilities
+13. Current dependency list and versions
 
 ### **Action Plan**
-12. Prioritized next steps with effort estimates
-13. Risk assessment for identified issues
-14. Quick wins vs. long-term improvements
-15. Resource requirements and timeline
+14. Prioritized next steps with effort estimates
+15. Risk assessment for identified issues
+16. Quick wins vs. long-term improvements
+17. Resource requirements and timeline
 
 ### **Documentation Updates**
 All reassessment findings and updates must be documented in `/docs/`:
