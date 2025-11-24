@@ -30,7 +30,94 @@ Prepare a project for professional GitHub publication by establishing proper str
 [ -f "CODE_OF_CONDUCT.md" ] && echo "✅ CODE_OF_CONDUCT.md" || echo "⚠️  Missing CODE_OF_CONDUCT.md"
 ```
 
-### 2. **Dependency Management Check**
+### 2. **.gitignore Review & Validation**
+
+**Critical Checks**:
+- Verify `.gitignore` is not excluding files that are needed for the project to function
+- Ensure all build artifacts, temporary files, and OS-specific files are ignored
+- Check that secrets, credentials, and environment files are properly ignored
+- Validate that source code, configuration, and documentation are NOT ignored
+
+**Organization Requirements**:
+```gitignore
+# === Dependencies ===
+node_modules/
+vendor/
+__pycache__/
+
+# === Build Output ===
+dist/
+build/
+*.exe
+*.dll
+
+# === Environment & Secrets ===
+.env
+.env.local
+*.key
+*.pem
+credentials.json
+
+# === IDE & Editor ===
+.vscode/
+.idea/
+*.swp
+
+# === OS Files ===
+.DS_Store
+Thumbs.db
+
+# === Logs ===
+*.log
+logs/
+```
+
+**Validation Steps**:
+1. Check if any tracked files match patterns in `.gitignore` (orphaned patterns)
+2. Verify essential files like `package.json`, `README.md`, `.env.example` are tracked
+3. Ensure `.gitignore` patterns are not too broad (e.g., `*.json` would ignore `package.json`)
+4. Identify missing patterns for common build output or temporary files
+5. Remove obsolete patterns for directories or file types no longer in the project
+
+**Test Needed Files Are Not Ignored**:
+```bash
+# Verify critical files are not accidentally ignored
+git check-ignore README.md package.json src/ tests/ docs/ .env.example
+# Should return nothing - these files must be tracked
+```
+
+### 3. **File Organization Verification**
+
+**Repository Hygiene Audit**:
+- Identify the purpose of every file in the repository
+- Flag files that appear to be obsolete (old scripts, deprecated code, unused configurations)
+- Find duplicate functionality or redundant files
+- Ensure files are organized into appropriate directories
+- Verify file naming conventions are consistent
+
+**Common Issues to Flag**:
+- Test files or scratch scripts in root directory (should be in `tests/` or `scripts/`)
+- Multiple configuration files for the same purpose (e.g., `config.js`, `config.json`, `settings.js`)
+- Old backup files (e.g., `app.js.bak`, `config.old.json`)
+- Commented-out or deprecated code files that should be removed
+- Documentation files scattered across directories instead of centralized in `docs/`
+- Build artifacts that should be in `.gitignore`
+
+**Organization Checklist**:
+```bash
+# Find files that may need organization
+find . -type f -name "*.bak" -o -name "*.old" -o -name "*_old.*" -o -name "*.tmp"
+find . -maxdepth 1 -type f -name "test_*" -o -name "*_test.*"  # Tests in root
+find . -type f -name "config*" | wc -l  # Multiple config files?
+```
+
+**Documentation Requirements**:
+- Ambiguous files must have their purpose documented in README or inline comments
+- Directory structure should align with documented architecture
+- Files with unclear names should be renamed or have explanation added
+- Deprecated files should be removed, not just commented out or renamed
+
+### 4. **Dependency Management Check**
 
 **Verify Package Management**:
 - **Node.js**: `package.json`, `package-lock.json` or `yarn.lock`
@@ -49,7 +136,7 @@ pip list 2>/dev/null || \
 go list -m all 2>/dev/null
 ```
 
-### 3. **Security Scan**
+### 5. **Security Scan**
 
 **Secrets Detection**:
 ```bash
@@ -74,7 +161,7 @@ pip-audit || safety check
 grep -E "\.env$|\.env\.local|secrets|credentials|\.pem$|\.key$" .gitignore
 ```
 
-### 4. **CI/CD Infrastructure**
+### 6. **CI/CD Infrastructure**
 
 **Check Automation**:
 ```bash
@@ -95,7 +182,9 @@ ls -la .github/workflows/
 | Priority | Item | Description | Status |
 |----------|------|-------------|--------|
 | **Critical** | Clear folder structure | Organize into `src/`, `tests/`, `docs/`, `config/`, etc. | ⬜ |
-| **Critical** | `.gitignore` | Exclude build artifacts, logs, secrets, `node_modules/`, etc. | ⬜ |
+| **Critical** | `.gitignore` properly configured | Exclude build artifacts, logs, secrets; ensure needed files tracked | ⬜ |
+| **Critical** | `.gitignore` organized | Sections for dependencies, build, env, IDE, OS, logs | ⬜ |
+| **Critical** | File organization audit | Identify obsolete files, document ambiguous files, remove duplicates | ⬜ |
 | **Critical** | `README.md` | Professional, comprehensive documentation | ⬜ |
 | **Critical** | `LICENSE` | MIT, Apache-2.0, GPL, or other explicit license | ⬜ |
 | **Critical** | Dependencies managed | `package.json`, `requirements.txt`, etc. with locked versions | ⬜ |
@@ -271,6 +360,7 @@ grep -r "password\s*=\s*['\"]" --include="*.py" --include="*.js"
 | Priority | Item | Description | Status |
 |----------|------|-------------|--------|
 | **Critical** | Semantic versioning | Use `MAJOR.MINOR.PATCH` (e.g., `1.2.3`) | ⬜ |
+| **Critical** | Dynamic versioning | Git-based version generation (`get_version.sh`) | ⬜ |
 | **Recommended** | GitHub Releases | Tag versions with release notes | ⬜ |
 | **Recommended** | Package publishing | npm, PyPI, Docker Hub, etc. | ⬜ |
 | **Recommended** | `CHANGELOG.md` | Automated or manual changelog | ⬜ |
@@ -280,6 +370,46 @@ grep -r "password\s*=\s*['\"]" --include="*.py" --include="*.js"
 - **Major**: Breaking changes
 - **Minor**: New features (backward compatible)
 - **Patch**: Bug fixes
+
+**Dynamic Versioning Implementation**:
+
+Create `get_version.sh` script for Git-based version generation:
+
+```bash
+#!/bin/bash
+set -e
+
+# Get base version from package.json or equivalent
+BASE_VERSION=$(node -p "require('./package.json').version" 2>/dev/null || echo "0.1.0")
+
+# Get Git context
+BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "unknown")
+COMMIT=$(git rev-parse --short HEAD 2>/dev/null || echo "unknown")
+TAG=$(git describe --exact-match --tags 2>/dev/null || echo "")
+
+# Generate version based on context
+if [ "$BRANCH" = "main" ] && [ -n "$TAG" ]; then
+    VERSION="$TAG"                                    # Tagged: 1.0.0
+elif [ "$BRANCH" = "main" ]; then
+    VERSION="${BASE_VERSION}-main-${COMMIT}"          # Main: 0.1.0-main-abc1234
+elif [ "$BRANCH" = "develop" ]; then
+    VERSION="${BASE_VERSION}-dev-${COMMIT}"           # Develop: 0.1.0-dev-abc1234
+else
+    SANITIZED_BRANCH=$(echo "$BRANCH" | sed 's/[^a-zA-Z0-9._-]/-/g')
+    VERSION="${BASE_VERSION}-${SANITIZED_BRANCH}-${COMMIT}"  # Feature: 0.1.0-feature-auth-abc1234
+fi
+
+echo "$VERSION"
+```
+
+**Requirements**:
+- Script must be executable: `chmod +x get_version.sh`
+- Works in CI/CD with `fetch-depth: 0`
+- Falls back gracefully when Git unavailable
+- Sanitizes branch names (replace special chars)
+- Used in Dockerfile: `ARG VERSION=unknown` → `ENV VERSION=${VERSION}`
+- Application reads from environment variable
+- Version displayed at startup and in health endpoint
 
 ### 📊 **9. Metadata & Visibility**
 
@@ -416,6 +546,7 @@ Thumbs.db
 3. **`README.md`** - Professional, complete documentation (or update existing)
 4. **`CHANGELOG.md`** - Initial version history
 5. **`.env.example`** - Template for environment variables
+6. **`get_version.sh`** - Dynamic version generation script (executable)
 
 ### **Community Files**
 6. **`CONTRIBUTING.md`** - Contribution guidelines
@@ -425,9 +556,10 @@ Thumbs.db
 10. **`.github/PULL_REQUEST_TEMPLATE.md`** - PR template
 
 ### **Automation & CI/CD**
-11. **`.github/workflows/ci.yml`** - Build, test, lint workflow
+11. **`.github/workflows/ci.yml`** - Build, test, lint workflow with dynamic versioning
 12. **`.github/workflows/release.yml`** - Release automation (optional)
 13. **`.github/dependabot.yml`** - Automated dependency updates
+14. **Updated Dockerfile** - With `ARG VERSION` and `ENV VERSION` support
 
 ### **Security**
 14. **`SECURITY.md`** - Security policy and vulnerability reporting
@@ -455,17 +587,24 @@ All GitHub preparation work must be documented in `/docs/`:
 - [ ] Folder structure organized and logical
 - [ ] No secrets or credentials in repository history
 - [ ] Dependencies properly managed and locked
+- [ ] **`get_version.sh` script created and executable** (`chmod +x get_version.sh`)
+- [ ] **Dynamic versioning working**: Script generates correct version strings
+- [ ] **Dockerfile updated** with `ARG VERSION` and `ENV VERSION`
+- [ ] **Application reads VERSION** from environment variable with fallback
+- [ ] **Version displayed at startup** in application logs
+- [ ] **CI/CD uses `fetch-depth: 0`** for full Git history (required for tags)
+- [ ] **CI/CD runs `get_version.sh`** and passes VERSION to Docker build
 - [ ] Tests exist and run successfully
 - [ ] CI/CD workflow configured and passing
 - [ ] README comprehensive with badges and examples
 - [ ] Contributing and community guidelines established
 - [ ] Security scanning enabled (Dependabot, secret scanning)
-- [ ] Release strategy defined with semantic versioning
+- [ ] Release strategy defined with semantic versioning and dynamic versioning
 - [ ] GitHub topics and metadata configured
 - [ ] Project can be cloned and run by anyone without guidance
 - [ ] All builds pass, tests pass, linting passes
 - [ ] Documentation synchronized with code
-- [ ] **`/docs/` files updated** with GitHub setup and policies
+- [ ] **`/docs/` files updated** with GitHub setup, versioning strategy, and policies
 
 ---
 

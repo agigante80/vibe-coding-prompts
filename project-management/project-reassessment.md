@@ -29,7 +29,26 @@ Perform a full reassessment of the current repository against its documentation 
 * Validate that all CI/CD pipelines are functional
 * Check code quality and adherence to standards
 
-### 4. **Reporting & Planning**
+### 4. **.gitignore Review**
+
+* Verify `.gitignore` is not excluding files that are needed for the project
+* Check for missing patterns that should ignore build artifacts, temporary files, or sensitive data
+* Organize entries into logical sections with comments (Dependencies, Build Output, IDE, OS, etc.)
+* Identify obsolete patterns that no longer match project structure
+* Ensure environment-specific files (`.env.example`) are tracked while secrets (`.env`) are ignored
+* Validate that documentation, configuration, and source files are not accidentally ignored
+
+### 5. **File Organization Verification**
+
+* Audit all files in the repository to identify their purpose and relevance
+* Document the purpose of any ambiguous or unclear files
+* Flag files that are most probably not needed anymore (old scripts, deprecated code, unused configurations)
+* Identify duplicate files or functionality
+* Verify logical directory structure aligns with documented architecture
+* Check for orphaned files that should be organized into appropriate directories
+* Ensure file naming conventions are consistent across the project
+
+### 6. **Reporting & Planning**
 
 * Generate or update `/docs/PROJECT_REASSESSMENT_REPORT.md`
 * Update relevant `/docs` files as needed
@@ -71,18 +90,20 @@ Maintain strict compliance with:
 3. Test results and quality metrics
 4. Security scan results and vulnerability report
 5. Performance benchmarks and bottlenecks
+6. `.gitignore` audit results with recommended changes
+7. File organization analysis with flagged obsolete files
 
 ### **Updated Documentation**
-6. All `/docs` files synchronized with current codebase
-7. Architecture documentation reflecting actual structure
-8. Updated feature list and capabilities
-9. Current dependency list and versions
+8. All `/docs` files synchronized with current codebase
+9. Architecture documentation reflecting actual structure
+10. Updated feature list and capabilities
+11. Current dependency list and versions
 
 ### **Action Plan**
-10. Prioritized next steps with effort estimates
-11. Risk assessment for identified issues
-12. Quick wins vs. long-term improvements
-13. Resource requirements and timeline
+12. Prioritized next steps with effort estimates
+13. Risk assessment for identified issues
+14. Quick wins vs. long-term improvements
+15. Resource requirements and timeline
 
 ### **Documentation Updates**
 All reassessment findings and updates must be documented in `/docs/`:
