@@ -14,6 +14,47 @@ This folder contains prompts for establishing and maintaining efficient developm
 
 **Purpose**: Analyzes codebases to identify code smells, technical debt, and architectural issues, then generates a prioritized, actionable refactoring roadmap.
 
+### 📁 File & Folder Organization Refactoring
+**File**: `file-organization-refactoring.md`
+
+**Purpose**: Systematically reorganizes project files and folders, removes obsolete files, standardizes naming conventions, and establishes clear structure while ensuring application functionality throughout the process.
+
+**Key Features**:
+- Analyzes current project structure and identifies organizational issues
+- Creates target structure based on project type and best practices
+- Generates safe migration scripts with testing after each change
+- Updates all import paths automatically
+- Removes obsolete files (backups, temp files, deprecated code)
+- Standardizes file naming conventions
+- Integrates with `/docs/REFACTORING_PLAN.md`
+- Preserves Git history using `git mv`
+- Comprehensive verification (tests, build, application health)
+
+**Organization Goals**:
+- Clear directory structure (src/, tests/, config/, docs/)
+- No source files in project root
+- Consistent naming conventions
+- Logical grouping of related files
+- Separation of concerns
+- Easy navigation and file discovery
+
+**Best For**:
+- Projects with cluttered root directories
+- Flat structures needing hierarchy
+- Codebases with scattered files
+- Removing accumulated obsolete files
+- Standardizing naming across projects
+- Preparing for major refactoring
+- Improving team onboarding
+
+**Safety Measures**:
+- One file at a time with testing
+- Automated import path updates
+- Git history preservation
+- Full test suite validation
+- Application health verification
+- Rollback procedures
+
 ---
 
 **Key Features**:

@@ -63,6 +63,8 @@ This repository uses **meta-prompts** — prompts that don't just solve one spec
 | Fix skipped/failing tests | [Test Suite Generator](./development-workflow/test-suite-generator.md) | 🔄 Workflow |
 | Improve code quality | [Code Refactoring Plan Generator](./development-workflow/code-refactoring-plan.md) | 🔄 Workflow |
 | Analyze technical debt | [Code Refactoring Plan Generator](./development-workflow/code-refactoring-plan.md) | 🔄 Workflow |
+| Organize project files | [File & Folder Organization Refactoring](./development-workflow/file-organization-refactoring.md) | 🔄 Workflow |
+| Remove obsolete files | [File & Folder Organization Refactoring](./development-workflow/file-organization-refactoring.md) | 🔄 Workflow |
 
 ---
 
@@ -87,8 +89,9 @@ This repository uses **meta-prompts** — prompts that don't just solve one spec
 | **2** | [Security Audit Generator](./security/security-audit-generator.md) | After reassessment | Monthly / After incidents | Security posture validation |
 | **3** | [Dependency Update Manager](./security/dependency-update-manager.md) | After security audit | Weekly or Monthly | Keep dependencies current |
 | **4** | [Code Refactoring Plan Generator](./development-workflow/code-refactoring-plan.md) | When tech debt accumulates | Quarterly | Improve code quality |
-| **5** | [Test Suite Generator](./development-workflow/test-suite-generator.md) | After refactoring | After major changes | Update test coverage |
-| **6** | [README Generator](./documentation/readme-generator.md) | After significant changes | On feature releases | Keep documentation current |
+| **5** | [File & Folder Organization Refactoring](./development-workflow/file-organization-refactoring.md) | After refactoring plan | As needed | Organize files and remove obsolete code |
+| **6** | [Test Suite Generator](./development-workflow/test-suite-generator.md) | After file organization | After major changes | Update test coverage |
+| **7** | [README Generator](./documentation/readme-generator.md) | After significant changes | On feature releases | Keep documentation current |
 
 ### Periodic Maintenance Schedule
 
@@ -96,7 +99,7 @@ This repository uses **meta-prompts** — prompts that don't just solve one spec
 |-----------|---------------|---------|
 | **Weekly** | [Dependency Update Manager](./security/dependency-update-manager.md) | Stay current with security patches |
 | **Monthly** | [Security Audit Generator](./security/security-audit-generator.md)<br>[Project Reassessment](./project-management/project-reassessment.md) | Regular security & health checks |
-| **Quarterly** | [Code Refactoring Plan Generator](./development-workflow/code-refactoring-plan.md)<br>[Documentation Standardization](./documentation/documentation-standardization.md) | Address technical debt & doc drift |
+| **Quarterly** | [Code Refactoring Plan Generator](./development-workflow/code-refactoring-plan.md)<br>[File & Folder Organization Refactoring](./development-workflow/file-organization-refactoring.md)<br>[Documentation Standardization](./documentation/documentation-standardization.md) | Address technical debt, organize files & doc drift |
 | **Pre-Release** | [GitHub Ready Preparation](./project-management/github-ready-preparation.md)<br>[Security Audit Generator](./security/security-audit-generator.md)<br>[Test Suite Generator](./development-workflow/test-suite-generator.md) | Ensure release quality |
 | **As Needed** | [README Generator](./documentation/readme-generator.md)<br>[GitHub Actions CI/CD Generator](./devops-automation/github-actions-cicd-generator.md) | When documentation or workflows need updates |
 
@@ -105,11 +108,11 @@ This repository uses **meta-prompts** — prompts that don't just solve one spec
 | Scenario | Prompts to Run (in order) |
 |----------|---------------------------|
 | **🚀 Starting brand new project** | Documentation Standardization → README Generator → Test Suite Generator → CI/CD Generator |
-| **📦 Inheriting existing project** | Project Reassessment → Security Audit → Dependency Update → Code Refactoring Plan |
+| **📦 Inheriting existing project** | Project Reassessment → Security Audit → Dependency Update → Code Refactoring Plan → File Organization |
 | **🔐 Security incident response** | Security Audit Generator → Dependency Update Manager → Project Reassessment |
 | **📢 Preparing public release** | GitHub Ready Preparation → Security Audit → README Generator → Test Suite Generator |
-| **🔧 Major refactoring planned** | Project Reassessment → Code Refactoring Plan → Test Suite Generator → Documentation Update |
-| **📈 Quarterly maintenance** | Project Reassessment → Security Audit → Code Refactoring Plan → Dependency Update |
+| **🔧 Major refactoring planned** | Project Reassessment → Code Refactoring Plan → File Organization → Test Suite Generator → Documentation Update |
+| **📈 Quarterly maintenance** | Project Reassessment → Security Audit → Code Refactoring Plan → File Organization → Dependency Update |
 
 ---
 
@@ -237,6 +240,22 @@ This repository uses **meta-prompts** — prompts that don't just solve one spec
 - ✅ Establishing code quality baselines
 
 **Outputs**: Code quality metrics, code smell analysis, prioritized refactoring roadmap, effort estimates, risk assessments, automated linting setup
+
+#### [File & Folder Organization Refactoring](./development-workflow/file-organization-refactoring.md)
+**Word Count**: ~4850 words | **Platform**: ChatGPT, Claude, Gemini (use Copilot Chat)
+
+**What it does**: Systematically reorganizes project files and folders, removes obsolete files, standardizes naming conventions, and establishes clear structure while ensuring application functionality.
+
+**Ideal for**:
+- ✅ Projects with cluttered root directories and flat structures
+- ✅ Codebases where files are scattered without clear organization
+- ✅ Removing obsolete backup files and deprecated code
+- ✅ Standardizing naming conventions across the project
+- ✅ Preparing for major refactoring or architectural changes
+- ✅ Improving project navigability for team members
+- ✅ Establishing clear separation of concerns (src, tests, config)
+
+**Outputs**: File organization plan, safe migration scripts, import path updates, test verification, updated refactoring documentation, new directory structure
 
 ---
 
