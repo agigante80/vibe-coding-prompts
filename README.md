@@ -75,11 +75,12 @@ This repository uses **meta-prompts** — prompts that don't just solve one spec
 | Order | Prompt | When to Run | Re-run Frequency | Purpose |
 |-------|--------|-------------|------------------|---------|
 | **1** | [Documentation Standardization](./documentation/documentation-standardization.md) | Project start | Once (then maintain) | Establish documentation foundation |
-| **2** | [README Generator](./documentation/readme-generator.md) | After initial structure | On major changes | Professional project introduction |
-| **3** | [Test Suite Generator](./development-workflow/test-suite-generator.md) | After core features | When adding features | Ensure code reliability |
-| **4** | [GitHub Actions CI/CD Generator](./devops-automation/github-actions-cicd-generator.md) | After tests pass | On workflow changes | Automate testing & deployment |
-| **5** | [Security Audit Generator](./security/security-audit-generator.md) | Before first release | Monthly / Pre-release | Identify vulnerabilities |
-| **6** | [GitHub Ready Preparation](./project-management/github-ready-preparation.md) | Before going public | Before each release | Final polish & compliance |
+| **2** | [File & Folder Organization Refactoring](./development-workflow/file-organization-refactoring.md) | After initial code | Once (at setup) | Establish clean structure from start |
+| **3** | [README Generator](./documentation/readme-generator.md) | After structure set | On major changes | Professional project introduction |
+| **4** | [Test Suite Generator](./development-workflow/test-suite-generator.md) | After core features | When adding features | Ensure code reliability |
+| **5** | [GitHub Actions CI/CD Generator](./devops-automation/github-actions-cicd-generator.md) | After tests pass | On workflow changes | Automate testing & deployment |
+| **6** | [Security Audit Generator](./security/security-audit-generator.md) | Before first release | Monthly / Pre-release | Identify vulnerabilities |
+| **7** | [GitHub Ready Preparation](./project-management/github-ready-preparation.md) | Before going public | Before each release | Final polish & compliance |
 
 ### For Existing Projects (Maintenance & Improvement)
 
@@ -89,7 +90,7 @@ This repository uses **meta-prompts** — prompts that don't just solve one spec
 | **2** | [Security Audit Generator](./security/security-audit-generator.md) | After reassessment | Monthly / After incidents | Security posture validation |
 | **3** | [Dependency Update Manager](./security/dependency-update-manager.md) | After security audit | Weekly or Monthly | Keep dependencies current |
 | **4** | [Code Refactoring Plan Generator](./development-workflow/code-refactoring-plan.md) | When tech debt accumulates | Quarterly | Improve code quality |
-| **5** | [File & Folder Organization Refactoring](./development-workflow/file-organization-refactoring.md) | After refactoring plan | As needed | Organize files and remove obsolete code |
+| **5** | [File & Folder Organization Refactoring](./development-workflow/file-organization-refactoring.md) | After refactoring plan | Quarterly / As needed | Organize files, remove obsolete code |
 | **6** | [Test Suite Generator](./development-workflow/test-suite-generator.md) | After file organization | After major changes | Update test coverage |
 | **7** | [README Generator](./documentation/readme-generator.md) | After significant changes | On feature releases | Keep documentation current |
 
@@ -107,12 +108,33 @@ This repository uses **meta-prompts** — prompts that don't just solve one spec
 
 | Scenario | Prompts to Run (in order) |
 |----------|---------------------------|
-| **🚀 Starting brand new project** | Documentation Standardization → README Generator → Test Suite Generator → CI/CD Generator |
-| **📦 Inheriting existing project** | Project Reassessment → Security Audit → Dependency Update → Code Refactoring Plan → File Organization |
+| **🚀 Starting brand new project** | Documentation Standardization → File Organization → README Generator → Test Suite Generator → CI/CD Generator |
+| **📦 Inheriting existing project** | Project Reassessment → Security Audit → Dependency Update → Code Refactoring Plan → File Organization → Test Suite Generator |
 | **🔐 Security incident response** | Security Audit Generator → Dependency Update Manager → Project Reassessment |
-| **📢 Preparing public release** | GitHub Ready Preparation → Security Audit → README Generator → Test Suite Generator |
+| **📢 Preparing public release** | GitHub Ready Preparation → File Organization → Security Audit → README Generator → Test Suite Generator |
 | **🔧 Major refactoring planned** | Project Reassessment → Code Refactoring Plan → File Organization → Test Suite Generator → Documentation Update |
 | **📈 Quarterly maintenance** | Project Reassessment → Security Audit → Code Refactoring Plan → File Organization → Dependency Update |
+| **🧹 Cleanup & organization** | Project Reassessment → File Organization → Code Refactoring Plan → Documentation Standardization |
+
+### 💡 Why File Organization Matters
+
+**File & Folder Organization is a critical step** that should be run:
+
+- **Early in new projects** (Step 2) - Establish clean structure before code grows
+- **After code refactoring plans** - Implement the organizational changes identified
+- **Before test suite updates** - Ensure tests can find and import reorganized files
+- **Quarterly as maintenance** - Remove accumulated obsolete files and maintain structure
+- **Before public releases** - Clean up clutter, remove backup files, standardize naming
+
+**Key Benefits**:
+- 🗂️ **Clear Navigation** - Easy to find files and understand project layout
+- 🧹 **Remove Clutter** - Delete obsolete backups, temp files, deprecated code
+- 📏 **Consistency** - Standardized naming conventions across entire project
+- 🎯 **Separation of Concerns** - Logical grouping (src/, tests/, config/, docs/)
+- 👥 **Team Onboarding** - New developers understand structure immediately
+- 🔧 **Enable Refactoring** - Clean structure makes code improvements easier
+
+**Warning**: Always run File Organization **before** updating tests, as moving files requires updating import paths and test file locations.
 
 ---
 
