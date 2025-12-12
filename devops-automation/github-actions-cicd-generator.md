@@ -2,6 +2,10 @@
 
 ## **Objective**
 
+Generate a complete, production-ready CI/CD workflow with dynamic versioning, automated releases, and comprehensive quality gates.
+
+**See Also:** [Version Management Guide](../development-workflow/version-management.md) for semantic versioning concepts and strategies.
+
 Analyze this repository and determine whether it already includes a GitHub Actions workflow for CI/CD (e.g., `.github/workflows/ci-cd.yml`).
 
 If a workflow exists → **review, improve, and modernize it** to meet all the requirements below.
