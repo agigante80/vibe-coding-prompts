@@ -65,6 +65,9 @@ This repository uses **meta-prompts** — prompts that don't just solve one spec
 | Analyze technical debt | [Code Refactoring Plan Generator](./development-workflow/code-refactoring-plan.md) | 🔄 Workflow |
 | Organize project files | [File & Folder Organization Refactoring](./development-workflow/file-organization-refactoring.md) | 🔄 Workflow |
 | Remove obsolete files | [File & Folder Organization Refactoring](./development-workflow/file-organization-refactoring.md) | 🔄 Workflow |
+| Implement logging best practices | [Logging Implementation & Best Practices](./operations/logging-implementation-best-practices.md) | 🔧 Operations |
+| Set up log rotation & retention | [Logging Implementation & Best Practices](./operations/logging-implementation-best-practices.md) | 🔧 Operations |
+| Establish observability | [Logging Implementation & Best Practices](./operations/logging-implementation-best-practices.md) | 🔧 Operations |
 
 ---
 
@@ -281,7 +284,28 @@ This repository uses **meta-prompts** — prompts that don't just solve one spec
 
 ---
 
-### 🔐 Security
+### � Operations
+
+#### [Logging Implementation & Best Practices](./operations/logging-implementation-best-practices.md)
+**Word Count**: ~2850 words | **Platform**: ChatGPT, Claude, Gemini (use Copilot Chat)
+
+**What it does**: Assesses current logging practices and generates a comprehensive implementation plan including structured logging, log rotation, retention policies, security controls, and observability integration.
+
+**Ideal for**:
+- ✅ Establishing logging standards for new projects
+- ✅ Migrating from unstructured to structured logging
+- ✅ Implementing compliance requirements (HIPAA, PCI-DSS, GDPR)
+- ✅ Setting up centralized logging infrastructure (ELK, Loki, CloudWatch)
+- ✅ Establishing log rotation and long-term retention (1-7 years)
+- ✅ Integrating logs with distributed tracing and metrics
+- ✅ Implementing PII redaction and security best practices
+- ✅ Quarterly logging practice reviews and improvements
+
+**Outputs**: Structured logging configuration (multi-language), log rotation configs (logrotate/Docker), archive automation (S3/GCS lifecycle), ingestion pipeline setup (Fluent Bit/Vector), monitoring/alerting, comprehensive documentation
+
+---
+
+### �🔐 Security
 
 #### [Security Audit Generator](./security/security-audit-generator.md)
 **Word Count**: ~1286 words | **Platform**: ChatGPT, Claude, Gemini (use Copilot Chat)
@@ -332,7 +356,7 @@ The following prompts are planned for future releases. Contributions welcome!
 - [ ] **Code Review Checklist** - Customizable code review guidelines and automation
 
 ### 📊 Monitoring & Observability
-- [ ] **Logging & Monitoring Setup** - Configure structured logging, metrics, and alerts
+- [x] **Logging & Monitoring Setup** - Configure structured logging, metrics, and alerts ✅
 - [ ] **Performance Optimization** - Identify bottlenecks and generate optimization plan
 - [ ] **Error Tracking Integration** - Set up Sentry, Datadog, or similar tools
 
