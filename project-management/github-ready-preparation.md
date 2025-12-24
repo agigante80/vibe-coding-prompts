@@ -306,7 +306,145 @@ project-root/
 └── package.json / requirements.txt / etc.
 ```
 
-### 🚀 **2. Build & Run**
+### 🏷️ **2. Repository Metadata (GitHub Presentation)**
+
+| Priority | Item | Description | Status |
+|----------|------|-------------|--------|
+| **Critical** | Repository description | Concise summary (≤350 chars) of project purpose and features | ⬜ |
+| **Critical** | Repository topics | 10-15 relevant keywords for discoverability | ⬜ |
+| **Recommended** | Homepage URL | Link to live demo, docs site, or landing page | ⬜ |
+| **Optional** | Social preview image | Custom image for social media shares | ⬜ |
+
+**Description Format**:
+```
+[Type of tool/service] for [target use case] - [feature 1], [feature 2], [feature 3], and [feature 4]
+```
+
+**Description Requirements**:
+- Keep under 350 characters (GitHub limit)
+- Focus on benefits and features, not implementation
+- Lead with what it does, not how it's built
+- Include 3-4 key features
+- Avoid jargon unless target audience expects it
+
+**Good Description Examples**:
+```
+✅ "Curated AI prompts for software development - comprehensive meta-prompts for documentation, CI/CD, testing, security audits, logging, and code quality with vibe coding philosophy"
+
+✅ "Automated bank sync service for Actual Budget - scheduled synchronization, real-time monitoring, and multi-budget management with Telegram notifications"
+
+✅ "Lightning-fast API testing framework - built-in assertion library, parallel test execution, detailed reporting, and seamless CI/CD integration"
+
+❌ "A Node.js application using Docker and Express.js" (too technical, no benefits)
+❌ "My awesome project that does stuff" (vague, unprofessional)
+```
+
+**Topics Strategy**:
+
+**Topic Categories** (aim for 10-15 total):
+
+1. **Technical Stack** (3-5 topics):
+   - Languages: `python`, `javascript`, `typescript`, `go`, `rust`
+   - Frameworks: `nodejs`, `react`, `django`, `express`
+   - Tools: `docker`, `kubernetes`, `terraform`
+
+2. **Functional Domain** (3-5 topics):
+   - Use case: `automation`, `monitoring`, `ci-cd`, `testing`
+   - Industry: `finance`, `healthcare`, `devops`, `security`
+   - Problem space: `logging`, `observability`, `deployment`
+
+3. **Specific Technologies** (2-4 topics):
+   - Platform: `github-actions`, `aws`, `azure`, `gcp`
+   - Integration: `prometheus`, `grafana`, `telegram-bot`
+   - Protocol: `rest-api`, `graphql`, `grpc`
+
+4. **Project Type** (1-2 topics):
+   - Category: `library`, `cli-tool`, `web-app`, `api`
+   - Approach: `meta-prompts`, `prompt-engineering`, `vibe-coding`
+
+**Topics Guidelines**:
+- Use lowercase only
+- Use hyphens for multi-word topics: `ci-cd`, `github-actions`
+- Maximum 20 topics (GitHub limit)
+- Prioritize discoverability: what would users search for?
+- Include both technical and functional keywords
+- Avoid redundancy: `javascript` + `js` is wasteful
+
+**Topics Examples by Project Type**:
+
+**DevOps Tool**:
+```
+automation, ci-cd, devops, docker, github-actions, kubernetes, monitoring, nodejs, prometheus, deployment
+```
+
+**AI/ML Project**:
+```
+ai, artificial-intelligence, chatgpt, deep-learning, machine-learning, neural-networks, nlp, python, pytorch, tensorflow
+```
+
+**API/Backend Service**:
+```
+api, backend, database, docker, express, microservices, nodejs, postgresql, rest-api, typescript
+```
+
+**Applying Metadata to GitHub**:
+
+**Option 1: Via Web UI** (easiest):
+1. Go to repository main page
+2. Click ⚙️ gear icon next to "About" section
+3. Add description
+4. Add topics (comma-separated or clicking suggestions)
+5. Save changes
+
+**Option 2: Via GitHub CLI**:
+```bash
+# Update description
+gh api \
+  --method PATCH \
+  -H "Accept: application/vnd.github+json" \
+  /repos/OWNER/REPO \
+  -f description="Your description here"
+
+# Update topics
+gh api \
+  --method PUT \
+  -H "Accept: application/vnd.github+json" \
+  /repos/OWNER/REPO/topics \
+  -f names[]="topic-one" \
+  -f names[]="topic-two" \
+  -f names[]="topic-three"
+```
+
+**Option 3: Via REST API**:
+```bash
+# Using curl with GitHub token
+curl -X PATCH \
+  -H "Accept: application/vnd.github+json" \
+  -H "Authorization: Bearer YOUR_GITHUB_TOKEN" \
+  https://api.github.com/repos/OWNER/REPO \
+  -d '{
+    "description": "Your description here",
+    "topics": ["topic-one", "topic-two", "topic-three"]
+  }'
+```
+
+**Validation**:
+- [ ] Description is under 350 characters
+- [ ] Description clearly explains what the project does
+- [ ] Topics include mix of technical and functional keywords
+- [ ] Topics are lowercase and use hyphens
+- [ ] 10-15 topics selected (not too few, not hitting 20 limit)
+- [ ] Topics would help target users discover the project
+- [ ] Metadata visible on repository main page
+
+**SEO Benefits**:
+- Description appears in GitHub search results
+- Topics make project discoverable via GitHub topic pages
+- Clear description improves click-through rate
+- Topics help GitHub recommend similar projects
+- Metadata used by external search engines and aggregators
+
+### 🚀 **3. Build & Run**
 
 | Priority | Item | Description | Status |
 |----------|------|-------------|--------|
@@ -325,7 +463,7 @@ docker build -t test-image .
 docker-compose up -d
 ```
 
-### 🧪 **3. Testing**
+### 🧪 **4. Testing**
 
 | Priority | Item | Description | Status |
 |----------|------|-------------|--------|
@@ -342,7 +480,7 @@ docker-compose up -d
 - **Go**: `go test`
 - **Rust**: `cargo test`
 
-### 🧰 **4. Automation / CI/CD**
+### 🧰 **5. Automation / CI/CD**
 
 | Priority | Item | Description | Status |
 |----------|------|-------------|--------|
@@ -376,7 +514,7 @@ jobs:
           # Build project
 ```
 
-### 🧭 **5. Documentation**
+### 🧭 **6. Documentation**
 
 | Priority | Item | Description | Status |
 |----------|------|-------------|--------|
@@ -396,7 +534,7 @@ jobs:
 - Contributing guidelines
 - License information
 
-### 👥 **6. Community & Contribution**
+### 👥 **7. Community & Contribution**
 
 | Priority | Item | Description | Status |
 |----------|------|-------------|--------|
@@ -427,7 +565,7 @@ jobs:
 - Version: [e.g., 1.2.3]
 ```
 
-### 🔐 **7. Security & Secrets**
+### 🔐 **8. Security & Secrets**
 
 | Priority | Item | Description | Status |
 |----------|------|-------------|--------|
@@ -450,7 +588,7 @@ trufflehog git file://. --only-verified
 grep -r "password\s*=\s*['\"]" --include="*.py" --include="*.js"
 ```
 
-### 🧱 **8. Releases & Distribution**
+### 🧱 **9. Releases & Distribution**
 
 | Priority | Item | Description | Status |
 |----------|------|-------------|--------|
