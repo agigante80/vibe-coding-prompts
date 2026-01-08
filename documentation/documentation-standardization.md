@@ -44,7 +44,7 @@ Common obsolete files to remove:
 
 ### **`/docs/` Directory - Standard Documentation Set**
 
-After initialization, `/docs/` must contain **exactly 9 markdown files** (no more, no less):
+After initialization, `/docs/` must contain **9 required markdown files** (plus optional VERSIONING.md if it already exists):
 
 | # | Filename                     | Purpose                                                   | Keep in /docs/? |
 |---|------------------------------|-----------------------------------------------------------|----------------|
@@ -57,8 +57,9 @@ After initialization, `/docs/` must contain **exactly 9 markdown files** (no mor
 | 7 | `IMPROVEMENT_AREAS.md`       | Known gaps, missing elements, and tech debt               | ✅ YES - Required |
 | 8 | `SECURITY_AND_PRIVACY.md`    | Security rules, privacy policy, and AI safety             | ✅ YES - Required |
 | 9 | `ROADMAP.md`                 | Priority-based future improvement plan                    | ✅ YES - Required |
+| 10 | `VERSIONING.md`             | Version management strategy and release process           | ⚠️ OPTIONAL - Keep if exists, do not create if missing |
 
-**Summary: `/docs/` must have exactly 9 `.md` files. Any other documents should be deleted, merged, or archived.**
+**Summary: `/docs/` must have 9 required `.md` files (plus optional VERSIONING.md if it already exists). Any other documents should be deleted, merged, or archived.**
 
 **Archive Location**: Obsolete files from `/docs/` go to `docs/archive/docs-backup-YYYY-MM-DD/`
 
@@ -75,9 +76,10 @@ Any other documents in `/docs/` should be **deleted or merged** into one of thes
 - For each non-allowed file: merge useful content into standard file, move obsolete to `docs/archive/docs-backup-YYYY-MM-DD/`, or delete if trivial
 
 **`/docs/` Directory**:
-- List all files, identify files NOT in standard 9-file set
+- List all files, identify files NOT in standard 9-file set (plus VERSIONING.md if present)
+- **VERSIONING.md**: If exists, keep it and review content; if missing, do not create it
 - For each non-standard file: merge useful content, move obsolete to archive, consolidate duplicates
-- Final `/docs/` must contain ONLY 9 standard files (plus optional `archive/` folder)
+- Final `/docs/` must contain 9 required files (plus optional VERSIONING.md if it exists, plus optional `archive/` folder)
 
 **Archive Command**: `mkdir -p docs/archive/docs-backup-$(date +%Y-%m-%d)`
 
@@ -87,7 +89,7 @@ Any other documents in `/docs/` should be **deleted or merged** into one of thes
 
 ### **Step 2. Generate or Update Each Document**
 
-Below are requirements for each file:
+Below are requirements for each required file (if VERSIONING.md exists, review and update it as needed):
 
 **`README.md`**: Project name/tagline, overview, setup, usage examples, link to `/docs`, license. Must include setup validation commands.
 
@@ -138,7 +140,7 @@ Below are requirements for each file:
 ## 📋 **Deliverables**
 
 ### **Standardized Documentation Set**
-1. Complete `/docs/` directory with exactly 9 files (no more, no less)
+1. Complete `/docs/` directory with 9 required files (plus VERSIONING.md if it already exists)
 2. All files following the template structure and requirements above
 3. Cross-referenced documentation with accurate internal links
 4. Synchronized content reflecting current codebase state
@@ -163,7 +165,7 @@ All 9 `/docs/` files regenerated/updated to match current state, cross-reference
 ## 📋 **Success Criteria**
 
 - [ ] Root has ONLY allowed `.md` files (2-6)
-- [ ] `/docs/` has ONLY 9 standard files
+- [ ] `/docs/` has 9 required files (plus VERSIONING.md if it existed)
 - [ ] Archive folder created if needed
 - [ ] All documents complete and current
 - [ ] Tests pass, security scan clean
@@ -213,7 +215,7 @@ All 9 `/docs/` files regenerated/updated to match current state, cross-reference
 # List all .md files in root (should be max 6)
 ls -la *.md | wc -l
 
-# List all files in /docs/ (should be exactly 9 after cleanup)
+# List all files in /docs/ (should be 9 required, plus VERSIONING.md if it exists)
 ls -la docs/*.md | wc -l
 
 # Find potentially obsolete files
@@ -237,13 +239,13 @@ Compliance needs: [GDPR/HIPAA/PCI-DSS/none]
 ls -la *.md
 # Should show: README.md, LICENSE(.md), CONTRIBUTING.md, CODE_OF_CONDUCT.md, CHANGELOG.md, SECURITY.md (max 6)
 
-# Verify /docs/ has exactly 9 files
+# Verify /docs/ has 9 required files (10 if VERSIONING.md exists)
 ls -la docs/*.md | wc -l
-# Should output: 9
+# Should output: 9 or 10 (if VERSIONING.md exists)
 
 # List /docs/ files to confirm standard set
 ls -1 docs/
-# Should show exactly:
+# Should show these 9 required files:
 # README.md
 # PROJECT_OVERVIEW.md
 # ARCHITECTURE.md
@@ -253,13 +255,14 @@ ls -1 docs/
 # IMPROVEMENT_AREAS.md
 # SECURITY_AND_PRIVACY.md
 # ROADMAP.md
+# Plus VERSIONING.md (optional, only if it existed before)
 
 # Verify archive folder created (if applicable)
 ls -la docs/archive/docs-backup-*/
 
-# Verify only 9 .md files in docs/ (excluding archive folder)
+# Verify 9 required .md files in docs/ (plus VERSIONING.md if it exists, excluding archive folder)
 find docs/ -maxdepth 1 -name "*.md" | wc -l
-# Should output: 9
+# Should output: 9 or 10 (10 only if VERSIONING.md existed before)
 ```
 
 ### **Expected Outcome**
@@ -267,7 +270,7 @@ AI will audit/archive/delete `.md` files, merge useful content, create/update al
 
 You'll receive:
 - **Root**: 2-6 `.md` files (README, LICENSE, optional: CONTRIBUTING, CODE_OF_CONDUCT, CHANGELOG, SECURITY)
-- **`/docs/`**: Exactly 9 standard files
+- **`/docs/`**: 9 required files (plus VERSIONING.md if it existed)
 - **`docs/archive/`**: Timestamped backup folder (if needed)
 - **Commit message**: Documentation of all changes
 
