@@ -83,7 +83,41 @@ project/
 └── README.md
 ```
 
-### 3. **Target Structure Definition**
+### 3. **Documentation File Cleanup**
+
+**Critical**: When reorganizing project files, also **clean up documentation files** to follow standardized structure.
+
+**Documentation Requirements**:
+- **Root Directory**: Must have 2-6 `.md` files only
+  - Required: `README.md`, `LICENSE` or `LICENSE.md`
+  - Optional (max 4): `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `CHANGELOG.md`, `SECURITY.md`
+- **`/docs/` Directory**: Must have exactly 9 `.md` files (no more, no less):
+  1. `README.md` - Entry point with setup and doc index
+  2. `PROJECT_OVERVIEW.md` - Goals and features
+  3. `ARCHITECTURE.md` - System structure
+  4. `AI_INTERACTION_GUIDE.md` - AI agent rules
+  5. `REFACTORING_PLAN.md` - Task checklist
+  6. `TESTING_AND_RELIABILITY.md` - Testing policies
+  7. `IMPROVEMENT_AREAS.md` - Tech debt
+  8. `SECURITY_AND_PRIVACY.md` - Security rules
+  9. `ROADMAP.md` - Future plans
+
+**Archive Obsolete Documentation**:
+```bash
+# Create timestamped archive folder inside docs/
+mkdir -p docs/archive/docs-backup-$(date +%Y-%m-%d)
+
+# Move obsolete documentation files (examples)
+mv docs/OLD_GUIDE.md docs/archive/docs-backup-$(date +%Y-%m-%d)/
+mv docs/DEPRECATED.md docs/archive/docs-backup-$(date +%Y-%m-%d)/
+mv API_OLD.md docs/archive/docs-backup-$(date +%Y-%m-%d)/
+```
+
+**Reference**: Use the **Documentation Standardization** prompt for comprehensive documentation cleanup guidance.
+
+---
+
+### 4. **Target Structure Definition**
 
 **Standard Project Structure by Type**:
 
@@ -489,8 +523,9 @@ Add new section or create file if it doesn't exist:
 ### **Updated Documentation**
 9. **Updated `/docs/REFACTORING_PLAN.md`** - File organization section added/updated
 10. **Updated `/docs/ARCHITECTURE.md`** - Reflect new directory structure
-11. **Updated `/docs/DEVELOPMENT_WORKFLOW.md`** - New file locations and import conventions
-12. **Updated README.md** - Project structure section updated
+11. **Updated `/docs/README.md`** - New file locations and project structure
+12. **Updated root `README.md`** - Project structure section updated
+13. **Documentation Cleanup** - Apply Documentation Standardization prompt to ensure exactly 9 files in `/docs/` and 2-6 files in root (archive obsolete docs to `docs/archive/docs-backup-YYYY-MM-DD/`)
 
 ### **Verification Reports**
 13. **Import Verification Report** - Confirmation all imports updated correctly

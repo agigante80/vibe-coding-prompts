@@ -64,15 +64,17 @@ grep -r "version" docs/
 5. **Add Redirects**: If needed, add notes in README about removed docs
 
 **Required Standard Documents** (from Documentation Standardization prompt):
+- `README.md` - Entry point with setup, usage, and doc index
 - `PROJECT_OVERVIEW.md` - High-level project description and status
 - `ARCHITECTURE.md` - System architecture and design decisions
-- `API_DOCUMENTATION.md` - API endpoints, authentication, examples
-- `DEVELOPMENT_WORKFLOW.md` - Development process and guidelines
-- `TESTING_AND_RELIABILITY.md` - Testing strategy and quality gates
-- `SECURITY_AND_PRIVACY.md` - Security policies and data protection
 - `AI_INTERACTION_GUIDE.md` - Agent behavior and automation rules
-- `IMPROVEMENT_AREAS.md` - Technical debt and areas needing work
 - `REFACTORING_PLAN.md` - Planned code improvements and roadmap
+- `TESTING_AND_RELIABILITY.md` - Testing strategy and quality gates
+- `IMPROVEMENT_AREAS.md` - Technical debt and areas needing work
+- `SECURITY_AND_PRIVACY.md` - Security policies and data protection
+- `ROADMAP.md` - Priority-based future improvement plan
+
+**Note**: `/docs/` must contain exactly these 9 files. Any other documentation should be deleted, merged into these files, or archived to `docs/archive/docs-backup-YYYY-MM-DD/`.
 
 **Detect Contradictions**:
 - Compare version numbers across all docs

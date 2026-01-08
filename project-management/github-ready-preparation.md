@@ -154,31 +154,62 @@ grep -r "install\|setup\|configure" docs/ --include="*.md"
 
 **Step 4: Standardization Requirements**
 
-**Enforce Standard Document Set** (align with Documentation Standardization prompt):
-- ✅ `PROJECT_OVERVIEW.md` - Single source for project description
-- ✅ `ARCHITECTURE.md` - Authoritative architecture documentation
-- ✅ `API_DOCUMENTATION.md` - Centralized API reference
-- ✅ `DEVELOPMENT_WORKFLOW.md` - Developer guidelines
-- ✅ `TESTING_AND_RELIABILITY.md` - Testing standards
-- ✅ `SECURITY_AND_PRIVACY.md` - Security policies
-- ✅ `AI_INTERACTION_GUIDE.md` - Agent automation rules
-- ✅ `IMPROVEMENT_AREAS.md` - Technical debt tracking
-- ✅ `REFACTORING_PLAN.md` - Refactoring roadmap
+**Enforce Standard 9-File Document Set** (use [Documentation Standardization](../documentation/documentation-standardization.md) prompt):
+
+**Root Directory** (2-6 `.md` files maximum):
+- ✅ `README.md` - Required
+- ✅ `LICENSE` or `LICENSE.md` - Required  
+- ✅ `CONTRIBUTING.md` - Recommended
+- ✅ `CODE_OF_CONDUCT.md` - Recommended
+- ✅ `CHANGELOG.md` - Recommended
+- ✅ `SECURITY.md` - Recommended
+
+**`/docs/` Directory** (exactly 9 `.md` files required):
+1. ✅ `README.md` - Entry point with setup, usage, and doc index
+2. ✅ `PROJECT_OVERVIEW.md` - Goals, features, and technology summary
+3. ✅ `ARCHITECTURE.md` - System structure and component flow
+4. ✅ `AI_INTERACTION_GUIDE.md` - AI agent rules and automation
+5. ✅ `REFACTORING_PLAN.md` - Task checklist for ongoing refactors
+6. ✅ `TESTING_AND_RELIABILITY.md` - Testing and CI policies
+7. ✅ `IMPROVEMENT_AREAS.md` - Known gaps and technical debt
+8. ✅ `SECURITY_AND_PRIVACY.md` - Security rules and privacy policy
+9. ✅ `ROADMAP.md` - Priority-based future improvement plan
+
+**All other `.md` files** in root or `/docs/` must be deleted, merged, or archived.
 
 **Consolidation Strategy**:
 1. **Choose Authoritative Source**: For each topic, select the most complete/accurate document
-2. **Merge Content**: Consolidate unique information from duplicates
-3. **Remove Duplicates**: Delete redundant files after merging
-4. **Update Cross-References**: Fix links to removed documents
-5. **Document Removals**: Note removed files in `docs/README.md` or changelog
+2. **Merge Content**: Consolidate unique information from duplicates into the 9 standard files
+3. **Archive Obsolete Files**: Move to `docs/archive/docs-backup-YYYY-MM-DD/` folder
+4. **Delete Empty/Redundant Files**: Remove files with no useful content
+5. **Update Cross-References**: Fix links to removed documents
+6. **Document Changes**: Note archived/deleted files in commit message
 
 **Naming Convention** (enforce consistency):
-- Use `UPPERCASE_WITH_UNDERSCORES.md` for standard docs
-- Use `lowercase-with-dashes.md` for supplementary guides
-- Avoid version numbers in filenames (use Git tags instead)
+- Root files: Use `UPPERCASE.md` or `UPPERCASE_WITH_UNDERSCORES.md` (e.g., README.md, CODE_OF_CONDUCT.md)
+- `/docs/` files: Use `UPPERCASE_WITH_UNDERSCORES.md` for standard 9 files
+- No version numbers in filenames (use Git tags instead)
 - No spaces in filenames
+- Archive folder: `docs/archive/docs-backup-YYYY-MM-DD/` for obsolete files
+
+**Archive Process**:
+```bash
+# Create timestamped archive folder inside docs/
+mkdir -p docs/archive/docs-backup-$(date +%Y-%m-%d)
+
+# Move obsolete files
+mv OLD_README.md docs/archive/docs-backup-$(date +%Y-%m-%d)/
+mv docs/SETUP_OLD.md docs/archive/docs-backup-$(date +%Y-%m-%d)/
+mv docs/API_DOCUMENTATION.md docs/archive/docs-backup-$(date +%Y-%m-%d)/  # If merging into ARCHITECTURE.md
+
+# Document what was archived
+echo "Archived on $(date)" > docs/archive/docs-backup-$(date +%Y-%m-%d)/ARCHIVED_FILES.txt
+ls -la docs/archive/docs-backup-$(date +%Y-%m-%d)/ >> docs/archive/docs-backup-$(date +%Y-%m-%d)/ARCHIVED_FILES.txt
+```
 
 **Step 5: Validation Checks**
+- [ ] Root has 2-6 `.md` files only (README, LICENSE required; CONTRIBUTING, CODE_OF_CONDUCT, CHANGELOG, SECURITY optional)
+- [ ] `/docs/` has exactly 9 `.md` files (plus `archive/` folder if files were archived)
 - [ ] Each topic has ONE authoritative document
 - [ ] No contradictory statements across documents
 - [ ] All internal links (`[link](../docs/FILE.md)`) are valid
@@ -188,6 +219,7 @@ grep -r "install\|setup\|configure" docs/ --include="*.md"
 - [ ] Document hierarchy is clear (README → specific docs)
 - [ ] No orphaned documents (all referenced from somewhere)
 - [ ] Consistent formatting and structure
+- [ ] Archive folder created if obsolete files exist: `docs/archive/docs-backup-YYYY-MM-DD/`
 
 **Common Contradictions to Resolve**:
 - Version numbers (project version, dependency versions)
