@@ -16,16 +16,18 @@ The AI agent must:
 
 ### **Root Directory - Allowed `.md` Files**
 
-The project root must contain **only** these markdown files:
+The project root must contain **only** these markdown files (maximum 6):
 
-| Filename                 | Purpose                                      | Required |
-| ------------------------ | -------------------------------------------- | -------- |
-| `README.md`              | Project overview, setup, and usage           | ✅ Yes    |
-| `LICENSE`                | Project license (can be .md or no extension) | ✅ Yes    |
-| `CONTRIBUTING.md`        | Contribution guidelines                      | ⚠️ Recommended |
-| `CODE_OF_CONDUCT.md`     | Community behavior standards                 | ⚠️ Recommended |
-| `CHANGELOG.md`           | Version history and changes                  | ⚠️ Recommended |
-| `SECURITY.md`            | Security policy and vulnerability reporting  | ⚠️ Recommended |
+| Filename                 | Purpose                                      | Keep in Root? |
+| ------------------------ | -------------------------------------------- | ------------- |
+| `README.md`              | Project overview, setup, and usage           | ✅ YES - Required |
+| `LICENSE` or `LICENSE.md`| Project license                              | ✅ YES - Required |
+| `CONTRIBUTING.md`        | Contribution guidelines                      | ✅ YES - Recommended |
+| `CODE_OF_CONDUCT.md`     | Community behavior standards                 | ✅ YES - Recommended |
+| `CHANGELOG.md`           | Version history and changes                  | ✅ YES - Recommended |
+| `SECURITY.md`            | Security policy and vulnerability reporting  | ✅ YES - Recommended |
+
+**Summary: Root should have 2-6 `.md` files maximum (2 required + 4 optional recommended).**
 
 **All other `.md` files in root must be deleted or archived.**
 
@@ -42,21 +44,25 @@ Common obsolete files to remove:
 
 ### **`/docs/` Directory - Standard Documentation Set**
 
-After initialization, `/docs` must contain **only** the following files:
+After initialization, `/docs/` must contain **exactly 9 markdown files** (no more, no less):
 
-| Filename                     | Purpose                                                   |
-| ---------------------------- | --------------------------------------------------------- |
-| `README.md`                  | Entry point with setup, usage, and doc index              |
-| `PROJECT_OVERVIEW.md`        | Goals, features, and technology summary                   |
-| `ARCHITECTURE.md`            | System structure and component flow                       |
-| `AI_INTERACTION_GUIDE.md`    | AI agent rules, automation, and local testing enforcement |
-| `REFACTORING_PLAN.md`        | Task checklist for ongoing refactors                      |
-| `TESTING_AND_RELIABILITY.md` | Testing and CI policies, reliability strategy             |
-| `IMPROVEMENT_AREAS.md`       | Known gaps, missing elements, and tech debt               |
-| `SECURITY_AND_PRIVACY.md`    | Security rules, privacy policy, and AI safety             |
-| `ROADMAP.md`                 | Priority-based future improvement plan                    |
+| # | Filename                     | Purpose                                                   | Keep in /docs/? |
+|---|------------------------------|-----------------------------------------------------------|----------------|
+| 1 | `README.md`                  | Entry point with setup, usage, and doc index              | ✅ YES - Required |
+| 2 | `PROJECT_OVERVIEW.md`        | Goals, features, and technology summary                   | ✅ YES - Required |
+| 3 | `ARCHITECTURE.md`            | System structure and component flow                       | ✅ YES - Required |
+| 4 | `AI_INTERACTION_GUIDE.md`    | AI agent rules, automation, and local testing enforcement | ✅ YES - Required |
+| 5 | `REFACTORING_PLAN.md`        | Task checklist for ongoing refactors                      | ✅ YES - Required |
+| 6 | `TESTING_AND_RELIABILITY.md` | Testing and CI policies, reliability strategy             | ✅ YES - Required |
+| 7 | `IMPROVEMENT_AREAS.md`       | Known gaps, missing elements, and tech debt               | ✅ YES - Required |
+| 8 | `SECURITY_AND_PRIVACY.md`    | Security rules, privacy policy, and AI safety             | ✅ YES - Required |
+| 9 | `ROADMAP.md`                 | Priority-based future improvement plan                    | ✅ YES - Required |
 
-Any other documents in `/docs` should be **deleted or merged** into one of these.
+**Summary: `/docs/` must have exactly 9 `.md` files. Any other documents should be deleted, merged, or archived.**
+
+**Archive Location**: Obsolete files from `/docs/` go to `docs/archive/docs-backup-YYYY-MM-DD/`
+
+Any other documents in `/docs/` should be **deleted or merged** into one of these 9 files.
 
 ---
 
@@ -78,23 +84,31 @@ Any other documents in `/docs` should be **deleted or merged** into one of these
 2. Identify files NOT in the standard 9-file set
 3. For each non-standard file:
    - If contains useful content: merge into appropriate standard document
-   - If obsolete/outdated: move to `/archive/docs-backup-YYYY-MM-DD/` folder
+   - If obsolete/outdated: move to `docs/archive/docs-backup-YYYY-MM-DD/` folder
    - If duplicate/redundant: consolidate and delete
-4. Ensure final `/docs/` contains ONLY the 9 standard files
+4. Ensure final `/docs/` contains ONLY the 9 standard files (plus `archive/` folder if created)
 
 **Archive Process:**
 ```bash
-# Create timestamped archive folder
-mkdir -p archive/docs-backup-$(date +%Y-%m-%d)
+# Create timestamped archive folder inside docs/
+mkdir -p docs/archive/docs-backup-$(date +%Y-%m-%d)
 
-# Move obsolete files (examples)
-mv OLD_README.md archive/docs-backup-$(date +%Y-%m-%d)/
-mv docs/DEPRECATED_GUIDE.md archive/docs-backup-$(date +%Y-%m-%d)/
-mv docs/OLD_ARCHITECTURE.md archive/docs-backup-$(date +%Y-%m-%d)/
+# Move obsolete files from root (examples)
+mv OLD_README.md docs/archive/docs-backup-$(date +%Y-%m-%d)/
+mv INSTALL.md docs/archive/docs-backup-$(date +%Y-%m-%d)/
+mv TODO.md docs/archive/docs-backup-$(date +%Y-%m-%d)/
+
+# Move obsolete files from docs/ (examples)
+mv docs/DEPRECATED_GUIDE.md docs/archive/docs-backup-$(date +%Y-%m-%d)/
+mv docs/OLD_ARCHITECTURE.md docs/archive/docs-backup-$(date +%Y-%m-%d)/
+mv docs/SETUP_OLD.md docs/archive/docs-backup-$(date +%Y-%m-%d)/
 
 # Document what was archived
-echo "Archived on $(date)" > archive/docs-backup-$(date +%Y-%m-%d)/ARCHIVED_FILES.txt
-ls -la archive/docs-backup-$(date +%Y-%m-%d)/ >> archive/docs-backup-$(date +%Y-%m-%d)/ARCHIVED_FILES.txt
+echo "Archived on $(date)" > docs/archive/docs-backup-$(date +%Y-%m-%d)/ARCHIVED_FILES.txt
+ls -la docs/archive/docs-backup-$(date +%Y-%m-%d)/ >> docs/archive/docs-backup-$(date +%Y-%m-%d)/ARCHIVED_FILES.txt
+
+# Add archive folder to .gitignore (optional, if you don't want to track archived files)
+echo "docs/archive/" >> .gitignore
 ```
 
 **Deletion Guidelines:**
@@ -322,11 +336,12 @@ Below are detailed requirements for each file.
 7. Useful content from removed root files merged into standard docs
 
 ### **Cleanup & Migration**
-8. Created `/archive/docs-backup-YYYY-MM-DD/` folder with archived files
-9. Removed or merged redundant/outdated documentation files from `/docs/`
+8. Created `docs/archive/docs-backup-YYYY-MM-DD/` folder with archived files
+9. Removed or merged redundant/outdated documentation files from root and `/docs/`
 10. Migrated useful content from deprecated docs into standard files
 11. Updated all references to moved/removed documentation
 12. Documented all deletions and archives in commit message
+13. Optionally added `docs/archive/` to `.gitignore` if archives shouldn't be tracked
 
 ### **Automation Configuration**
 8. AI agent rules configured in `/docs/AI_INTERACTION_GUIDE.md`
@@ -344,10 +359,10 @@ This prompt creates the entire `/docs/` structure, so all documentation is gener
 
 ## 📋 **Success Criteria**
 
-- [ ] Root directory contains ONLY allowed `.md` files (max 6 files)
-- [ ] All obsolete `.md` files removed from root or archived
-- [ ] `/docs/` contains ONLY the 9 specified files (no more, no less)
-- [ ] `/archive/docs-backup-YYYY-MM-DD/` folder created if files were archived
+- [ ] Root directory contains ONLY allowed `.md` files (2-6 files: 2 required + up to 4 recommended)
+- [ ] All obsolete `.md` files removed from root or archived to `docs/archive/`
+- [ ] `/docs/` contains ONLY the 9 standard `.md` files (plus `archive/` folder if created)
+- [ ] `docs/archive/docs-backup-YYYY-MM-DD/` folder created if files were archived
 - [ ] All documents are complete and current
 - [ ] Cross-references between documents are accurate
 - [ ] All tests pass locally
@@ -442,7 +457,11 @@ ls -1 docs/
 # ROADMAP.md
 
 # Verify archive folder created (if applicable)
-ls -la archive/docs-backup-*/
+ls -la docs/archive/docs-backup-*/
+
+# Verify only 9 .md files in docs/ (excluding archive folder)
+find docs/ -maxdepth 1 -name "*.md" | wc -l
+# Should output: 9
 ```
 
 ### **Expected Outcome**
@@ -457,10 +476,10 @@ The AI will:
 8. **Establish** a living documentation system synchronized with codebase
 
 You'll receive a clean, standardized documentation structure with:
-- Root directory: max 6 `.md` files (README, LICENSE, CONTRIBUTING, CODE_OF_CONDUCT, CHANGELOG, SECURITY)
-- `/docs/` directory: exactly 9 standard files
-- `/archive/` folder: timestamped backup of removed files
-- Commit message: documentation of all changes
+- **Root directory**: 2-6 `.md` files only (README, LICENSE, CONTRIBUTING, CODE_OF_CONDUCT, CHANGELOG, SECURITY)
+- **`/docs/` directory**: exactly 9 standard `.md` files (README, PROJECT_OVERVIEW, ARCHITECTURE, AI_INTERACTION_GUIDE, REFACTORING_PLAN, TESTING_AND_RELIABILITY, IMPROVEMENT_AREAS, SECURITY_AND_PRIVACY, ROADMAP)
+- **`docs/archive/` folder**: timestamped backup folder with removed files (if any were archived)
+- **Commit message**: documentation of all changes, deletions, and archives
 
 ---
 
