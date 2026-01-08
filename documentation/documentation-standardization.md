@@ -81,6 +81,15 @@ Any other documents in `/docs/` should be **deleted or merged** into one of thes
 - For each non-standard file: merge useful content, move obsolete to archive, consolidate duplicates
 - Final `/docs/` must contain 9 required files (plus optional VERSIONING.md if it exists, plus optional `archive/` folder)
 
+**Subdirectories (Outside Root and `/docs/`)**:
+- Scan for UPPERCASE `.md` files (e.g., `src/ARCHITECTURE.md`, `lib/CONTRIBUTING.md`, `scripts/DEPLOYMENT.md`)
+- **Exception**: `README.md` files are allowed in subdirectories (e.g., `docker/README.md`, `scripts/README.md`)
+- For each UPPERCASE `.md` file found:
+  - **Review purpose**: Is it general project documentation (belongs in `/docs/` or root)?
+  - **Assess placement**: Is it component-specific and legitimately placed (e.g., `docker/TROUBLESHOOTING.md` for Docker-specific troubleshooting)?
+  - **Decision**: Move to `/docs/archive/` if obsolete/duplicate, or migrate to appropriate location in `/docs/` or root if still relevant
+- Present findings to user for approval before moving/deleting
+
 **Archive Command**: `mkdir -p docs/archive/docs-backup-$(date +%Y-%m-%d)`
 
 **Deletion Guidelines**: Delete empty files, obvious duplicates (`README_old.md`), scratch files (`NOTES.md`, `TODO.md`). Archive files with potentially useful content. Document all changes in commit.
@@ -148,14 +157,15 @@ Below are requirements for each required file (if VERSIONING.md exists, review a
 ### **Root Directory Cleanup**
 5. Root contains only allowed `.md` files (6 max)
 6. Obsolete files removed/archived
+7. UPPERCASE `.md` files in subdirectories reviewed and relocated/archived as appropriate
 
 ### **Cleanup & Migration**
-7. Created `docs/archive/docs-backup-YYYY-MM-DD/` if needed
-8. Merged useful content from removed files
-9. Updated references to moved/removed docs
+8. Created `docs/archive/docs-backup-YYYY-MM-DD/` if needed
+9. Merged useful content from removed files
+10. Updated references to moved/removed docs
 
 ### **Automation Configuration**
-10. AI agent rules configured in `/docs/AI_INTERACTION_GUIDE.md`
+11. AI agent rules configured in `/docs/AI_INTERACTION_GUIDE.md`
 
 ### **Documentation Updates**
 All 9 `/docs/` files regenerated/updated to match current state, cross-references validated.
@@ -166,6 +176,7 @@ All 9 `/docs/` files regenerated/updated to match current state, cross-reference
 
 - [ ] Root has ONLY allowed `.md` files (2-6)
 - [ ] `/docs/` has 9 required files (plus VERSIONING.md if it existed)
+- [ ] No misplaced UPPERCASE `.md` files in subdirectories (except README.md)
 - [ ] Archive folder created if needed
 - [ ] All documents complete and current
 - [ ] Tests pass, security scan clean
@@ -221,6 +232,9 @@ ls -la docs/*.md | wc -l
 # Find potentially obsolete files
 find . -maxdepth 1 -name "*old*.md" -o -name "*backup*.md" -o -name "*deprecated*.md"
 find docs/ -name "*old*.md" -o -name "*backup*.md" -o -name "*deprecated*.md"
+
+# Find UPPERCASE .md files in subdirectories (excluding README.md)
+find . -type f -name "[A-Z]*.md" ! -name "README.md" ! -path "./docs/*" ! -path "./*.md"
 ```
 
 ### **Execution**
