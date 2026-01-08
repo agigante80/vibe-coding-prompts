@@ -12,7 +12,35 @@ The AI agent must:
 
 ---
 
-## 📁 **Target Documentation Set**
+## 📁 **Required File Structure**
+
+### **Root Directory - Allowed `.md` Files**
+
+The project root must contain **only** these markdown files:
+
+| Filename                 | Purpose                                      | Required |
+| ------------------------ | -------------------------------------------- | -------- |
+| `README.md`              | Project overview, setup, and usage           | ✅ Yes    |
+| `LICENSE`                | Project license (can be .md or no extension) | ✅ Yes    |
+| `CONTRIBUTING.md`        | Contribution guidelines                      | ⚠️ Recommended |
+| `CODE_OF_CONDUCT.md`     | Community behavior standards                 | ⚠️ Recommended |
+| `CHANGELOG.md`           | Version history and changes                  | ⚠️ Recommended |
+| `SECURITY.md`            | Security policy and vulnerability reporting  | ⚠️ Recommended |
+
+**All other `.md` files in root must be deleted or archived.**
+
+Common obsolete files to remove:
+- `TODO.md`, `NOTES.md`, `SCRATCH.md`
+- `OLD_README.md`, `README.old.md`, `README_backup.md`
+- `INSTALL.md` (merge into README.md)
+- `USAGE.md` (merge into README.md)
+- `API.md` (move to `/docs/API_DOCUMENTATION.md`)
+- `DEPLOYMENT.md` (move to `/docs/`)
+- Any dated or versioned docs: `README_2023.md`, `ARCHITECTURE_v1.md`
+
+---
+
+### **`/docs/` Directory - Standard Documentation Set**
 
 After initialization, `/docs` must contain **only** the following files:
 
@@ -34,12 +62,47 @@ Any other documents in `/docs` should be **deleted or merged** into one of these
 
 ## ⚙️ **Agent Task Flow**
 
-### **Step 1. Audit Existing Documentation**
+### **Step 1. Audit and Clean Existing Documentation**
 
-* List all files under `/docs`.
-* Delete outdated, redundant, or incomplete ones.
-* Merge useful content into the standard documents.
-* Ensure final `/docs` matches the structure above.
+**Root Directory Audit:**
+1. List all `.md` files in project root
+2. Identify files NOT in the allowed list above
+3. For each non-allowed `.md` file:
+   - If contains useful content: merge into appropriate standard file
+   - If obsolete/redundant: move to `/archive/docs-backup-YYYY-MM-DD/` folder
+   - If empty or trivial: delete permanently
+4. Ensure only allowed `.md` files remain in root
+
+**`/docs/` Directory Audit:**
+1. List all files under `/docs/`
+2. Identify files NOT in the standard 9-file set
+3. For each non-standard file:
+   - If contains useful content: merge into appropriate standard document
+   - If obsolete/outdated: move to `/archive/docs-backup-YYYY-MM-DD/` folder
+   - If duplicate/redundant: consolidate and delete
+4. Ensure final `/docs/` contains ONLY the 9 standard files
+
+**Archive Process:**
+```bash
+# Create timestamped archive folder
+mkdir -p archive/docs-backup-$(date +%Y-%m-%d)
+
+# Move obsolete files (examples)
+mv OLD_README.md archive/docs-backup-$(date +%Y-%m-%d)/
+mv docs/DEPRECATED_GUIDE.md archive/docs-backup-$(date +%Y-%m-%d)/
+mv docs/OLD_ARCHITECTURE.md archive/docs-backup-$(date +%Y-%m-%d)/
+
+# Document what was archived
+echo "Archived on $(date)" > archive/docs-backup-$(date +%Y-%m-%d)/ARCHIVED_FILES.txt
+ls -la archive/docs-backup-$(date +%Y-%m-%d)/ >> archive/docs-backup-$(date +%Y-%m-%d)/ARCHIVED_FILES.txt
+```
+
+**Deletion Guidelines:**
+- Delete empty or nearly-empty files without hesitation
+- Delete obvious duplicates (e.g., `README_old.md`, `README_backup.md`)
+- Delete scratch files (e.g., `NOTES.md`, `TODO.md`, `SCRATCH.md`)
+- Archive files with potentially useful content for review
+- Document all deletions/archives in commit message
 
 ---
 
@@ -253,10 +316,17 @@ Below are detailed requirements for each file.
 3. Cross-referenced documentation with accurate internal links
 4. Synchronized content reflecting current codebase state
 
+### **Root Directory Cleanup**
+5. Root directory contains only allowed `.md` files (6 max: README, LICENSE, CONTRIBUTING, CODE_OF_CONDUCT, CHANGELOG, SECURITY)
+6. All obsolete/redundant `.md` files removed from root
+7. Useful content from removed root files merged into standard docs
+
 ### **Cleanup & Migration**
-5. Removed or merged redundant/outdated documentation files
-6. Migrated useful content from deprecated docs into standard files
-7. Updated all references to moved documentation
+8. Created `/archive/docs-backup-YYYY-MM-DD/` folder with archived files
+9. Removed or merged redundant/outdated documentation files from `/docs/`
+10. Migrated useful content from deprecated docs into standard files
+11. Updated all references to moved/removed documentation
+12. Documented all deletions and archives in commit message
 
 ### **Automation Configuration**
 8. AI agent rules configured in `/docs/AI_INTERACTION_GUIDE.md`
@@ -274,7 +344,10 @@ This prompt creates the entire `/docs/` structure, so all documentation is gener
 
 ## 📋 **Success Criteria**
 
-- [ ] `/docs` contains only the 9 specified files
+- [ ] Root directory contains ONLY allowed `.md` files (max 6 files)
+- [ ] All obsolete `.md` files removed from root or archived
+- [ ] `/docs/` contains ONLY the 9 specified files (no more, no less)
+- [ ] `/archive/docs-backup-YYYY-MM-DD/` folder created if files were archived
 - [ ] All documents are complete and current
 - [ ] Cross-references between documents are accurate
 - [ ] All tests pass locally
@@ -282,7 +355,7 @@ This prompt creates the entire `/docs/` structure, so all documentation is gener
 - [ ] Agent rules are properly configured in `/docs/AI_INTERACTION_GUIDE.md`
 - [ ] Refactoring plan is up-to-date in `/docs/REFACTORING_PLAN.md`
 - [ ] Documentation triggers automated updates on code changes
-- [ ] **All 9 `/docs/` files** exist and follow the standard structure
+- [ ] Commit message documents all deleted/archived files
 
 ---
 
@@ -322,6 +395,19 @@ This prompt creates the entire `/docs/` structure, so all documentation is gener
 3. Identify which content needs migration vs. deletion
 4. Ensure project has basic testing and CI/CD in place
 
+### **Pre-Execution Validation**
+```bash
+# List all .md files in root (should be max 6)
+ls -la *.md | wc -l
+
+# List all files in /docs/ (should be exactly 9 after cleanup)
+ls -la docs/*.md | wc -l
+
+# Find potentially obsolete files
+find . -maxdepth 1 -name "*old*.md" -o -name "*backup*.md" -o -name "*deprecated*.md"
+find docs/ -name "*old*.md" -o -name "*backup*.md" -o -name "*deprecated*.md"
+```
+
 ### **Execution**
 ```
 I need to standardize my project documentation using the /docs/ structure.
@@ -332,8 +418,49 @@ Team size: [solo/small team/large team]
 Compliance needs: [GDPR/HIPAA/PCI-DSS/none]
 ```
 
+### **Post-Execution Validation**
+```bash
+# Verify root has only allowed .md files
+ls -la *.md
+# Should show: README.md, LICENSE(.md), CONTRIBUTING.md, CODE_OF_CONDUCT.md, CHANGELOG.md, SECURITY.md (max 6)
+
+# Verify /docs/ has exactly 9 files
+ls -la docs/*.md | wc -l
+# Should output: 9
+
+# List /docs/ files to confirm standard set
+ls -1 docs/
+# Should show exactly:
+# README.md
+# PROJECT_OVERVIEW.md
+# ARCHITECTURE.md
+# AI_INTERACTION_GUIDE.md
+# REFACTORING_PLAN.md
+# TESTING_AND_RELIABILITY.md
+# IMPROVEMENT_AREAS.md
+# SECURITY_AND_PRIVACY.md
+# ROADMAP.md
+
+# Verify archive folder created (if applicable)
+ls -la archive/docs-backup-*/
+```
+
 ### **Expected Outcome**
-The AI will audit existing documentation, create or update all 9 required `/docs/` files with complete and accurate content, remove redundant documentation, configure AI agent rules for automated updates, and establish a living documentation system that stays synchronized with your codebase. You'll receive a standardized documentation structure that serves as the single source of truth for your project.
+The AI will:
+1. **Audit** all `.md` files in root and `/docs/` directories
+2. **Archive** obsolete files to `/archive/docs-backup-YYYY-MM-DD/`
+3. **Delete** empty, duplicate, or trivial markdown files
+4. **Merge** useful content from removed files into standard documents
+5. **Create or update** all 9 required `/docs/` files with complete content
+6. **Clean root directory** to contain only allowed `.md` files (max 6)
+7. **Configure** AI agent rules for automated updates
+8. **Establish** a living documentation system synchronized with codebase
+
+You'll receive a clean, standardized documentation structure with:
+- Root directory: max 6 `.md` files (README, LICENSE, CONTRIBUTING, CODE_OF_CONDUCT, CHANGELOG, SECURITY)
+- `/docs/` directory: exactly 9 standard files
+- `/archive/` folder: timestamped backup of removed files
+- Commit message: documentation of all changes
 
 ---
 
