@@ -65,133 +65,36 @@ find . -name "short.md" -o -name "description.md" -o -name "docker-description.m
 
 ### 📋 **Required Sections** (Every README)
 
-1. **Project Identity**
-   - Title with optional emoji/logo
-   - Tagline (one-liner description)
-   - Badges (build status, version, license, downloads, etc.)
-
-2. **Table of Contents**
-   - For READMEs >200 lines
-   - Linked navigation to all major sections
-
-3. **About/Description**
-   - What the project does
-   - Problem it solves
-   - Key value proposition
-   - Optional: Brief architecture overview
-
-4. **Features**
-   - Bullet list of key capabilities
-   - Highlight what makes it unique
-   - Use emojis for visual appeal
-
-5. **Installation/Setup**
-   - Prerequisites and dependencies
-   - Installation commands (npm, pip, docker, etc.)
-   - Quick start minimal setup
-   - Environment variables (reference .env.example)
-
-6. **Usage/Quick Start**
-   - Basic usage examples
-   - Common commands or API calls
-   - CLI output examples
-   - Screenshots or GIFs (if available)
-
-7. **License**
-   - Clear license statement
-   - Link to LICENSE file
+1. **Project Identity**: Title with logo, tagline, badges (build, version, license)
+2. **Table of Contents**: For READMEs >200 lines, linked navigation
+3. **About/Description**: What it does, problem solved, key value proposition
+4. **Features**: Bullet list of capabilities, unique points (use emojis)
+5. **Installation/Setup**: Prerequisites, installation commands (npm/pip/docker), quick start, env vars
+6. **Usage/Quick Start**: Basic examples, common commands/API calls, screenshots/GIFs
+7. **License**: Clear statement, link to LICENSE file
 
 ### 🔧 **Conditional Sections** (Include if Relevant)
 
-8. **Configuration/Advanced Setup**
-   - Detailed configuration options
-   - Environment variables documentation
-   - Config file examples
-   - Integration notes
-
-9. **Docker Usage**
-   - `docker run` examples
-   - `docker-compose.yml` example
-   - Environment variables for containers
-   - Volume mounts and port mappings
-   - Links to Docker Hub/GHCR
-
-10. **API Documentation**
-    - Endpoint list
-    - Request/response examples
-    - Authentication
-    - Rate limiting
-
-11. **Security/Credentials**
-    - How to handle secrets securely
-    - .env best practices
-    - Security policies
-    - Vulnerability reporting
-
-12. **Testing/Development**
-    - How to run tests
-    - Development setup
-    - Build commands
-    - Debugging tips
-
-13. **CI/CD and Deployment**
-    - GitHub Actions or other CI/CD info
-    - Automated workflows description
-    - Deployment process
-    - Release strategy
-
-14. **Contributing**
-    - Contribution guidelines
-    - Code style requirements
-    - Branch strategy
-    - Pull request process
-    - Link to CONTRIBUTING.md
-
-15. **Roadmap**
-    - Planned features
-    - Known limitations
-    - Future improvements
-
-16. **Acknowledgments/Credits**
-    - Contributors
-    - Inspirations
-    - Third-party resources
-
-17. **AI Integration** (for AI/MCP projects)
-    - Agent roles and capabilities
-    - MCP server information
-    - AI model requirements
-    - Security/sandboxing
+8. **Configuration**: Config options, env vars, examples
+9. **Docker Usage**: `docker run`, compose examples, volumes, links to registries
+10. **API Documentation**: Endpoints, examples, auth, rate limits
+11. **Security**: Secrets handling, .env practices, vulnerability reporting
+12. **Testing/Development**: Run tests, dev setup, build commands
+13. **CI/CD**: GitHub Actions, workflows, deployment, releases
+14. **Contributing**: Guidelines, code style, branch strategy, PR process
+15. **Roadmap**: Planned features, limitations, improvements
+16. **Acknowledgments**: Contributors, inspirations, resources
+17. **AI Integration** (AI/MCP): Agent roles, MCP server info, requirements
 
 ### 🎨 **Best Practices**
 
-**Formatting**:
-- Use emojis for section headers (sparingly)
-- Keep paragraphs short (2-3 sentences max)
-- Use code blocks with language syntax highlighting
-- Use tables for structured data
-- Use blockquotes for important notes
+**Formatting**: Emojis for headers (sparingly), short paragraphs (2-3 sentences), code blocks with syntax highlighting, tables for data, blockquotes for notes
 
-**Badges** (from shields.io):
-```markdown
-![Build](https://github.com/USER/REPO/actions/workflows/ci.yml/badge.svg)
-![Docker Pulls](https://img.shields.io/docker/pulls/USER/IMAGE)
-![License](https://img.shields.io/github/license/USER/REPO)
-![Version](https://img.shields.io/github/v/release/USER/REPO)
-![Stars](https://img.shields.io/github/stars/USER/REPO?style=social)
-```
+**Badges**: Build status, Docker pulls, license, version, stars (shields.io)
 
-**Visual Hierarchy**:
-- Use `#` for main title
-- Use `##` for major sections
-- Use `###` for subsections
-- Use `####` for minor subsections (sparingly)
+**Visual Hierarchy**: `#` main title, `##` major sections, `###` subsections
 
-**Code Examples**:
-- Show realistic, runnable examples
-- Include expected output
-- Provide copy-paste ready commands
-- Use proper syntax highlighting
+**Code Examples**: Realistic runnable examples, expected output, copy-paste ready, proper syntax highlighting
 
 ---
 
@@ -383,155 +286,32 @@ All README updates must be documented in `/docs/`:
 
 ### **When to Run This Prompt**
 
-* Creating a new project and need a professional README
-* Existing README is outdated or incomplete
-* Preparing for public release or open source
-* After major feature additions or breaking changes
-* Documentation audit requirements
-* Updating Docker Hub descriptions
-* Improving project discoverability and SEO
+* Creating new project, existing README outdated/incomplete
+* Preparing for public release or after major feature changes
+* Documentation audit, updating Docker Hub descriptions
 
 ### **Initial Setup**
-1. Review the PROMPT_CREATION_GUIDE.md to understand documentation requirements
-2. Examine existing README.md (if present) and identify preserved content
-3. Check for Docker description files in `./docker/description/`
-4. Ensure project metadata files exist (package.json, etc.)
-5. Have project repository information ready (GitHub URL, license)
+1. Review PROMPT_CREATION_GUIDE.md, examine existing README.md
+2. Check for Docker description files in `./docker/description/`
+3. Have project metadata ready (package.json, GitHub URL, license)
 
 ### **Execution**
 ```
 I need a comprehensive README for my project.
 
-Project name: [name]
-Project type: [library/CLI/web app/API/Docker image/etc.]
-Programming language: [JavaScript/Python/Java/etc.]
-Main purpose: [brief description]
-Key features: [list 3-5 main features]
-Docker published: [yes/no, Docker Hub username if yes]
-Existing README: [yes/no - if yes, preserve screenshots]
-Target audience: [developers/DevOps/end-users/etc.]
+Project: [name], Type: [library/CLI/web/API/Docker], Language: [JS/Python/etc.]
+Purpose: [brief description], Key features: [3-5 features]
+Docker: [yes/no, username if yes], Existing README: [yes/no]
+Target audience: [developers/DevOps/end-users]
 ```
 
-### **Expected Outcome**
-The AI will analyze your project structure, read existing documentation, identify and preserve all screenshots/images/GIFs, extract key features and capabilities, generate a comprehensive README.md following all 16 guidelines with proper formatting and badges, create or update Docker short description (≤100 chars) and long description if Docker is used, validate all links and code examples, ensure professional language and formatting, and document all changes in `/docs/` files. You'll receive a production-ready README that improves project discoverability and provides clear documentation for users.
+**Expected Outcome**: AI analyzes project, preserves screenshots/images/GIFs, generates comprehensive README.md with formatting/badges, creates/updates Docker descriptions (≤100 chars short), validates links/code, provides production-ready README
 
 ---
 
 ## **Example README Template**
 
-```markdown
-# 🚀 Project Name
-
-> One-line tagline describing what the project does
-
-![Build](https://github.com/user/repo/actions/workflows/ci.yml/badge.svg)
-![Version](https://img.shields.io/github/v/release/user/repo)
-![License](https://img.shields.io/github/license/user/repo)
-![Docker Pulls](https://img.shields.io/docker/pulls/user/image)
-
-## 📚 Table of Contents
-- [About](#about)
-- [Features](#features)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Configuration](#configuration)
-- [Docker](#docker)
-- [Contributing](#contributing)
-- [License](#license)
-
-## 🧠 About
-
-[Project Name] solves [specific problem] by [solution approach].
-
-Built with [technology stack], it provides [key value proposition] for [target audience].
-
-## ✨ Features
-
-- 🎯 **Feature One** - Description
-- 🔒 **Feature Two** - Description
-- ⚡ **Feature Three** - Description
-- 🛠️ **Feature Four** - Description
-
-## 📦 Installation
-
-### Prerequisites
-- Node.js 18+ / Python 3.9+ / etc.
-- Docker (optional)
-
-### Quick Start
-
-\`\`\`bash
-npm install project-name
-# or
-pip install project-name
-\`\`\`
-
-## 🚀 Usage
-
-Basic example:
-
-\`\`\`javascript
-const project = require('project-name');
-
-project.doSomething({
-  option: 'value'
-});
-\`\`\`
-
-## ⚙️ Configuration
-
-Create a `.env` file:
-
-\`\`\`env
-API_KEY=your_key_here
-PORT=8080
-\`\`\`
-
-## 🐳 Docker
-
-Pull and run:
-
-\`\`\`bash
-docker pull user/image:latest
-docker run -d -p 8080:8080 -e API_KEY=xxx user/image
-\`\`\`
-
-Docker Compose:
-
-\`\`\`yaml
-version: '3.8'
-services:
-  app:
-    image: user/image:latest
-    ports:
-      - "8080:8080"
-    environment:
-      - API_KEY=${API_KEY}
-\`\`\`
-
-## 🤝 Contributing
-
-Contributions welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) first.
-
-1. Fork the repository
-2. Create your feature branch (\`git checkout -b feature/amazing\`)
-3. Commit your changes (\`git commit -m 'Add amazing feature'\`)
-4. Push to the branch (\`git push origin feature/amazing\`)
-5. Open a Pull Request
-
-## 📄 License
-
-Distributed under the MIT License. See [LICENSE](LICENSE) for more information.
-
-## 🙏 Acknowledgments
-
-- [Dependency Name](https://example.com) - Description
-- Inspired by [Project](https://example.com)
-
----
-
-Made with ❤️ by [Your Name](https://github.com/username)
-```
+Structure: Title with badges, TOC, About (problem/solution), Features (bullet list with emojis), Installation (prerequisites/quick start), Usage (examples), Configuration (.env), Docker (pull/run/compose), Contributing (fork/branch/commit/PR process), License, Acknowledgments
 
 ---
 

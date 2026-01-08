@@ -174,126 +174,18 @@ structlog.configure(processors=[sample_debug, structlog.processors.JSONRenderer(
 
 ### 🔄 **Log Rotation & Retention**
 
-**Industry-standard configuration**:
+**Configuration**:
+- **Dev**: 50-100MB files, 3-7 days local
+- **Prod**: 100-500MB files, 7-30 days local, gzip/zstd, 1-7 years archive
+- **Audit**: 100-200MB files, 30-90 days local, 7-10 years archive
 
-| Environment | File Size | Local Retention | Compression | Archive Retention |
-|------------|-----------|----------------|-------------|------------------|
-| **Development** | 50-100 MB | 3-7 days | Optional | None |
-| **Production** | 100-500 MB | 7-30 days | gzip/zstd | 1-7 years |
-| **Audit Logs** | 100-200 MB | 30-90 days | Required | 7-10 years |
+**Strategy**: Size-based (100-500MB) + daily rotation, compress after rotation, keep 24-48h uncompressed
 
-**Rotation strategy**:
-- Primary trigger: Size-based (100-500 MB per file)
-- Secondary trigger: Daily rotation at minimum
-- Compress immediately after rotation (gzip or zstd)
-- Keep last 24-48h uncompressed for quick access
-
-**logrotate configuration** (Linux):
-
-```bash
-/var/log/myapp/*.log {
-    daily
-    rotate 14
-    maxsize 100M
-    compress
-    delaycompress
-    missingok
-    notifempty
-    create 0640 appuser appgroup
-    sharedscripts
-    postrotate
-        systemctl reload myapp || true
-    endscript
-}
-```
-
-**Docker/container configuration**:
-
-```yaml
-# docker-compose.yml
-services:
-  app:
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "100m"
-        max-file: "7"
-        compress: "true"
-```
-
-**Application-level rotation** (Node.js example):
-
-```javascript
-const winston = require('winston');
-require('winston-daily-rotate-file');
-
-const transport = new winston.transports.DailyRotateFile({
-  filename: 'app-%DATE%.log',
-  datePattern: 'YYYY-MM-DD',
-  maxSize: '100m',
-  maxFiles: '14d',
-  compress: true,
-  zippedArchive: true
-});
-```
+**Tools**: logrotate (Linux), Docker logging driver (`max-size: 100m`, `max-file: 7`), app-level libraries (winston-daily-rotate-file, python-logrotate)
 
 ### 📦 **Long-Term Archive & Lifecycle**
 
-**Archival strategy** (tiered storage):
-
-1. **Hot tier** (7-30 days):
-   - Full indexed logs in Elasticsearch/Loki/CloudWatch
-   - Fast queries, dashboards, real-time alerting
-   - High cost per GB
-
-2. **Warm tier** (30-90 days):
-   - Reduced replicas, higher compression
-   - Slower queries acceptable
-   - Medium cost
-
-3. **Cold tier/Archive** (90 days → 7+ years):
-   - Object storage (S3/GCS/Azure Blob)
-   - Compressed NDJSON or Parquet format
-   - Lifecycle rules: transition to Glacier after 365 days
-   - Low cost, restore latency acceptable
-
-**S3 lifecycle policy example**:
-
-```json
-{
-  "Rules": [
-    {
-      "ID": "LogArchival",
-      "Filter": {"Prefix": "logs/"},
-      "Status": "Enabled",
-      "Transitions": [
-        {"Days": 90, "StorageClass": "STANDARD_IA"},
-        {"Days": 365, "StorageClass": "GLACIER"}
-      ],
-      "Expiration": {"Days": 2555}
-    }
-  ]
-}
-```
-
-**Archive export automation** (GitHub Actions):
-
-```yaml
-name: Archive Logs
-on:
-  schedule:
-    - cron: '0 2 * * *'
-jobs:
-  archive:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Export logs to S3
-        run: ./scripts/export-logs-to-s3.sh --from-yesterday
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-```
+**Tiered storage**: Hot tier (7-30d) for indexed logs in Elasticsearch/Loki/CloudWatch, warm tier (30-90d) with reduced replicas, cold tier/archive (90d→7+yrs) in object storage (S3/GCS) with lifecycle rules (transition to Glacier after 365d)
 
 ### 🔍 **Observability Integration**
 
@@ -345,94 +237,29 @@ Application → Local Buffer → Agent (Fluent Bit/Vector)
 - Buffer fill > 80% → Critical
 - Failed log exports → Warning
 
-**SLO examples**:
-- Log ingestion latency < 60s (P99)
-- Log delivery success rate > 99.9%
-- Log query response time < 2s (P95)
-
 ---
 
 ## **Deliverables**
 
-Generate the following outputs based on project context:
+1. **Logging library config**: Structured logging setup, JSON formatter, correlation middleware, PII redaction
+2. **Rotation config**: logrotate config, Docker logging driver, compression/retention settings
+3. **Archive automation**: S3/GCS lifecycle policy, log export script, GitHub Actions workflow
+4. **Ingestion pipeline**: Fluent Bit/Vector config, aggregation architecture, schema validation
+5. **Monitoring**: Prometheus metrics, alert rules, Grafana dashboard, SLO definitions
+6. **Documentation**: Policy doc (retention, PII, compliance), developer guide, runbook, schema docs
 
-1. **Logging Library Configuration**
-   - Language-specific structured logging setup
-   - JSON formatter with required fields
-   - Correlation ID middleware/context binding
-   - PII redaction configuration
-
-2. **Log Rotation Configuration**
-   - `logrotate` config for Linux systems
-   - Docker logging driver configuration
-   - Application-level rotation (if applicable)
-   - Compression and retention settings
-
-3. **Archive & Lifecycle Automation**
-   - S3/GCS lifecycle policy (JSON)
-   - Log export script (`scripts/export-logs-to-s3.sh`)
-   - Scheduled GitHub Actions workflow for archival
-   - Restore verification script
-
-4. **Ingestion Pipeline Setup**
-   - Fluent Bit/Vector/Fluentd configuration
-   - Log aggregation pipeline architecture
-   - Schema validation rules
-   - Backpressure and retry configuration
-
-5. **Monitoring & Alerting**
-   - Prometheus metrics for log pipeline health
-   - Alert rules for error rates and failures
-   - Grafana dashboard for log observability
-   - SLO definitions
-
-6. **Documentation**
-   - Logging policy document (retention, PII, compliance)
-   - Developer guide for adding structured logs
-   - Runbook for log pipeline troubleshooting
-   - Schema documentation and examples
-
-### **Documentation Updates**
-
-Update the following files in `/docs/`:
-
-- **`/docs/OPERATIONS.md`** (or create if missing):
-  - Add logging architecture and pipeline diagram
-  - Document log levels and when to use each
-  - Include log schema and required fields
-  - Add retention policy and compliance notes
-
-- **`/docs/ARCHITECTURE.md`**:
-  - Add observability section with logging component
-  - Document log aggregation pipeline
-  - Include correlation ID flow diagram
-
-- **`/docs/README.md`**:
-  - Add link to logging documentation
-  - Include quick reference for viewing logs
-
-- **`/docs/SECURITY_AND_PRIVACY.md`**:
-  - Document PII handling and redaction rules
-  - Add log access control policies
-  - Include audit log requirements
+**Update `/docs/`**: OPERATIONS.md (architecture, levels, schema, retention), ARCHITECTURE.md (observability, pipeline), SECURITY_AND_PRIVACY.md (PII handling, access control, audit)
 
 ---
 
 ## **Success Criteria**
 
-- [ ] Structured JSON logging implemented across all services
-- [ ] Required fields (`ts`, `level`, `service`, `env`, `message`) present in all logs
-- [ ] Correlation IDs (`trace_id`, `request_id`) flow through distributed systems
-- [ ] PII redaction working correctly (verified with unit tests)
-- [ ] Log rotation configured and tested (no log file >500MB)
-- [ ] Logs compressed after rotation (gzip or zstd)
-- [ ] Local retention policy enforced (7-30 days hot)
-- [ ] Archive pipeline operational (logs exported to S3/GCS daily)
-- [ ] Lifecycle policies applied (transition to Glacier after 365 days)
-- [ ] Log aggregation pipeline operational (ingestion lag <60s)
-- [ ] Monitoring alerts configured for error rates and pipeline health
-- [ ] Documentation complete and developer guide available
-- [ ] Restore tested successfully from archive
+- [ ] Structured JSON logging with required fields (ts, level, service, env, message) and correlation IDs
+- [ ] PII redaction working (verified with tests)
+- [ ] Log rotation configured and tested (files <500MB, compressed, 7-30d retention)
+- [ ] Archive pipeline operational (exported to S3/GCS daily, lifecycle policies applied, Glacier transition after 365d)
+- [ ] Log aggregation operational (ingestion lag <60s, alerts for error rates)
+- [ ] Documentation complete (developer guide, runbook, restore tested)
 
 ---
 
@@ -477,41 +304,15 @@ Update the following files in `/docs/`:
 
 ## **Implementation Phases**
 
-### **Phase 1: Foundation (Week 1)**
-1. Implement structured logging library in all services
-2. Add required fields and JSON formatting
-3. Configure log levels appropriately
-4. Add correlation ID middleware
-5. Implement basic PII redaction
+**Phase 1 (Week 1)**: Implement structured logging library, add required fields/JSON formatting, configure log levels, add correlation ID middleware, implement PII redaction
 
-### **Phase 2: Rotation & Local Retention (Week 1-2)**
-1. Configure log rotation (logrotate or app-level)
-2. Set file size limits and retention periods
-3. Enable compression
-4. Test rotation doesn't lose logs
-5. Monitor disk usage
+**Phase 2 (Week 1-2)**: Configure log rotation (logrotate/app-level), set file size/retention/compression, test rotation
 
-### **Phase 3: Aggregation & Observability (Week 2-3)**
-1. Deploy log shipping agents (Fluent Bit/Vector)
-2. Configure ingestion pipeline
-3. Set up log storage (Elasticsearch/Loki)
-4. Create dashboards (Grafana/Kibana)
-5. Implement correlation with traces/metrics
+**Phase 3 (Week 2-3)**: Deploy log shipping agents, configure ingestion pipeline, set up storage (Elasticsearch/Loki), create dashboards, implement correlation with traces/metrics
 
-### **Phase 4: Archive & Compliance (Week 3-4)**
-1. Set up object storage (S3/GCS)
-2. Create export automation script
-3. Schedule daily archive jobs
-4. Apply lifecycle policies
-5. Test restore from archive
-6. Document retention policy
+**Phase 4 (Week 3-4)**: Set up object storage (S3/GCS), create export automation, schedule daily archive jobs, apply lifecycle policies, test restore, document retention policy
 
-### **Phase 5: Monitoring & Hardening (Week 4)**
-1. Configure pipeline health metrics
-2. Set up alerting rules
-3. Test failure scenarios
-4. Document runbooks
-5. Train team on log access and troubleshooting
+**Phase 5 (Week 4)**: Configure pipeline health metrics, set up alerting, test failure scenarios, document runbooks, train team
 
 ---
 
@@ -531,15 +332,6 @@ Run this prompt when:
 ---
 
 ## **Multi-Language Quick Reference**
-
-| Language | Structured Logging | Rotation | Redaction | Correlation |
-|----------|------------------|----------|-----------|-------------|
-| **Node.js** | Pino, Winston | winston-daily-rotate | pino-noir | cls-hooked |
-| **Python** | structlog | logging.handlers.RotatingFileHandler | Custom processor | contextvars |
-| **Java** | Logback + Logstash encoder | RollingFileAppender | Logback filters | MDC |
-| **Go** | slog, zap | lumberjack | Custom middleware | context.Context |
-| **Rust** | tracing | tracing-appender | Custom layer | span context |
-| **PHP** | Monolog | RotatingFileHandler | Monolog processors | Request context |
 
 ---
 

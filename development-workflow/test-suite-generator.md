@@ -39,98 +39,20 @@ Choose appropriate frameworks based on project type:
 
 ### **Skipped/Disabled Test Analysis**
 
-If the project has existing tests with many skipped/disabled:
+**Catalog**: List test name, skip reason, date, issue references
 
-#### 1. **Catalog All Skipped Tests**
+**Categorize**:
+- **Fixable**: Update assertions/mocks, fix test data
+- **Environment-Dependent**: Add conditional skipping, document setup
+- **Flaky**: Add retry, fix timing/race conditions
+- **Obsolete**: Document and remove
+- **Blocked**: Link issues, document skip reason clearly
+- **Unclear**: Investigate git history, fix or document
 
-Create an inventory with:
-* Test name and location
-* Skip reason (from decorators/comments)
-* Date skipped (from git history if available)
-* Associated issue/ticket references
-
-**Common Skip Patterns:**
-```python
-# Python
-@pytest.mark.skip(reason="...")
-@pytest.mark.skipif(condition, reason="...")
-@unittest.skip("...")
-
-# JavaScript/Jest
-test.skip('...', () => {})
-xit('...', () => {})
-
-# Java
-@Ignore("...")
-@Disabled("...")
-```
-
-#### 2. **Categorize Skipped Tests**
-
-Group into categories:
-
-* **Fixable** - Tests that can be repaired (outdated assertions, mock issues)
-* **Environment-Dependent** - Require specific setup (CI-only, database-dependent)
-* **Flaky** - Intermittent failures due to timing, race conditions
-* **Obsolete** - Test legacy/removed features, no longer relevant
-* **Blocked** - Waiting on bug fixes, external dependencies, or features
-* **Unclear** - No documented reason, investigation needed
-
-#### 3. **Remediation Strategy**
-
-For each category:
-
-**Fixable Tests:**
-* Update assertions to match current implementation
-* Fix mocking/stubbing issues
-* Update test data and fixtures
-* Modernize to current testing patterns
-
-**Environment-Dependent:**
-* Add environment checks and conditional skipping
-* Document required environment setup
-* Create fixture/setup utilities for local testing
-* Ensure they run in CI/CD
-
-**Flaky Tests:**
-* Add retry mechanisms with backoff
-* Fix timing issues (use proper waits, not sleep)
-* Eliminate race conditions
-* Consider refactoring underlying code
-
-**Obsolete Tests:**
-* Document reason for removal
-* Archive for historical reference
-* Remove from test suite
-* Update documentation
-
-**Blocked Tests:**
-* Link to blocking issues/tickets
-* Add clear skip messages with issue references
-* Set up tracking for when blockers are resolved
-* Create reminder to re-enable
-
-**Unclear Tests:**
-* Investigate git history and related code
-* Try running and document failure reason
-* Consult team/documentation
-* Either fix, document skip reason, or remove
-
-#### 4. **Skip Reason Documentation**
-
-For tests that must remain skipped:
-
+**Skip Documentation**: Always include specific reason, issue reference, re-enabling conditions
 ```python
 @pytest.mark.skip(reason="Requires PostgreSQL 14+. See issue #123")
-@pytest.mark.skipif(not has_cuda(), reason="GPU tests require CUDA")
-@pytest.mark.xfail(reason="Known bug in dependency v2.1. See PR #456")
 ```
-
-Always include:
-* Clear, specific reason
-* Reference to tracking issue/PR
-* Conditions for re-enabling
-* Alternative coverage if available
 
 ---
 
@@ -219,197 +141,36 @@ class TestComponentName:
 
 ### **Variable Validation Testing**
 
-Every configuration variable, parameter, and input must be thoroughly tested:
+Test every configuration variable/parameter/input:
 
-#### **Default Value Testing**
-Test that each variable has the correct default value:
-```python
-def test_default_value_is_correct():
-    """Verify default value matches specification"""
-    config = Configuration()
-    assert config.timeout == 30  # Expected default: 30 seconds
-    assert config.retry_count == 3  # Expected default: 3 retries
-    assert config.log_level == "INFO"  # Expected default: INFO
-```
+**Test Coverage Required**:
+| Category | Tests |
+|----------|-------|
+| **Default Values** | Verify correct defaults |
+| **Valid Values** | Test all enum values, min/max boundaries |
+| **Valid Behavior** | Verify correct operation with valid values |
+| **Invalid Values** | Wrong type/range/enum raises clear errors |
+| **Null/Empty** | Rejected if not allowed |
+| **Error Messages** | Clear, actionable (include valid options) |
 
-#### **Valid Value Testing**
-Test that variables accept expected valid values and behave correctly:
+**Example**:
 ```python
-def test_valid_value_accepted_and_works():
-    """Verify valid values are accepted and produce expected behavior"""
-    # Test with expected valid value
+def test_default_timeout():
+    assert Configuration().timeout == 30
+
+def test_valid_timeout():
     config = Configuration(timeout=60)
     assert config.timeout == 60
-    
-    # Verify behavior with this valid value
-    result = service.execute(config)
-    assert result.elapsed_time <= 60
-    
-    # Test with another valid value
-    config.log_level = "DEBUG"
-    assert config.log_level == "DEBUG"
-    logger = Logger(config)
-    assert logger.will_log("DEBUG") is True
+    assert service.execute(config).elapsed_time <= 60
 
-def test_all_valid_enum_values():
-    """Test all possible valid enum/choice values"""
-    valid_levels = ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
-    for level in valid_levels:
-        config = Configuration(log_level=level)
-        assert config.log_level == level
-        # Verify behavior is correct for each level
-        logger = Logger(config)
-        assert logger.current_level == level
-
-def test_valid_boundary_values():
-    """Test minimum and maximum valid values"""
-    # Test minimum valid value
-    config = Configuration(timeout=1)
-    assert config.timeout == 1
-    
-    # Test maximum valid value
-    config = Configuration(timeout=3600)
-    assert config.timeout == 3600
+def test_invalid_timeout():
+    with pytest.raises(TypeError, match="timeout must be an integer"):
+        Configuration(timeout="60")
+    with pytest.raises(ValueError, match="timeout must be positive"):
+        Configuration(timeout=-1)
 ```
 
-#### **Invalid Value Testing**
-Test that variables reject invalid values and provide appropriate errors:
-```python
-def test_invalid_value_raises_error():
-    """Verify invalid values are rejected with clear error messages"""
-    # Test with wrong type
-    with pytest.raises(TypeError) as exc_info:
-        config = Configuration(timeout="invalid")
-    assert "timeout must be an integer" in str(exc_info.value)
-    
-    # Test with out-of-range value
-    with pytest.raises(ValueError) as exc_info:
-        config = Configuration(timeout=-1)
-    assert "timeout must be positive" in str(exc_info.value)
-    
-    # Test with invalid enum value
-    with pytest.raises(ValueError) as exc_info:
-        config = Configuration(log_level="INVALID")
-    assert "log_level must be one of" in str(exc_info.value)
-    assert "DEBUG, INFO, WARNING, ERROR, CRITICAL" in str(exc_info.value)
-
-def test_invalid_impossible_values():
-    """Test impossible or nonsensical values"""
-    # Test impossible numeric value
-    with pytest.raises(ValueError) as exc_info:
-        config = Configuration(retry_count=0)
-    assert "retry_count must be at least 1" in str(exc_info.value)
-    
-    # Test null/None when not allowed
-    with pytest.raises(TypeError) as exc_info:
-        config = Configuration(timeout=None)
-    assert "timeout cannot be None" in str(exc_info.value)
-    
-    # Test empty string when not allowed
-    with pytest.raises(ValueError) as exc_info:
-        config = Configuration(api_key="")
-    assert "api_key cannot be empty" in str(exc_info.value)
-
-def test_invalid_value_combinations():
-    """Test invalid combinations of values"""
-    # Test conflicting configuration
-    with pytest.raises(ValueError) as exc_info:
-        config = Configuration(
-            min_connections=10,
-            max_connections=5  # Invalid: max < min
-        )
-    assert "max_connections must be >= min_connections" in str(exc_info.value)
-```
-
-#### **Variable Validation Test Coverage**
-
-For **every** configurable variable, ensure tests for:
-
-| Test Category | Test Cases | Example |
-|--------------|------------|---------|
-| **Default Value** | Verify default is correct | `assert config.timeout == 30` |
-| **Valid Values** | Test all expected valid values | Test each enum value, min/max boundaries |
-| **Valid Behavior** | Verify correct behavior with valid values | Service works correctly with timeout=60 |
-| **Type Validation** | Wrong type raises TypeError | String instead of int raises error |
-| **Range Validation** | Out-of-range raises ValueError | Negative timeout raises error |
-| **Enum Validation** | Invalid choice raises ValueError | Invalid log level raises error |
-| **Null/Empty** | Null/empty rejected (if not allowed) | Empty string raises error |
-| **Impossible Values** | Nonsensical values rejected | Zero retries raises error |
-| **Error Messages** | Clear, actionable error messages | Error includes valid options |
-
-#### **Example: Complete Variable Validation Suite**
-
-```python
-class TestConfigurationValidation:
-    """Comprehensive validation tests for all configuration variables"""
-    
-    # DEFAULT VALUE TESTS
-    def test_default_timeout_is_30_seconds(self):
-        config = Configuration()
-        assert config.timeout == 30
-    
-    def test_default_retry_count_is_3(self):
-        config = Configuration()
-        assert config.retry_count == 3
-    
-    def test_default_log_level_is_info(self):
-        config = Configuration()
-        assert config.log_level == "INFO"
-    
-    # VALID VALUE TESTS
-    @pytest.mark.parametrize("timeout", [1, 30, 60, 300, 3600])
-    def test_valid_timeout_values_accepted(self, timeout):
-        config = Configuration(timeout=timeout)
-        assert config.timeout == timeout
-    
-    @pytest.mark.parametrize("level", ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"])
-    def test_valid_log_levels_accepted(self, level):
-        config = Configuration(log_level=level)
-        assert config.log_level == level
-    
-    def test_valid_timeout_produces_expected_behavior(self):
-        config = Configuration(timeout=5)
-        service = Service(config)
-        # Verify service actually respects the timeout
-        with pytest.raises(TimeoutError):
-            service.long_running_operation()  # Takes >5 seconds
-    
-    # INVALID VALUE TESTS
-    def test_invalid_timeout_type_raises_error(self):
-        with pytest.raises(TypeError) as exc:
-            Configuration(timeout="60")
-        assert "timeout must be an integer" in str(exc.value)
-    
-    def test_negative_timeout_raises_error(self):
-        with pytest.raises(ValueError) as exc:
-            Configuration(timeout=-1)
-        assert "timeout must be positive" in str(exc.value)
-        assert "got: -1" in str(exc.value)
-    
-    def test_invalid_log_level_raises_error_with_valid_options(self):
-        with pytest.raises(ValueError) as exc:
-            Configuration(log_level="TRACE")
-        assert "log_level must be one of" in str(exc.value)
-        assert "DEBUG, INFO, WARNING, ERROR, CRITICAL" in str(exc.value)
-    
-    def test_zero_retry_count_raises_error(self):
-        with pytest.raises(ValueError) as exc:
-            Configuration(retry_count=0)
-        assert "retry_count must be at least 1" in str(exc.value)
-    
-    def test_none_timeout_raises_error(self):
-        with pytest.raises(TypeError) as exc:
-            Configuration(timeout=None)
-        assert "timeout cannot be None" in str(exc.value)
-```
-
-**Key Principles:**
-- **Test every variable** - No configuration should go untested
-- **Test default first** - Ensure defaults match specification
-- **Test valid boundaries** - Min and max valid values
-- **Test invalid with errors** - Verify rejection and error messages
-- **Error messages must be clear** - Include what was wrong and valid options
-- **Test behavior, not just assignment** - Verify the value actually affects behavior
+**Key Principles**: Test every variable, defaults first, valid boundaries, invalid with clear errors, test behavior not just assignment
 
 ### **Mocking and Fixtures**
 

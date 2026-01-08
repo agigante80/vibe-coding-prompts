@@ -40,75 +40,15 @@ Categorize updates by type and risk:
 
 ### **Security Vulnerability Scanning**
 
-Run comprehensive vulnerability checks:
-
-```bash
-# Node.js
-npm audit --production
-npm audit fix --dry-run
-yarn audit
-
-# Python
-pip-audit
-safety check --json
-
-# Java
-mvn dependency-check:check
-./gradlew dependencyCheckAnalyze
-
-# Go
-go list -json -m all | nancy sleuth
-govulncheck ./...
-
-# Rust
-cargo audit
-
-# Ruby
-bundle audit check --update
-
-# PHP
-composer audit
-```
+**Tools**: Node.js (`npm audit`, `yarn audit`), Python (`pip-audit`, `safety`), Java (`mvn dependency-check`, `gradle dependencyCheckAnalyze`), Go (`govulncheck`), Rust (`cargo audit`), Ruby (`bundle audit`), PHP (`composer audit`)
 
 ### **Outdated Package Detection**
 
-Identify available updates:
-
-```bash
-# Node.js
-npm outdated
-npx npm-check-updates -u --dry-run
-
-# Python
-pip list --outdated
-poetry show --outdated
-
-# Java
-mvn versions:display-dependency-updates
-
-# Go
-go list -u -m all
-
-# Rust
-cargo outdated
-
-# Ruby
-bundle outdated
-
-# PHP
-composer outdated
-```
+**Tools**: Node.js (`npm outdated`, `npm-check-updates`), Python (`pip list --outdated`, `poetry show --outdated`), Java (`mvn versions:display-dependency-updates`), Go (`go list -u -m all`), Rust (`cargo outdated`), Ruby (`bundle outdated`), PHP (`composer outdated`)
 
 ### **Dependency Health Analysis**
 
-**Check for**:
-- Deprecated packages (no longer maintained)
-- Package typosquatting risks
-- Excessive dependencies (bloat)
-- Circular dependencies
-- License compatibility issues
-- Download count and community activity
-- Last release date and maintenance status
+**Check**: Deprecated packages, typosquatting risks, bloat, circular deps, license compatibility, community activity, maintenance status
 
 ---
 
@@ -152,147 +92,27 @@ Group updates intelligently:
 
 ## **Breaking Change Detection**
 
-### **Automated Analysis**
+**Automated analysis**:
+1. **Changelog**: Parse CHANGELOG.md/HISTORY.md for "BREAKING", "removed", "deprecated"
+2. **Migration guides**: Look for MIGRATION.md/UPGRADING.md, codemods
+3. **API compatibility**: Compare exported APIs, detect removed functions/classes/methods
+4. **Type definitions**: Compare TypeScript types for breaking changes
 
-**Check for breaking changes**:
-
-1. **Changelog Analysis**
-   - Parse CHANGELOG.md, HISTORY.md, RELEASES.md
-   - Search for keywords: "BREAKING", "breaking change", "removed", "deprecated"
-   - Identify API removals and signature changes
-
-2. **Migration Guide Detection**
-   - Look for MIGRATION.md, UPGRADING.md
-   - Extract migration steps and required code changes
-   - Identify automated migration tools (codemods)
-
-3. **API Compatibility**
-   - Compare exported APIs between versions
-   - Detect removed functions, classes, methods
-   - Identify signature changes (parameters, return types)
-
-4. **TypeScript/Type Definitions**
-   - Compare type definitions for breaking changes
-   - Detect changed interfaces and type signatures
-   - Identify removed or renamed types
-
-### **Impact Assessment**
-
-For each update, analyze:
-
-```bash
-# Example: Check what files import the dependency
-# Node.js/TypeScript
-grep -r "from 'package-name'" --include="*.{js,ts,jsx,tsx}"
-grep -r "require('package-name')" --include="*.{js,ts}"
-
-# Python
-grep -r "import package_name" --include="*.py"
-grep -r "from package_name" --include="*.py"
-
-# Count affected files
-echo "Affected files: $(grep -r "import package" --include="*.py" | wc -l)"
-```
-
-**Generate impact report**:
-- Number of files importing the dependency
-- Test files that exercise the dependency
-- Critical paths using the dependency
-- Estimated refactoring effort (hours)
+**Impact assessment**: Count files importing dependency (grep), identify test files exercising it, estimate refactoring effort
 
 ---
 
 ## **Automated Update Workflow**
 
-### **1. Preparation**
+**1. Preparation**: Create update branch `git checkout -b deps/update-[package]-[version]`, backup lock files
 
-```bash
-# Create update branch
-git checkout -b deps/update-[package-name]-[version]
+**2. Update**: Conservative (one at a time): `npm update [package]@[version]`. Aggressive (patches): `npm update` or `npx npm-check-updates -i`
 
-# Ensure clean working directory
-git status
+**3. Testing**: Install (`npm ci`), run tests/type-check/lint/build/integration/e2e
 
-# Backup lock files
-cp package-lock.json package-lock.json.backup
-```
+**4. Validation**: All tests pass, no type/lint errors, build succeeds, bundle size OK, critical flows work
 
-### **2. Update Execution**
-
-**Conservative approach** (recommended):
-
-```bash
-# Update one package at a time
-npm update [package-name]@[version]
-
-# Or specify exact version
-npm install [package-name]@[exact-version]
-```
-
-**Aggressive approach** (for patch updates):
-
-```bash
-# Update all packages (use with caution)
-npm update
-
-# Or interactive mode
-npx npm-check-updates -i
-```
-
-### **3. Automated Testing**
-
-Run comprehensive test suite:
-
-```bash
-# Install dependencies
-npm ci  # or yarn install --frozen-lockfile
-
-# Run all tests
-npm test
-
-# Run type checking
-npm run type-check  # or tsc --noEmit
-
-# Run linting
-npm run lint
-
-# Build project
-npm run build
-
-# Run integration tests
-npm run test:integration
-
-# Run E2E tests (if applicable)
-npm run test:e2e
-```
-
-### **4. Validation Checks**
-
-**Verify**:
-- [ ] All tests pass
-- [ ] No new type errors
-- [ ] No new linting errors
-- [ ] Build succeeds
-- [ ] Bundle size acceptable (check with bundlesize, size-limit)
-- [ ] No console warnings or errors
-- [ ] Critical user flows work (manual testing)
-- [ ] Performance benchmarks maintained
-
-### **5. Commit & PR**
-
-```bash
-# Commit with semantic message
-git add package.json package-lock.json
-git commit -m "chore(deps): update [package] from [old-ver] to [new-ver]
-
-- Fixes: [security-issue or bug]
-- Breaking changes: [none/list]
-- Migration steps: [none/required]
-- Tests: [all passing]"
-
-# Push and create PR
-git push origin deps/update-[package-name]-[version]
-```
+**5. Commit**: `git commit -m "chore(deps): update [package] [old]→[new]\n\n- Fixes: [issue]\n- Breaking: [none/list]\n- Tests: [passing]"`
 
 ---
 

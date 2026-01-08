@@ -2,7 +2,7 @@
 
 ## **Objective**
 
-Generate a complete, production-ready CI/CD workflow with dynamic versioning, automated releases, and comprehensive quality gates.
+Generate production-ready GitHub Actions CI/CD: auto-detect project type, build/test/deploy, dynamic versioning (commit hashes for dev, semantic for releases), publish artifacts to registries, security scanning, automated releases, performance optimization (caching, parallel jobs), observability (badges, notifications).
 
 **See Also:** [Version Management Guide](../development-workflow/version-management.md) for semantic versioning concepts and strategies.
 
@@ -49,26 +49,11 @@ The workflow must be:
 
 ### 1. **Auto-Detect Project Type**
 
-* Detect main language/toolchain from files like `package.json`, `requirements.txt`, `pom.xml`, `Cargo.toml`, etc.
-* Automatically configure lint, test, and build commands.
+* Detect main language/toolchain (package.json, requirements.txt, pom.xml, Cargo.toml), autoconfigure lint/test/build
 
 ### 2. **Pipeline Stages**
 
-* **Lint** → Run static analysis and format checks.
-* **Test** → Execute unit/integration tests.
-* **Build** → Compile or bundle code.
-* **Validate Short Description** → Ensure `./docker/description/short.md` has **≤100 characters**; fail workflow if exceeded.
-* **Docker Test Build** → Perform a **local test build** of the Docker image before pushing:
-  * Build without publishing to validate Dockerfile correctness.
-  * Use cached layers.
-  * Fail immediately on build errors.
-  * Print resulting image size.
-* **Docker Publish** → Build and publish Docker image(s) to both:
-  1. **Docker Hub**
-  2. **GitHub Container Registry (GHCR)**
-* **Security Scan** → Scan image and dependencies (`trivy`, `npm audit`, etc.), upload SARIF to GitHub Security tab.
-* **Deployment Test** → Validate deployment manifests (`docker-compose.yml`, Helm, K8s, etc.).
-* **Release** → Update Docker Hub descriptions (via API) and create a GitHub Release with semantic versioning.
+**Lint** → **Test** → **Build** → **Validate Short Description** (≤100 chars) → **Docker Test Build** (local test build without publishing, validate Dockerfile) → **Docker Publish** (Docker Hub + GHCR) → **Security Scan** (trivy/npm audit, upload SARIF) → **Deployment Test** (validate manifests) → **Release** (update Docker Hub descriptions, create GitHub Release)
 
 ### 3. **Manual and Automatic Triggers**
 
@@ -83,18 +68,7 @@ on:
 
 ### 4. **Dynamic Versioning System**
 
-Implement Git-based dynamic versioning that generates context-aware version strings:
-
-**Version Format:**
-```
-<base_version>-<context>-<commit>
-```
-
-**Examples:**
-- Main branch with tag: `1.0.0`
-- Main branch, no tag: `0.1.0-main-71f02b6`
-- Develop branch: `0.1.0-dev-71f02b6`
-- Feature branch: `0.1.0-feature-auth-71f02b6`
+Implement Git-based versioning: `<base>-<context>-<commit>` (e.g., `1.0.0` on tag, `0.1.0-main-71f02b6` on main, `0.1.0-dev-71f02b6` on develop, `0.1.0-feature-auth-71f02b6` on feature)
 
 **Requirements:**
 * Create `get_version.sh` script that:
@@ -279,44 +253,15 @@ All CI/CD setup and workflow configurations must be documented in `/docs/`:
 
 ## 🔹 **Best Practices**
 
-### **Dynamic Versioning**
-- **Always use `fetch-depth: 0`** in checkout to get full Git history (required for tags)
-- **Make `get_version.sh` executable** and commit: `chmod +x get_version.sh && git add get_version.sh`
-- **Handle missing Git gracefully** with fallbacks: `git rev-parse HEAD 2>/dev/null || echo "unknown"`
-- **Sanitize branch names** to remove special characters: `sed 's/[^a-zA-Z0-9._-]/-/g'`
-- **Use short commit hashes** (7 chars): `git rev-parse --short HEAD`
-- **Don't hardcode versions** in Dockerfile - use ARG/ENV pattern
-- **Display version prominently** at application startup
-- **Include version in Docker labels** following OCI spec
-- **Test version generation locally** before pushing: `./get_version.sh`
+**Dynamic Versioning**: Use `fetch-depth: 0`, executable `get_version.sh`, handle missing Git gracefully, sanitize branch names, short hashes (7 chars), use ARG/ENV in Dockerfile, display version at startup, test locally
 
-### **Modular Job Design**
-- Separate concerns into distinct jobs (version, lint, test, build, deploy)
-- Use job dependencies to control execution order
-- Implement parallel execution where possible
-- Share artifacts between jobs efficiently
-- Pass version as job output to downstream jobs
+**Modular Jobs**: Separate concerns, use dependencies, parallel execution, share artifacts, pass version as outputs
 
-### **Caching Strategy**
-- Cache dependencies aggressively (npm, pip, cargo, etc.)
-- Use action-specific caching (actions/cache, actions/setup-node)
-- Invalidate caches on lock file changes
-- Monitor cache hit rates and adjust
+**Caching**: Cache dependencies (npm/pip/cargo), use action-specific caching, invalidate on lock file changes
 
-### **Security First**
-- Never expose secrets in logs or outputs
-- Use GitHub's secret masking
-- Implement least privilege for tokens
-- Rotate secrets regularly
-- Use OIDC for cloud provider authentication when possible
-- **Don't include sensitive info in version strings** (no private branch names or secrets)
+**Security**: Never expose secrets, use masking, least privilege tokens, rotate secrets, use OIDC, no sensitive info in version strings
 
-### **Fail Fast, Fail Clearly**
-- Run fast checks (lint, version) before slow ones (integration tests)
-- Provide clear error messages in workflow output
-- Set appropriate timeouts for all jobs
-- Implement proper cleanup on failure
-- **Don't fail builds on version generation errors** - use fallbacks
+**Fail Fast**: Run fast checks first (lint, version), clear errors, appropriate timeouts, cleanup on failure, fallbacks for version errors
 
 ---
 

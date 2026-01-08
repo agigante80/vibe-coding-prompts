@@ -2,7 +2,7 @@
 
 ## **Objective**
 
-Analyze the current codebase to identify code smells, technical debt, and architectural issues, then generate a prioritized, actionable refactoring roadmap with effort estimates and risk assessments.
+Analyze codebase to identify code smells, technical debt, and architectural issues, then generate prioritized refactoring roadmap with effort estimates and risk assessments.
 
 ---
 
@@ -74,75 +74,12 @@ cloc . --exclude-dir=node_modules,vendor,dist,build
 
 ### **Automated Analysis Tools**
 
-Use language-appropriate tools for objective measurements:
-
-**JavaScript/TypeScript**:
-```bash
-# ESLint with complexity rules
-npx eslint . --ext .js,.ts --max-warnings 0
-
-# Code complexity
-npx eslint . --plugin complexity --rule 'complexity: ["error", 10]'
-
-# Detect duplicates
-npx jscpd src/
-
-# TypeScript specific
-npx ts-prune  # Find unused exports
-```
-
-**Python**:
-```bash
-# Pylint for code quality
-pylint **/*.py --fail-under=8.0
-
-# Code complexity
-radon cc . -a -nb  # Cyclomatic complexity
-radon mi . -nb     # Maintainability index
-
-# Detect duplicates
-pylint --disable=all --enable=duplicate-code .
-
-# Type checking
-mypy . --strict
-```
-
-**Java**:
-```bash
-# PMD for code smells
-pmd check -d src/ -R rulesets/java/quickstart.xml
-
-# CheckStyle
-checkstyle -c google_checks.xml src/
-
-# SonarQube analysis
-mvn sonar:sonar
-```
-
-**Go**:
-```bash
-# Static analysis
-go vet ./...
-staticcheck ./...
-
-# Code complexity
-gocyclo -over 10 .
-
-# Detect common issues
-golangci-lint run
-```
-
-**Rust**:
-```bash
-# Clippy for lints
-cargo clippy -- -D warnings
-
-# Code formatting
-cargo fmt --check
-
-# Unused dependencies
-cargo machete
-```
+Use language-appropriate tools:
+- **JavaScript/TypeScript**: ESLint (complexity rules), jscpd (duplicates), ts-prune (unused exports)
+- **Python**: pylint (quality), radon (complexity/maintainability), mypy (types)
+- **Java**: PMD (code smells), CheckStyle, SonarQube
+- **Go**: go vet, staticcheck, gocyclo, golangci-lint
+- **Rust**: cargo clippy, cargo fmt, cargo machete
 
 ### **Complexity Thresholds**
 
@@ -344,146 +281,46 @@ Higher scores = Higher priority refactoring
 
 ## **Deliverables**
 
-### **Refactoring Analysis Report**
-1. **Executive Summary** - High-level overview of codebase health
-2. **Code Quality Metrics** - Complexity, duplication, coverage scores
-3. **Identified Code Smells** - Categorized list with locations and severity
-4. **Technical Debt Assessment** - Total debt hours and cost estimation
-5. **Risk Heat Map** - Visual representation of problem areas
-
-### **Prioritized Refactoring Roadmap**
-6. **Quick Wins List** - Immediate improvements (1-2 days each)
-7. **Medium Refactorings** - Planned improvements (1-2 weeks each)
-8. **Major Refactorings** - Strategic initiatives (1-3 months each)
-9. **Effort Estimates** - Time and resource requirements for each item
-10. **Risk Assessment** - Potential issues and mitigation strategies
-
-### **Implementation Plan**
-11. **Phase 1 (Month 1)** - Critical fixes and quick wins
-12. **Phase 2 (Months 2-3)** - Medium-priority refactorings
-13. **Phase 3 (Months 4-6)** - Major architectural improvements
-14. **Dependencies & Sequencing** - What must be done before what
-15. **Team Allocation** - Who works on which refactorings
-
-### **Tooling & Automation**
-16. **Linting Configuration** - ESLint, Pylint, etc. setup
-17. **Pre-commit Hooks** - Automated quality checks
-18. **CI/CD Integration** - Quality gates in pipeline
-19. **Code Review Checklist** - Standards for reviews
-20. **Refactoring Scripts** - Automated transformation tools
-
-### **Documentation Updates**
-All refactoring analysis and plans must be documented in `/docs/`:
-
-- **`/docs/REFACTORING_PLAN.md`**: Add complete refactoring roadmap with phases, prioritized tasks, effort estimates, risk assessments, and completion tracking
-- **`/docs/IMPROVEMENT_AREAS.md`**: Document identified code smells, technical debt items, complexity hotspots, and architectural issues with severity scores
-- **`/docs/ARCHITECTURE.md`**: Update with planned architectural changes, refactoring goals, and target state after major refactorings
-- **`/docs/TESTING_AND_RELIABILITY.md`**: Add test coverage goals for refactored code, quality gates, and refactoring safety procedures
+1. **Refactoring Analysis Report**: Code quality metrics, identified code smells, technical debt assessment, risk heat map
+2. **Prioritized Roadmap**: Quick wins, medium/major refactorings, effort estimates, risk assessment
+3. **Implementation Plan**: Phased approach (months 1-6), dependencies, team allocation
+4. **Tooling**: Linting config, pre-commit hooks, CI/CD quality gates
+5. **Documentation Updates**: Update `/docs/REFACTORING_PLAN.md`, `/docs/IMPROVEMENT_AREAS.md`, `/docs/ARCHITECTURE.md`, `/docs/TESTING_AND_RELIABILITY.md`
 
 ---
 
 ## **Success Criteria**
 
-- [ ] All code smells identified and categorized by severity
-- [ ] Complexity metrics calculated for entire codebase
-- [ ] Refactoring tasks prioritized using scoring framework
-- [ ] Quick wins identified and can be executed immediately
-- [ ] Major refactorings have detailed implementation plans
-- [ ] Risk assessment completed for all proposed changes
-- [ ] Effort estimates provided (person-hours/days)
-- [ ] Dependencies between refactorings mapped
-- [ ] Automated quality tools configured (linters, formatters)
-- [ ] Team trained on refactoring techniques and safety measures
-- [ ] **`/docs/` files updated** with refactoring roadmap and technical debt
+- [ ] Code smells identified and categorized
+- [ ] Complexity metrics calculated
+- [ ] Tasks prioritized with effort estimates
+- [ ] Risk assessment completed
+- [ ] Automated quality tools configured
+- [ ] `/docs/` files updated with refactoring roadmap
 
 ---
 
 ## **Best Practices**
 
-### **Incremental Over Big Bang**
-- Make small, frequent refactorings rather than massive rewrites
-- Keep the system working at all times (no long-lived broken branches)
-- Deploy refactorings gradually to production
-- Use feature flags to toggle between old and new implementations
-
-### **Test-Driven Refactoring**
-- Never refactor without adequate test coverage
-- Add tests before refactoring if coverage is insufficient
-- Use tests as safety net to catch regressions
-- Consider characterization tests for legacy code
-
-### **Boy Scout Rule**
-- Leave code better than you found it
-- Refactor opportunistically when touching code for other reasons
-- Don't wait for perfect time - refactor continuously
-- Build refactoring time into sprint planning
-
-### **Communication & Documentation**
-- Discuss major refactorings with team before starting
-- Document why refactorings are needed, not just what changes
-- Share learnings and patterns discovered
-- Update architecture documentation proactively
-
-### **Measure Impact**
-- Track metrics before and after refactoring
-- Monitor performance impact (positive and negative)
-- Measure developer velocity changes
-- Survey team satisfaction with code quality
+**Incremental**: Small frequent refactorings, keep system working, deploy gradually  
+**Test-Driven**: Never refactor without tests, add tests first if missing  
+**Boy Scout Rule**: Leave code better than found  
+**Communication**: Discuss major changes, document why  
+**Measure**: Track metrics before/after
 
 ---
 
 ## **Usage Instructions**
 
-### **When to Run This Analysis**
+**When to run**: Legacy codebase work, after rapid development, declining velocity, quarterly health checks, before major features
 
-* Starting work on a legacy codebase
-* After rapid feature development period (technical debt accumulated)
-* Before major new feature development
-* Quarterly codebase health assessments
-* When developer velocity is declining
-* Before bringing new team members onboard
-* After major incidents caused by code quality issues
-
-### **Initial Setup**
-1. Review the PROMPT_CREATION_GUIDE.md to understand documentation requirements
-2. Examine existing `/docs/REFACTORING_PLAN.md` and `/docs/IMPROVEMENT_AREAS.md` if they exist
-3. Ensure code quality tools are available (linters, complexity analyzers)
-4. Have comprehensive test suite or plan to add tests
-
-### **Execution**
+**Execution**:
 ```
-I need a comprehensive refactoring plan for my [PROJECT_TYPE].
-
-Project language: [JavaScript/Python/Java/Go/Rust/etc.]
-Codebase age: [months/years]
-Team size: [number of developers]
-Current pain points: [slow development, bugs, performance, etc.]
-Test coverage: [percentage or "unknown"]
-Available refactoring time: [% of sprint capacity]
-Risk tolerance: [low/medium/high]
+I need a refactoring plan for [PROJECT_TYPE].
+Language: [JS/Python/Java/Go/Rust]
+Pain points: [slow dev, bugs, performance]
+Test coverage: [%]
+Available time: [% of sprint]
 ```
 
-### **Expected Outcome**
-The AI will analyze your entire codebase using automated tools and pattern detection, identify code smells and technical debt with severity scoring, calculate complexity metrics and quality scores, generate a prioritized refactoring roadmap with effort estimates, provide specific refactoring techniques for each issue, assess risks and provide mitigation strategies, configure automated quality tools and pre-commit hooks, and document everything in `/docs/` files. You'll receive a comprehensive, actionable plan to systematically improve code quality while managing risk and maintaining delivery velocity.
-
----
-
-## **Example Refactoring Plan Output**
-
-### **Priority 1 - Quick Wins (Week 1)**
-1. ✅ Extract 12 magic numbers to constants (2 hours, Low Risk)
-2. ✅ Remove 47 unused imports and dead functions (3 hours, Low Risk)
-3. ✅ Rename 23 unclear variables in auth module (4 hours, Low Risk)
-4. ✅ Fix code formatting inconsistencies (1 hour, Low Risk)
-
-### **Priority 2 - Medium Impact (Weeks 2-4)**
-5. 🔨 Split `UserController` god class (1200 LOC → 4 classes, 2 days, Medium Risk)
-6. 🔨 Extract duplicate validation logic into validators (1.5 days, Low Risk)
-7. 🔨 Reduce cyclomatic complexity in payment processing (3 days, High Risk)
-8. 🔨 Introduce repository pattern for data access (4 days, Medium Risk)
-
-### **Priority 3 - Strategic (Months 2-3)**
-9. 🏗️ Migrate from inheritance to composition in core domain (2 weeks, High Risk)
-10. 🏗️ Break circular dependencies between modules (3 weeks, High Risk)
-11. 🏗️ Implement proper error handling with Result types (2 weeks, Medium Risk)
-12. 🏗️ Increase test coverage from 45% to 80% (4 weeks, Low Risk)
+**Outcome**: AI analyzes codebase, identifies smells/debt, generates prioritized roadmap with effort/risk estimates, provides refactoring techniques, configures tools, updates `/docs/`

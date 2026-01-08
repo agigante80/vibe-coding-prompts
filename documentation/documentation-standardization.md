@@ -70,229 +70,42 @@ Any other documents in `/docs/` should be **deleted or merged** into one of thes
 
 ### **Step 1. Audit and Clean Existing Documentation**
 
-**Root Directory Audit:**
-1. List all `.md` files in project root
-2. Identify files NOT in the allowed list above
-3. For each non-allowed `.md` file:
-   - If contains useful content: merge into appropriate standard file
-   - If obsolete/redundant: move to `docs/archive/docs-backup-YYYY-MM-DD/` folder
-   - If empty or trivial: delete permanently
-4. Ensure only allowed `.md` files remain in root
+**Root Directory**:
+- List all `.md` files, identify files NOT in allowed list
+- For each non-allowed file: merge useful content into standard file, move obsolete to `docs/archive/docs-backup-YYYY-MM-DD/`, or delete if trivial
 
-**`/docs/` Directory Audit:**
-1. List all files under `/docs/`
-2. Identify files NOT in the standard 9-file set
-3. For each non-standard file:
-   - If contains useful content: merge into appropriate standard document
-   - If obsolete/outdated: move to `docs/archive/docs-backup-YYYY-MM-DD/` folder
-   - If duplicate/redundant: consolidate and delete
-4. Ensure final `/docs/` contains ONLY the 9 standard files (plus `archive/` folder if created)
+**`/docs/` Directory**:
+- List all files, identify files NOT in standard 9-file set
+- For each non-standard file: merge useful content, move obsolete to archive, consolidate duplicates
+- Final `/docs/` must contain ONLY 9 standard files (plus optional `archive/` folder)
 
-**Archive Process:**
-```bash
-# Create timestamped archive folder inside docs/
-mkdir -p docs/archive/docs-backup-$(date +%Y-%m-%d)
+**Archive Command**: `mkdir -p docs/archive/docs-backup-$(date +%Y-%m-%d)`
 
-# Move obsolete files from root (examples)
-mv OLD_README.md docs/archive/docs-backup-$(date +%Y-%m-%d)/
-mv INSTALL.md docs/archive/docs-backup-$(date +%Y-%m-%d)/
-mv TODO.md docs/archive/docs-backup-$(date +%Y-%m-%d)/
-
-# Move obsolete files from docs/ (examples)
-mv docs/DEPRECATED_GUIDE.md docs/archive/docs-backup-$(date +%Y-%m-%d)/
-mv docs/OLD_ARCHITECTURE.md docs/archive/docs-backup-$(date +%Y-%m-%d)/
-mv docs/SETUP_OLD.md docs/archive/docs-backup-$(date +%Y-%m-%d)/
-
-# Document what was archived
-echo "Archived on $(date)" > docs/archive/docs-backup-$(date +%Y-%m-%d)/ARCHIVED_FILES.txt
-ls -la docs/archive/docs-backup-$(date +%Y-%m-%d)/ >> docs/archive/docs-backup-$(date +%Y-%m-%d)/ARCHIVED_FILES.txt
-
-# Add archive folder to .gitignore (optional, if you don't want to track archived files)
-echo "docs/archive/" >> .gitignore
-```
-
-**Deletion Guidelines:**
-- Delete empty or nearly-empty files without hesitation
-- Delete obvious duplicates (e.g., `README_old.md`, `README_backup.md`)
-- Delete scratch files (e.g., `NOTES.md`, `TODO.md`, `SCRATCH.md`)
-- Archive files with potentially useful content for review
-- Document all deletions/archives in commit message
+**Deletion Guidelines**: Delete empty files, obvious duplicates (`README_old.md`), scratch files (`NOTES.md`, `TODO.md`). Archive files with potentially useful content. Document all changes in commit.
 
 ---
 
 ### **Step 2. Generate or Update Each Document**
 
-Below are detailed requirements for each file.
+Below are requirements for each file:
 
----
+**`README.md`**: Project name/tagline, overview, setup, usage examples, link to `/docs`, license. Must include setup validation commands.
 
-### **`README.md`**
+**`PROJECT_OVERVIEW.md`**: Mission, features, tech stack, target audience, status. Update when features change.
 
-**Goal**: Primary entry point for developers and users.
+**`ARCHITECTURE.md`**: System diagram, component descriptions, data flow, design decisions. Must reflect actual code, update on major refactors.
 
-**Content:**
-* Project name and tagline
-* Quick overview (1-2 paragraphs)
-* Installation/setup steps
-* Basic usage examples
-* Link to complete documentation index
-* License and contribution info
+**`AI_INTERACTION_GUIDE.md`**: Agent automation boundaries, testing requirements, documentation triggers, security constraints. Must enforce local testing policy.
 
-**Requirements:**
-* Must include setup validation commands
-* Must reference all documents in `/docs`
-* Must be updated automatically on significant changes
+**`REFACTORING_PLAN.md`**: Current priorities, task breakdown with estimates, completion tracking, dependencies. Update after each task.
 
----
+**`TESTING_AND_RELIABILITY.md`**: Testing framework/tools, coverage requirements, CI/CD config, local procedures. Must enforce pre-commit testing.
 
-### **`PROJECT_OVERVIEW.md`**
+**`IMPROVEMENT_AREAS.md`**: Known limitations, performance optimization, technical debt, feature enhancements. Regular review and prioritization.
 
-**Goal**: High-level project summary for stakeholders.
+**`SECURITY_AND_PRIVACY.md`**: Security best practices, data handling, access control, vulnerability management, privacy compliance.
 
-**Content:**
-* Project mission and objectives
-* Key features and capabilities
-* Technology stack overview
-* Target audience
-* Current status and maturity
-
-**Requirements:**
-* Update when features are added/removed
-* Sync with actual implemented capabilities
-* Include version or milestone information
-
----
-
-### **`ARCHITECTURE.md`**
-
-**Goal**: Technical system design and component relationships.
-
-**Content:**
-* System architecture diagram
-* Component descriptions and responsibilities
-* Data flow and interaction patterns
-* Key design decisions and rationale
-* Technology choices explanation
-
-**Requirements:**
-* Must reflect actual code structure
-* Update when major refactors occur
-* Include dependency relationships
-* Reference actual file/module names
-
----
-
-### **`AI_INTERACTION_GUIDE.md`**
-
-**Goal**: Rules and policies for AI agent behavior.
-
-**Content:**
-* Agent automation boundaries
-* Required testing before commits
-* Documentation update triggers
-* Security and safety constraints
-* Human intervention requirements
-
-**Requirements:**
-* Must enforce local testing policy
-* Must prevent untested GitHub pushes
-* Must maintain security standards
-* Must be consulted before all agent actions
-
----
-
-### **`REFACTORING_PLAN.md`**
-
-**Goal**: Living task list for ongoing improvements.
-
-**Content:**
-* Current refactoring priorities
-* Task breakdown with estimates
-* Completion tracking
-* Dependency relationships
-* Risk assessment for each task
-
-**Requirements:**
-* Update after each completed task
-* Maintain current status
-* Link to related GitHub issues/PRs
-* Track time investment
-
----
-
-### **`TESTING_AND_RELIABILITY.md`**
-
-**Goal**: Testing strategy and reliability policies.
-
-**Content:**
-* Testing framework and tools
-* Test coverage requirements
-* CI/CD pipeline configuration
-* Local testing procedures
-* Performance benchmarks
-
-**Requirements:**
-* Must enforce pre-commit testing
-* Must define coverage thresholds
-* Must document all test types
-* Must include reliability metrics
-
----
-
-### **`IMPROVEMENT_AREAS.md`**
-
-**Goal**: Technical debt and enhancement tracking.
-
-**Content:**
-* Known limitations and gaps
-* Performance optimization opportunities
-* Technical debt items
-* Feature enhancement ideas
-* Third-party dependency updates
-
-**Requirements:**
-* Regular review and updates
-* Prioritization scoring
-* Effort estimation
-* Impact assessment
-
----
-
-### **`SECURITY_AND_PRIVACY.md`**
-
-**Goal**: Security policies and privacy protection.
-
-**Content:**
-* Security best practices
-* Data handling policies
-* Access control requirements
-* Vulnerability management
-* Privacy compliance
-
-**Requirements:**
-* Must be reviewed before security changes
-* Must comply with applicable regulations
-* Must address AI safety concerns
-* Must include incident response procedures
-
----
-
-### **`ROADMAP.md`**
-
-**Goal**: Future development planning and priorities.
-
-**Content:**
-* Short-term goals (next 1-3 months)
-* Medium-term objectives (3-12 months)
-* Long-term vision (1+ years)
-* Resource requirements
-* Milestone definitions
-
-**Requirements:**
-* Regular updates based on progress
-* Stakeholder input incorporation
-* Realistic timeline estimates
-* Clear success criteria
+**`ROADMAP.md`**: Short/medium/long-term goals, milestones, resource requirements. Regular updates based on progress.
 
 ---
 
@@ -331,45 +144,30 @@ Below are detailed requirements for each file.
 4. Synchronized content reflecting current codebase state
 
 ### **Root Directory Cleanup**
-5. Root directory contains only allowed `.md` files (6 max: README, LICENSE, CONTRIBUTING, CODE_OF_CONDUCT, CHANGELOG, SECURITY)
-6. All obsolete/redundant `.md` files removed from root
-7. Useful content from removed root files merged into standard docs
+5. Root contains only allowed `.md` files (6 max)
+6. Obsolete files removed/archived
 
 ### **Cleanup & Migration**
-8. Created `docs/archive/docs-backup-YYYY-MM-DD/` folder with archived files
-9. Removed or merged redundant/outdated documentation files from root and `/docs/`
-10. Migrated useful content from deprecated docs into standard files
-11. Updated all references to moved/removed documentation
-12. Documented all deletions and archives in commit message
-13. Optionally added `docs/archive/` to `.gitignore` if archives shouldn't be tracked
+7. Created `docs/archive/docs-backup-YYYY-MM-DD/` if needed
+8. Merged useful content from removed files
+9. Updated references to moved/removed docs
 
 ### **Automation Configuration**
-8. AI agent rules configured in `/docs/AI_INTERACTION_GUIDE.md`
-9. Documentation update triggers documented and active
-10. Pre-commit testing enforcement in place
+10. AI agent rules configured in `/docs/AI_INTERACTION_GUIDE.md`
 
 ### **Documentation Updates**
-This prompt creates the entire `/docs/` structure, so all documentation is generated fresh. However, when using this prompt to update existing documentation:
-
-- **All 9 `/docs/` files** will be regenerated or updated to match current project state
-- **Cross-references** between files will be validated and corrected
-- **Deprecated documentation** outside `/docs/` will be archived or removed
+All 9 `/docs/` files regenerated/updated to match current state, cross-references validated.
 
 ---
 
 ## 📋 **Success Criteria**
 
-- [ ] Root directory contains ONLY allowed `.md` files (2-6 files: 2 required + up to 4 recommended)
-- [ ] All obsolete `.md` files removed from root or archived to `docs/archive/`
-- [ ] `/docs/` contains ONLY the 9 standard `.md` files (plus `archive/` folder if created)
-- [ ] `docs/archive/docs-backup-YYYY-MM-DD/` folder created if files were archived
-- [ ] All documents are complete and current
-- [ ] Cross-references between documents are accurate
-- [ ] All tests pass locally
-- [ ] Security scan shows no new issues
-- [ ] Agent rules are properly configured in `/docs/AI_INTERACTION_GUIDE.md`
-- [ ] Refactoring plan is up-to-date in `/docs/REFACTORING_PLAN.md`
-- [ ] Documentation triggers automated updates on code changes
+- [ ] Root has ONLY allowed `.md` files (2-6)
+- [ ] `/docs/` has ONLY 9 standard files
+- [ ] Archive folder created if needed
+- [ ] All documents complete and current
+- [ ] Tests pass, security scan clean
+- [ ] Agent rules configured
 - [ ] Commit message documents all deleted/archived files
 
 ---
@@ -465,22 +263,14 @@ find docs/ -maxdepth 1 -name "*.md" | wc -l
 ```
 
 ### **Expected Outcome**
-The AI will:
-1. **Audit** all `.md` files in root and `/docs/` directories
-2. **Archive** obsolete files to `/archive/docs-backup-YYYY-MM-DD/`
-3. **Delete** empty, duplicate, or trivial markdown files
-4. **Merge** useful content from removed files into standard documents
-5. **Create or update** all 9 required `/docs/` files with complete content
-6. **Clean root directory** to contain only allowed `.md` files (max 6)
-7. **Configure** AI agent rules for automated updates
-8. **Establish** a living documentation system synchronized with codebase
+AI will audit/archive/delete `.md` files, merge useful content, create/update all 9 required `/docs/` files, clean root to 2-6 allowed files, and configure AI agent rules.
 
-You'll receive a clean, standardized documentation structure with:
-- **Root directory**: 2-6 `.md` files only (README, LICENSE, CONTRIBUTING, CODE_OF_CONDUCT, CHANGELOG, SECURITY)
-- **`/docs/` directory**: exactly 9 standard `.md` files (README, PROJECT_OVERVIEW, ARCHITECTURE, AI_INTERACTION_GUIDE, REFACTORING_PLAN, TESTING_AND_RELIABILITY, IMPROVEMENT_AREAS, SECURITY_AND_PRIVACY, ROADMAP)
-- **`docs/archive/` folder**: timestamped backup folder with removed files (if any were archived)
-- **Commit message**: documentation of all changes, deletions, and archives
+You'll receive:
+- **Root**: 2-6 `.md` files (README, LICENSE, optional: CONTRIBUTING, CODE_OF_CONDUCT, CHANGELOG, SECURITY)
+- **`/docs/`**: Exactly 9 standard files
+- **`docs/archive/`**: Timestamped backup folder (if needed)
+- **Commit message**: Documentation of all changes
 
 ---
 
-**Output:** Updated `/docs` directory with standardized, synchronized documentation ready for development workflow.
+**Output:** Standardized, synchronized documentation ready for development workflow.

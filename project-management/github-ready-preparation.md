@@ -10,247 +10,41 @@ Prepare a project for professional GitHub publication by establishing proper str
 
 ### 1. **Project Structure Analysis**
 
-**Discover Current State**:
-- Analyze repository structure and organization
-- Identify project type (library, application, CLI tool, Docker image, etc.)
-- Detect programming language and framework
-- Review existing files and documentation
-- Check for common structure issues (flat structure, mixed concerns)
-- Identify missing essential files
-
-**Required Files Audit**:
-```bash
-# Check for essential files
-[ -f "README.md" ] && echo "✅ README.md" || echo "❌ Missing README.md"
-[ -f "LICENSE" ] && echo "✅ LICENSE" || echo "❌ Missing LICENSE"
-[ -f ".gitignore" ] && echo "✅ .gitignore" || echo "❌ Missing .gitignore"
-[ -f "CHANGELOG.md" ] && echo "✅ CHANGELOG.md" || echo "⚠️  Missing CHANGELOG.md (optional)"
-[ -f ".gitattributes" ] && echo "✅ .gitattributes" || echo "⚠️  Missing .gitattributes (optional)"
-[ -f "CONTRIBUTING.md" ] && echo "✅ CONTRIBUTING.md" || echo "⚠️  Missing CONTRIBUTING.md"
-[ -f "CODE_OF_CONDUCT.md" ] && echo "✅ CODE_OF_CONDUCT.md" || echo "⚠️  Missing CODE_OF_CONDUCT.md"
-```
+- Analyze repository organization, identify project type and language
+- Check for essential files: `README.md`, `LICENSE`, `.gitignore`
+- Optional: `CHANGELOG.md`, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`
+- Document missing files and structure issues
 
 ### 2. **.gitignore Review & Validation**
 
 **Critical Checks**:
-- Verify `.gitignore` is not excluding files that are needed for the project to function
-- Ensure all build artifacts, temporary files, and OS-specific files are ignored
-- Check that secrets, credentials, and environment files are properly ignored
-- Validate that source code, configuration, and documentation are NOT ignored
+- Verify needed files aren't excluded
+- Ensure build artifacts, secrets (`.env`, `*.key`), and OS files are ignored
+- Organize by category (Dependencies, Build, Secrets, IDE, OS, Logs)
 
-**Organization Requirements**:
-```gitignore
-# === Dependencies ===
-node_modules/
-vendor/
-__pycache__/
-
-# === Build Output ===
-dist/
-build/
-*.exe
-*.dll
-
-# === Environment & Secrets ===
-.env
-.env.local
-*.key
-*.pem
-credentials.json
-
-# === IDE & Editor ===
-.vscode/
-.idea/
-*.swp
-
-# === OS Files ===
-.DS_Store
-Thumbs.db
-
-# === Logs ===
-*.log
-logs/
-```
-
-**Validation Steps**:
-1. Check if any tracked files match patterns in `.gitignore` (orphaned patterns)
-2. Verify essential files like `package.json`, `README.md`, `.env.example` are tracked
-3. Ensure `.gitignore` patterns are not too broad (e.g., `*.json` would ignore `package.json`)
-4. Identify missing patterns for common build output or temporary files
-5. Remove obsolete patterns for directories or file types no longer in the project
-
-**Test Needed Files Are Not Ignored**:
-```bash
-# Verify critical files are not accidentally ignored
-git check-ignore README.md package.json src/ tests/ docs/ .env.example
-# Should return nothing - these files must be tracked
-```
+**Validation**: Run `git check-ignore README.md package.json src/` (should return nothing)
 
 ### 3. **File Organization Verification**
 
-**Repository Hygiene Audit**:
-- Identify the purpose of every file in the repository
-- Flag files that appear to be obsolete (old scripts, deprecated code, unused configurations)
-- Find duplicate functionality or redundant files
-- Ensure files are organized into appropriate directories
-- Verify file naming conventions are consistent
+**For comprehensive file organization**, run **[File Organization Refactoring](../development-workflow/file-organization-refactoring.md)**
 
-**Common Issues to Flag**:
-- Test files or scratch scripts in root directory (should be in `tests/` or `scripts/`)
-- Multiple configuration files for the same purpose (e.g., `config.js`, `config.json`, `settings.js`)
-- Old backup files (e.g., `app.js.bak`, `config.old.json`)
-- Commented-out or deprecated code files that should be removed
-- Documentation files scattered across directories instead of centralized in `docs/`
-- Build artifacts that should be in `.gitignore`
-
-**Organization Checklist**:
-```bash
-# Find files that may need organization
-find . -type f -name "*.bak" -o -name "*.old" -o -name "*_old.*" -o -name "*.tmp"
-find . -maxdepth 1 -type f -name "test_*" -o -name "*_test.*"  # Tests in root
-find . -type f -name "config*" | wc -l  # Multiple config files?
-```
-
-**Documentation Requirements**:
-- Ambiguous files must have their purpose documented in README or inline comments
-- Directory structure should align with documented architecture
-- Files with unclear names should be renamed or have explanation added
-- Deprecated files should be removed, not just commented out or renamed
+**Quick checks**:
+- Find obsolete files: `find . -name "*.bak" -o -name "*.old"`
+- Tests in root: `find . -maxdepth 1 -name "*test*"`
+- Document or remove ambiguous files
 
 ### 3.1. **Documentation Sanitization & Standardization**
 
-**Problem**: After active development, `/docs` often accumulates duplicate, outdated, or contradictory documentation files that confuse contributors.
+**For comprehensive documentation cleanup**, run **[Documentation Standardization](../documentation/documentation-standardization.md)** which covers:
+- Standard 9-file `/docs/` structure enforcement
+- Duplicate/outdated file identification and archiving
+- Contradiction detection and resolution
+- Naming convention fixes and cross-reference validation
 
-**Sanitization Process**:
+### 4. **Dependency Management**
 
-**Step 1: Audit & Inventory**
-```bash
-# List all documentation files with sizes and dates
-find docs/ -type f -name "*.md" -exec ls -lh {} \;
-
-# Check for potential duplicates by name similarity
-find docs/ -name "*.md" | sort
-```
-
-**Step 2: Identify Issues**
-- [ ] **Duplicate Topics**: Multiple files covering the same subject (e.g., `SETUP.md`, `INSTALLATION.md`, `GETTING_STARTED.md`)
-- [ ] **Contradictory Information**: Different documents stating conflicting facts
-- [ ] **Outdated Content**: Documentation not reflecting current codebase
-- [ ] **Orphaned Files**: Docs not linked from anywhere, serving no clear purpose
-- [ ] **Inconsistent Naming**: Mixed conventions (lowercase, uppercase, underscores, hyphens)
-- [ ] **Scattered Information**: Related content split across multiple files
-
-**Step 3: Conflict Detection**
-```bash
-# Search for version mentions across docs (should be consistent)
-grep -r "version" docs/ --include="*.md"
-
-# Find architectural descriptions (should align)
-grep -r "architecture\|framework\|stack" docs/ --include="*.md"
-
-# Check for conflicting setup instructions
-grep -r "install\|setup\|configure" docs/ --include="*.md"
-```
-
-**Step 4: Standardization Requirements**
-
-**Enforce Standard 9-File Document Set** (use [Documentation Standardization](../documentation/documentation-standardization.md) prompt):
-
-**Root Directory** (2-6 `.md` files maximum):
-- ✅ `README.md` - Required
-- ✅ `LICENSE` or `LICENSE.md` - Required  
-- ✅ `CONTRIBUTING.md` - Recommended
-- ✅ `CODE_OF_CONDUCT.md` - Recommended
-- ✅ `CHANGELOG.md` - Recommended
-- ✅ `SECURITY.md` - Recommended
-
-**`/docs/` Directory** (exactly 9 `.md` files required):
-1. ✅ `README.md` - Entry point with setup, usage, and doc index
-2. ✅ `PROJECT_OVERVIEW.md` - Goals, features, and technology summary
-3. ✅ `ARCHITECTURE.md` - System structure and component flow
-4. ✅ `AI_INTERACTION_GUIDE.md` - AI agent rules and automation
-5. ✅ `REFACTORING_PLAN.md` - Task checklist for ongoing refactors
-6. ✅ `TESTING_AND_RELIABILITY.md` - Testing and CI policies
-7. ✅ `IMPROVEMENT_AREAS.md` - Known gaps and technical debt
-8. ✅ `SECURITY_AND_PRIVACY.md` - Security rules and privacy policy
-9. ✅ `ROADMAP.md` - Priority-based future improvement plan
-
-**All other `.md` files** in root or `/docs/` must be deleted, merged, or archived.
-
-**Consolidation Strategy**:
-1. **Choose Authoritative Source**: For each topic, select the most complete/accurate document
-2. **Merge Content**: Consolidate unique information from duplicates into the 9 standard files
-3. **Archive Obsolete Files**: Move to `docs/archive/docs-backup-YYYY-MM-DD/` folder
-4. **Delete Empty/Redundant Files**: Remove files with no useful content
-5. **Update Cross-References**: Fix links to removed documents
-6. **Document Changes**: Note archived/deleted files in commit message
-
-**Naming Convention** (enforce consistency):
-- Root files: Use `UPPERCASE.md` or `UPPERCASE_WITH_UNDERSCORES.md` (e.g., README.md, CODE_OF_CONDUCT.md)
-- `/docs/` files: Use `UPPERCASE_WITH_UNDERSCORES.md` for standard 9 files
-- No version numbers in filenames (use Git tags instead)
-- No spaces in filenames
-- Archive folder: `docs/archive/docs-backup-YYYY-MM-DD/` for obsolete files
-
-**Archive Process**:
-```bash
-# Create timestamped archive folder inside docs/
-mkdir -p docs/archive/docs-backup-$(date +%Y-%m-%d)
-
-# Move obsolete files
-mv OLD_README.md docs/archive/docs-backup-$(date +%Y-%m-%d)/
-mv docs/SETUP_OLD.md docs/archive/docs-backup-$(date +%Y-%m-%d)/
-mv docs/API_DOCUMENTATION.md docs/archive/docs-backup-$(date +%Y-%m-%d)/  # If merging into ARCHITECTURE.md
-
-# Document what was archived
-echo "Archived on $(date)" > docs/archive/docs-backup-$(date +%Y-%m-%d)/ARCHIVED_FILES.txt
-ls -la docs/archive/docs-backup-$(date +%Y-%m-%d)/ >> docs/archive/docs-backup-$(date +%Y-%m-%d)/ARCHIVED_FILES.txt
-```
-
-**Step 5: Validation Checks**
-- [ ] Root has 2-6 `.md` files only (README, LICENSE required; CONTRIBUTING, CODE_OF_CONDUCT, CHANGELOG, SECURITY optional)
-- [ ] `/docs/` has exactly 9 `.md` files (plus `archive/` folder if files were archived)
-- [ ] Each topic has ONE authoritative document
-- [ ] No contradictory statements across documents
-- [ ] All internal links (`[link](../docs/FILE.md)`) are valid
-- [ ] Consistent terminology used throughout
-- [ ] All documents reflect current codebase version
-- [ ] Cross-references between docs are bidirectional
-- [ ] Document hierarchy is clear (README → specific docs)
-- [ ] No orphaned documents (all referenced from somewhere)
-- [ ] Consistent formatting and structure
-- [ ] Archive folder created if obsolete files exist: `docs/archive/docs-backup-YYYY-MM-DD/`
-
-**Common Contradictions to Resolve**:
-- Version numbers (project version, dependency versions)
-- Technology choices (database, framework, libraries)
-- Configuration defaults (ports, timeouts, limits)
-- Workflow descriptions (branching, deployment, testing)
-- Feature status (planned vs. implemented vs. deprecated)
-- API endpoints and parameters
-- Environment variable names and purposes
-
-**Quality Gates**:
-```bash
-# Verify no broken internal links
-markdown-link-check docs/**/*.md
-
-# Check for TODO/FIXME markers
-grep -r "TODO\|FIXME\|XXX\|HACK" docs/
-
-# Validate consistent terminology
-# (manual review of key terms: API, endpoint, service, module, etc.)
-```
-
-### 4. **Dependency Management Check**
-
-**Verify Package Management**:
-- **Node.js**: `package.json`, `package-lock.json` or `yarn.lock`
-- **Python**: `requirements.txt`, `pyproject.toml`, `Pipfile`
-- **Java**: `pom.xml`, `build.gradle`
-- **Go**: `go.mod`, `go.sum`
-- **Rust**: `Cargo.toml`, `Cargo.lock`
-- **Ruby**: `Gemfile`, `Gemfile.lock`
+- Verify language-specific package files exist (`package.json`, `requirements.txt`, `pom.xml`, `go.mod`, `Cargo.toml`, `Gemfile`, etc.)
+- Ensure lock files present for reproducible builds
 - **PHP**: `composer.json`, `composer.lock`
 
 **Validation**:
@@ -274,29 +68,11 @@ grep -r "api_key\|API_KEY\|secret\|SECRET\|password\|PASSWORD\|token\|TOKEN" \
 git log --all --full-history -- **/.env
 ```
 
-**Vulnerability Scanning**:
-```bash
-# Node.js
-npm audit
-
-# Python
-pip-audit || safety check
-
-# Check .gitignore covers sensitive files
-grep -E "\.env$|\.env\.local|secrets|credentials|\.pem$|\.key$" .gitignore
-```
+**Vulnerability Scanning**: Run `npm audit` (Node.js), `pip-audit` (Python), or ecosystem equivalent
 
 ### 6. **CI/CD Infrastructure**
 
-**Check Automation**:
-```bash
-# GitHub Actions
-ls -la .github/workflows/
-
-# Check for common workflow files
-[ -f ".github/workflows/ci.yml" ] && echo "✅ CI workflow exists"
-[ -f ".github/workflows/release.yml" ] && echo "✅ Release workflow exists"
-```
+**For comprehensive CI/CD setup**, run **[GitHub Actions CI/CD Generator](../devops-automation/github-actions-cicd-generator.md)**
 
 ---
 
@@ -316,384 +92,105 @@ ls -la .github/workflows/
 | **Recommended** | `CHANGELOG.md` | Version history and notable changes | ⬜ |
 | **Optional** | `.gitattributes` | Consistent line endings and text normalization | ⬜ |
 
-**Folder Structure Template**:
-```
-project-root/
-├── .github/
-│   ├── workflows/          # CI/CD workflows
-│   ├── ISSUE_TEMPLATE/     # Issue templates
-│   └── PULL_REQUEST_TEMPLATE.md
-├── src/                    # Source code
-├── tests/                  # Test files
-├── docs/                   # Documentation
-├── scripts/                # Build/deployment scripts
-├── config/                 # Configuration files
-├── .gitignore
-├── .gitattributes
-├── LICENSE
-├── README.md
-├── CHANGELOG.md
-├── CONTRIBUTING.md
-├── CODE_OF_CONDUCT.md
-└── package.json / requirements.txt / etc.
-```
+**For detailed file organization**, run **[File Organization Refactoring](../development-workflow/file-organization-refactoring.md)**
 
-### 🏷️ **2. Repository Metadata (GitHub Presentation)**
+### 🏷️ **2. Repository Metadata**
 
-| Priority | Item | Description | Status |
-|----------|------|-------------|--------|
-| **Critical** | Repository description | Concise summary (≤350 chars) of project purpose and features | ⬜ |
-| **Critical** | Repository topics | 10-15 relevant keywords for discoverability | ⬜ |
-| **Recommended** | Homepage URL | Link to live demo, docs site, or landing page | ⬜ |
-| **Optional** | Social preview image | Custom image for social media shares | ⬜ |
+| Priority | Item | Status |
+|----------|------|--------|
+| **Critical** | Repository description (≤350 chars) | ⬜ |
+| **Critical** | Repository topics (10-15 keywords) | ⬜ |
+| **Recommended** | Homepage URL | ⬜ |
 
-**Description Format**:
-```
-[Type of tool/service] for [target use case] - [feature 1], [feature 2], [feature 3], and [feature 4]
-```
-
-**Description Requirements**:
-- Keep under 350 characters (GitHub limit)
-- Focus on benefits and features, not implementation
-- Lead with what it does, not how it's built
-- Include 3-4 key features
-- Avoid jargon unless target audience expects it
-
-**Good Description Examples**:
-```
-✅ "Curated AI prompts for software development - comprehensive meta-prompts for documentation, CI/CD, testing, security audits, logging, and code quality with vibe coding philosophy"
-
-✅ "Automated bank sync service for Actual Budget - scheduled synchronization, real-time monitoring, and multi-budget management with Telegram notifications"
-
-✅ "Lightning-fast API testing framework - built-in assertion library, parallel test execution, detailed reporting, and seamless CI/CD integration"
-
-❌ "A Node.js application using Docker and Express.js" (too technical, no benefits)
-❌ "My awesome project that does stuff" (vague, unprofessional)
-```
-
-**Topics Strategy**:
-
-**Topic Categories** (aim for 10-15 total):
-
-1. **Technical Stack** (3-5 topics):
-   - Languages: `python`, `javascript`, `typescript`, `go`, `rust`
-   - Frameworks: `nodejs`, `react`, `django`, `express`
-   - Tools: `docker`, `kubernetes`, `terraform`
-
-2. **Functional Domain** (3-5 topics):
-   - Use case: `automation`, `monitoring`, `ci-cd`, `testing`
-   - Industry: `finance`, `healthcare`, `devops`, `security`
-   - Problem space: `logging`, `observability`, `deployment`
-
-3. **Specific Technologies** (2-4 topics):
-   - Platform: `github-actions`, `aws`, `azure`, `gcp`
-   - Integration: `prometheus`, `grafana`, `telegram-bot`
-   - Protocol: `rest-api`, `graphql`, `grpc`
-
-4. **Project Type** (1-2 topics):
-   - Category: `library`, `cli-tool`, `web-app`, `api`
-   - Approach: `meta-prompts`, `prompt-engineering`, `vibe-coding`
-
-**Topics Guidelines**:
-- Use lowercase only
-- Use hyphens for multi-word topics: `ci-cd`, `github-actions`
-- Maximum 20 topics (GitHub limit)
-- Prioritize discoverability: what would users search for?
-- Include both technical and functional keywords
-- Avoid redundancy: `javascript` + `js` is wasteful
-
-**Topics Examples by Project Type**:
-
-**DevOps Tool**:
-```
-automation, ci-cd, devops, docker, github-actions, kubernetes, monitoring, nodejs, prometheus, deployment
-```
-
-**AI/ML Project**:
-```
-ai, artificial-intelligence, chatgpt, deep-learning, machine-learning, neural-networks, nlp, python, pytorch, tensorflow
-```
-
-**API/Backend Service**:
-```
-api, backend, database, docker, express, microservices, nodejs, postgresql, rest-api, typescript
-```
-
-**Applying Metadata to GitHub**:
-
-**Option 1: Via Web UI** (easiest):
-1. Go to repository main page
-2. Click ⚙️ gear icon next to "About" section
-3. Add description
-4. Add topics (comma-separated or clicking suggestions)
-5. Save changes
-
-**Option 2: Via GitHub CLI**:
-```bash
-# Update description
-gh api \
-  --method PATCH \
-  -H "Accept: application/vnd.github+json" \
-  /repos/OWNER/REPO \
-  -f description="Your description here"
-
-# Update topics
-gh api \
-  --method PUT \
-  -H "Accept: application/vnd.github+json" \
-  /repos/OWNER/REPO/topics \
-  -f names[]="topic-one" \
-  -f names[]="topic-two" \
-  -f names[]="topic-three"
-```
-
-**Option 3: Via REST API**:
-```bash
-# Using curl with GitHub token
-curl -X PATCH \
-  -H "Accept: application/vnd.github+json" \
-  -H "Authorization: Bearer YOUR_GITHUB_TOKEN" \
-  https://api.github.com/repos/OWNER/REPO \
-  -d '{
-    "description": "Your description here",
-    "topics": ["topic-one", "topic-two", "topic-three"]
-  }'
-```
-
-**Validation**:
-- [ ] Description is under 350 characters
-- [ ] Description clearly explains what the project does
-- [ ] Topics include mix of technical and functional keywords
-- [ ] Topics are lowercase and use hyphens
-- [ ] 10-15 topics selected (not too few, not hitting 20 limit)
-- [ ] Topics would help target users discover the project
-- [ ] Metadata visible on repository main page
-
-**SEO Benefits**:
-- Description appears in GitHub search results
-- Topics make project discoverable via GitHub topic pages
-- Clear description improves click-through rate
-- Topics help GitHub recommend similar projects
-- Metadata used by external search engines and aggregators
+**See [.github/REPOSITORY_METADATA.md](./.github/REPOSITORY_METADATA.md) for detailed guidance on:**
+- Description formatting best practices
+- Topic selection strategies
+- Application via Web UI or GitHub CLI
 
 ### 🚀 **3. Build & Run**
 
-| Priority | Item | Description | Status |
-|----------|------|-------------|--------|
-| **Critical** | Installation instructions | Clear, step-by-step in README | ⬜ |
-| **Critical** | Build script | `npm run build`, `make`, `cargo build`, etc. | ⬜ |
-| **Critical** | Start script | `npm start`, `python -m app`, `docker-compose up` | ⬜ |
-| **Recommended** | `.env.example` | Template for required environment variables | ⬜ |
-| **Recommended** | Docker setup | `Dockerfile` and/or `docker-compose.yml` | ⬜ |
-| **Optional** | Makefile | Simplified build commands | ⬜ |
+**See [.github/REPOSITORY_METADATA.md](./.github/REPOSITORY_METADATA.md) for detailed guidance on:**
+- Description formatting best practices
+- Topic selection strategies
+- Application via Web UI or GitHub CLI
 
-**Build Validation**:
-```bash
-# Test build process
-npm run build && npm start  # or equivalent
-docker build -t test-image .
-docker-compose up -d
-```
+### 🚀 **3. Build & Run**
+
+| Priority | Item | Status |
+|----------|------|--------|
+| **Critical** | Installation & build instructions in README | ⬜ |
+| **Recommended** | `.env.example` & Docker setup | ⬜ |
 
 ### 🧪 **4. Testing**
 
-| Priority | Item | Description | Status |
-|----------|------|-------------|--------|
-| **Critical** | Automated tests | Unit and integration tests | ⬜ |
-| **Critical** | Tests runnable | `npm test`, `pytest`, etc. | ⬜ |
-| **Recommended** | Coverage measurement | 70%+ code coverage ideal | ⬜ |
-| **Recommended** | CI test execution | Tests run on every push/PR | ⬜ |
-| **Recommended** | Test badges | Show test status in README | ⬜ |
+| Priority | Item | Status |
+|----------|------|--------|
+| **Critical** | Automated tests (runnable with single command) | ⬜ |
+| **Recommended** | 70%+ coverage & CI integration | ⬜ |
 
-**Test Frameworks by Language**:
-- **JavaScript/TypeScript**: Jest, Mocha, Vitest
-- **Python**: pytest, unittest
-- **Java**: JUnit, TestNG
-- **Go**: `go test`
-- **Rust**: `cargo test`
+**For comprehensive test setup**, run **[Test Suite Generator](../development-workflow/test-suite-generator.md)**
 
 ### 🧰 **5. Automation / CI/CD**
 
-| Priority | Item | Description | Status |
-|----------|------|-------------|--------|
-| **Critical** | CI workflow | `.github/workflows/ci.yml` - build, test, lint | ⬜ |
-| **Recommended** | Release automation | Auto-versioning and GitHub Releases | ⬜ |
-| **Recommended** | Docker publishing | Push to Docker Hub/GHCR on release | ⬜ |
-| **Recommended** | Code scanning | Security vulnerability scanning | ⬜ |
-| **Recommended** | Dependabot | Automated dependency updates | ⬜ |
-| **Optional** | Manual triggers | `workflow_dispatch` support | ⬜ |
+| Priority | Item | Status |
+|----------|------|--------|
+| **Critical** | CI workflow (`.github/workflows/ci.yml`) | ⬜ |
+| **Recommended** | Release automation & Dependabot | ⬜ |
 
-**Minimal CI Workflow Template**:
-```yaml
-name: CI
-on: [push, pull_request]
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Setup
-        run: |
-          # Install dependencies
-      - name: Lint
-        run: |
-          # Run linter
-      - name: Test
-        run: |
-          # Run tests
-      - name: Build
-        run: |
-          # Build project
-```
+**For comprehensive CI/CD setup**, run **[GitHub Actions CI/CD Generator](../devops-automation/github-actions-cicd-generator.md)** which provides:
+- Complete workflow templates (build, test, lint, deploy)
+- Docker publishing automation
+- Security scanning integration
+- Release automation with semantic versioning
 
 ### 🧭 **6. Documentation**
 
-| Priority | Item | Description | Status |
-|----------|------|-------------|--------|
-| **Critical** | `README.md` | Comprehensive project documentation | ⬜ |
-| **Critical** | `/docs/` sanitization | Remove duplicates, resolve contradictions, standardize | ⬜ |
-| **Recommended** | `/docs/` folder | Additional guides, API reference, architecture | ⬜ |
-| **Recommended** | Standard doc set | 9 core documents from Documentation Standardization | ⬜ |
-| **Recommended** | Inline comments | Explain non-obvious logic | ⬜ |
-| **Recommended** | API documentation | OpenAPI/Swagger for APIs | ⬜ |
-| **Optional** | Doc generator | Sphinx, JSDoc, Docusaurus, etc. | ⬜ |
+| Priority | Item | Status |
+|----------|------|--------|
+| **Critical** | Professional `README.md` | ⬜ |
+| **Critical** | `/docs/` standardization (9 files) | ⬜ |
 
-**Documentation Must Include**:
-- What the project does (problem + solution)
-- Installation instructions
-- Usage examples
-- Configuration options
-- Contributing guidelines
-- License information
+**For README generation**, run **[README Generator](../documentation/readme-generator.md)**
+**For documentation standardization**, already covered in Step 4 above
 
 ### 👥 **7. Community & Contribution**
 
-| Priority | Item | Description | Status |
-|----------|------|-------------|--------|
-| **Recommended** | `CONTRIBUTING.md` | How to submit issues and PRs | ⬜ |
-| **Recommended** | `CODE_OF_CONDUCT.md` | Community guidelines | ⬜ |
-| **Recommended** | Issue templates | `.github/ISSUE_TEMPLATE/` | ⬜ |
-| **Recommended** | PR template | `.github/PULL_REQUEST_TEMPLATE.md` | ⬜ |
-| **Optional** | Labels | Categorize issues (bug, enhancement, etc.) | ⬜ |
-| **Optional** | Milestones | Track project goals | ⬜ |
-
-**Issue Template Example**:
-```markdown
-## Description
-[Clear description of the issue]
-
-## Steps to Reproduce
-1. Step one
-2. Step two
-
-## Expected Behavior
-[What should happen]
-
-## Actual Behavior
-[What actually happens]
-
-## Environment
-- OS: [e.g., Ubuntu 22.04]
-- Version: [e.g., 1.2.3]
-```
+| Priority | Item | Status |
+|----------|------|--------|
+| **Recommended** | `CONTRIBUTING.md` | ⬜ |
+| **Recommended** | `CODE_OF_CONDUCT.md` | ⬜ |
+| **Recommended** | Issue & PR templates (`.github/`) | ⬜ |
 
 ### 🔐 **8. Security & Secrets**
 
-| Priority | Item | Description | Status |
-|----------|------|-------------|--------|
-| **Critical** | No secrets in repo | Scan history with `git-secrets` or `trufflehog` | ⬜ |
-| **Critical** | `.env.example` | Document required environment variables | ⬜ |
-| **Critical** | `.gitignore` secrets | Ensure `.env`, `*.key`, `*.pem` are ignored | ⬜ |
-| **Recommended** | Dependabot enabled | Automated dependency security updates | ⬜ |
-| **Recommended** | `SECURITY.md` | Security policy and vulnerability reporting | ⬜ |
-| **Optional** | Secret scanning | Enable GitHub secret scanning | ⬜ |
+| Priority | Item | Status |
+|----------|------|--------|
+| **Critical** | No secrets in repo (scan with `git-secrets`) | ⬜ |
+| **Critical** | `.env.example` with required variables | ⬜ |
+| **Recommended** | `SECURITY.md` & Dependabot enabled | ⬜ |
 
-**Security Scan Commands**:
-```bash
-# Install and run git-secrets
-git secrets --scan-history
-
-# Or use trufflehog
-trufflehog git file://. --only-verified
-
-# Check for common patterns
-grep -r "password\s*=\s*['\"]" --include="*.py" --include="*.js"
-```
+**For comprehensive security audit**, run **[Security Audit Generator](../security/security-audit-generator.md)**
 
 ### 🧱 **9. Releases & Distribution**
 
-| Priority | Item | Description | Status |
-|----------|------|-------------|--------|
-| **Critical** | Semantic versioning | Use `MAJOR.MINOR.PATCH` (e.g., `1.2.3`) | ⬜ |
-| **Critical** | Dynamic versioning | Git-based version generation (`get_version.sh`) | ⬜ |
-| **Recommended** | GitHub Releases | Tag versions with release notes | ⬜ |
-| **Recommended** | Package publishing | npm, PyPI, Docker Hub, etc. | ⬜ |
-| **Recommended** | `CHANGELOG.md` | Automated or manual changelog | ⬜ |
-| **Optional** | Release automation | Semantic-release or similar | ⬜ |
+| Priority | Item | Status |
+|----------|------|--------|
+| **Critical** | Semantic versioning (`MAJOR.MINOR.PATCH`) | ⬜ |
+| **Recommended** | GitHub Releases & `CHANGELOG.md` | ⬜ |
 
-**Versioning Strategy**:
-- **Major**: Breaking changes
-- **Minor**: New features (backward compatible)
-- **Patch**: Bug fixes
+**For version management**, run **[Version Management](../development-workflow/version-management.md)** which covers:
+- Dynamic Git-based versioning
+- Release automation
+- Changelog generation
 
-**Dynamic Versioning Implementation**:
+### 📊 **10. Metadata & Visibility**
 
-Create `get_version.sh` script for Git-based version generation:
+| Priority | Item | Status |
+|----------|------|--------|
+| **Critical** | Repository description & topics | ⬜ |
+| **Recommended** | README badges & screenshots | ⬜ |
 
-```bash
-#!/bin/bash
-set -e
-
-# Get base version from package.json or equivalent
-BASE_VERSION=$(node -p "require('./package.json').version" 2>/dev/null || echo "0.1.0")
-
-# Get Git context
-BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "unknown")
-COMMIT=$(git rev-parse --short HEAD 2>/dev/null || echo "unknown")
-TAG=$(git describe --exact-match --tags 2>/dev/null || echo "")
-
-# Generate version based on context
-if [ "$BRANCH" = "main" ] && [ -n "$TAG" ]; then
-    VERSION="$TAG"                                    # Tagged: 1.0.0
-elif [ "$BRANCH" = "main" ]; then
-    VERSION="${BASE_VERSION}-main-${COMMIT}"          # Main: 0.1.0-main-abc1234
-elif [ "$BRANCH" = "develop" ]; then
-    VERSION="${BASE_VERSION}-dev-${COMMIT}"           # Develop: 0.1.0-dev-abc1234
-else
-    SANITIZED_BRANCH=$(echo "$BRANCH" | sed 's/[^a-zA-Z0-9._-]/-/g')
-    VERSION="${BASE_VERSION}-${SANITIZED_BRANCH}-${COMMIT}"  # Feature: 0.1.0-feature-auth-abc1234
-fi
-
-echo "$VERSION"
-```
-
-**Requirements**:
-- Script must be executable: `chmod +x get_version.sh`
-- Works in CI/CD with `fetch-depth: 0`
-- Falls back gracefully when Git unavailable
-- Sanitizes branch names (replace special chars)
-- Used in Dockerfile: `ARG VERSION=unknown` → `ENV VERSION=${VERSION}`
-- Application reads from environment variable
-- Version displayed at startup and in health endpoint
-
-### 📊 **9. Metadata & Visibility**
-
-| Priority | Item | Description | Status |
-|----------|------|-------------|--------|
-| **Critical** | Repository description | Clear one-liner on GitHub | ⬜ |
-| **Recommended** | GitHub topics | Add relevant tags (e.g., `python`, `docker`, `ai`) | ⬜ |
-| **Recommended** | Website link | Link to docs or homepage | ⬜ |
-| **Recommended** | README badges | Build, version, license, downloads | ⬜ |
-| **Recommended** | Screenshots/GIFs | Visual representation of the project | ⬜ |
-| **Optional** | Social preview | Custom Open Graph image | ⬜ |
-
-**Essential Badges**:
-```markdown
-![Build](https://github.com/USER/REPO/actions/workflows/ci.yml/badge.svg)
-![Version](https://img.shields.io/github/v/release/USER/REPO)
-![License](https://img.shields.io/github/license/USER/REPO)
-![Downloads](https://img.shields.io/github/downloads/USER/REPO/total)
-```
+**Already covered in Section 2 above**
 
 ### 🤖 **10. AI/Agent Integration** (Optional)
 
@@ -805,117 +302,42 @@ Thumbs.db
 
 ## **Deliverables**
 
-### **Essential Files Created**
-1. **`.gitignore`** - Comprehensive ignore rules for your language/framework
-2. **`LICENSE`** - Appropriate open-source license (MIT, Apache-2.0, etc.)
-3. **`README.md`** - Professional, complete documentation (or update existing)
-4. **`CHANGELOG.md`** - Initial version history
-5. **`.env.example`** - Template for environment variables
-6. **`get_version.sh`** - Dynamic version generation script (executable)
-
-### **Community Files**
-6. **`CONTRIBUTING.md`** - Contribution guidelines
-7. **`CODE_OF_CONDUCT.md`** - Community standards
-8. **`.github/ISSUE_TEMPLATE/bug_report.md`** - Bug report template
-9. **`.github/ISSUE_TEMPLATE/feature_request.md`** - Feature request template
-10. **`.github/PULL_REQUEST_TEMPLATE.md`** - PR template
-
-### **Automation & CI/CD**
-11. **`.github/workflows/ci.yml`** - Build, test, lint workflow with dynamic versioning
-12. **`.github/workflows/release.yml`** - Release automation (optional)
-13. **`.github/dependabot.yml`** - Automated dependency updates
-14. **Updated Dockerfile** - With `ARG VERSION` and `ENV VERSION` support
-
-### **Security**
-14. **`SECURITY.md`** - Security policy and vulnerability reporting
-15. **Security scan report** - Results from secrets scanning
-16. **Dependency audit report** - Vulnerability assessment
-
-### **Documentation**
-17. **`/docs/` structure** - Additional documentation organized
-18. **API documentation** - If applicable (OpenAPI, etc.)
-19. **Architecture diagrams** - If applicable
+### **Essential Files**
+1. `.gitignore`, `LICENSE`, `README.md`, `CHANGELOG.md`, `.env.example`
+2. `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `SECURITY.md`
+3. Issue & PR templates (`.github/`)
+4. CI/CD workflows (`.github/workflows/`)
+5. Dependabot configuration
 
 ### **Documentation Updates**
-All GitHub preparation work must be documented in `/docs/`:
-
-- **`/docs/README.md`**: Update with repository setup instructions, contribution workflow, and links to new community files
-- **`/docs/PROJECT_OVERVIEW.md`**: Add GitHub visibility status, community guidelines, release strategy, and distribution channels
-- **`/docs/SECURITY_AND_PRIVACY.md`**: Document security policies, vulnerability reporting process, secrets management, and GitHub security features enabled
-- **`/docs/ROADMAP.md`**: Include release schedule, versioning strategy, planned GitHub integrations, and community engagement plans
+Update `/docs/` files per [Documentation Standardization](../documentation/documentation-standardization.md):
+- `/docs/README.md` - Repository setup and contribution workflow
+- `/docs/PROJECT_OVERVIEW.md` - GitHub visibility and release strategy
+- `/docs/SECURITY_AND_PRIVACY.md` - Security policies and vulnerability reporting
+- `/docs/ROADMAP.md` - Release schedule and versioning strategy
 
 ---
 
 ## **Success Criteria**
 
-- [ ] All critical files present (`.gitignore`, `LICENSE`, `README.md`, dependencies)
-- [ ] Folder structure organized and logical
-- [ ] No secrets or credentials in repository history
-- [ ] Dependencies properly managed and locked
-- [ ] **`get_version.sh` script created and executable** (`chmod +x get_version.sh`)
-- [ ] **Dynamic versioning working**: Script generates correct version strings
-- [ ] **Dockerfile updated** with `ARG VERSION` and `ENV VERSION`
-- [ ] **Application reads VERSION** from environment variable with fallback
-- [ ] **Version displayed at startup** in application logs
-- [ ] **CI/CD uses `fetch-depth: 0`** for full Git history (required for tags)
-- [ ] **CI/CD runs `get_version.sh`** and passes VERSION to Docker build
-- [ ] Tests exist and run successfully
-- [ ] CI/CD workflow configured and passing
-- [ ] README comprehensive with badges and examples
-- [ ] Contributing and community guidelines established
+- [ ] All critical files present (`.gitignore`, `LICENSE`, `README.md`)
+- [ ] No secrets in repository history
+- [ ] Tests pass, CI/CD configured and passing
+- [ ] `/docs/` standardized (9 files)
 - [ ] Security scanning enabled (Dependabot, secret scanning)
-- [ ] Release strategy defined with semantic versioning and dynamic versioning
-- [ ] GitHub topics and metadata configured
-- [ ] Project can be cloned and run by anyone without guidance
-- [ ] All builds pass, tests pass, linting passes
-- [ ] Documentation synchronized with code
-- [ ] **`/docs/` files updated** with GitHub setup, versioning strategy, and policies
+- [ ] Repository metadata configured (description, topics)
+- [ ] Project can be cloned and run without additional guidance
 
 ---
 
 ## **Best Practices**
 
-### **Repository Hygiene**
-- Keep repository root clean (move configs to dedicated folders)
-- Use consistent naming conventions (kebab-case for files)
-- Delete unused files and branches
-- Keep commit history clean and meaningful
-- Use conventional commits (feat:, fix:, docs:, etc.)
-
-### **Documentation Excellence**
-- Write README for newcomers, not experts
-- Provide runnable examples in documentation
-- Keep documentation synchronized with code
-- Use diagrams and visuals where helpful
-- Document breaking changes prominently
-
-### **Security First**
-- Never commit secrets (scan history before first push)
-- Use environment variables for all credentials
-- Enable branch protection rules
-- Require PR reviews for main branch
-- Use signed commits (optional but recommended)
-
-### **Automation Strategy**
-- Automate everything that can be automated
-- Fail fast (run quick checks before slow ones)
-- Cache dependencies in CI to speed up builds
-- Use matrix strategies for multi-platform testing
-- Keep CI workflows simple and maintainable
-
-### **Community Building**
-- Respond to issues and PRs promptly
-- Be welcoming to first-time contributors
-- Document decision-making process
-- Use GitHub Discussions for Q&A
-- Celebrate contributions and milestones
-
-### **Release Management**
-- Use semantic versioning consistently
-- Write clear, user-focused release notes
-- Tag all releases properly
-- Maintain changelog discipline
-- Consider pre-releases for testing (beta, rc)
+* Keep repository root clean, consistent naming
+* Write README for newcomers, sync docs with code
+* Never commit secrets, enable branch protection
+* Automate everything, fail fast in CI
+* Respond to issues/PRs promptly, welcome contributors
+* Use semantic versioning, write clear release notes, maintain CHANGELOG
 
 ---
 
@@ -953,35 +375,23 @@ Special considerations: [AI integration/MCP/sensitive data/etc.]
 ```
 
 ### **Expected Outcome**
-The AI will analyze your project structure, create or update all essential files (`.gitignore`, `LICENSE`, `README.md`, `CONTRIBUTING.md`, etc.), scan for and report any secrets or security issues, set up CI/CD workflows for automated testing and releases, organize folder structure following best practices, create issue and PR templates, configure Dependabot for security updates, generate comprehensive documentation, add appropriate badges and metadata, and ensure the project is ready for professional GitHub publication. You'll receive a completely GitHub-ready repository that anyone can clone, understand, run, and contribute to without external guidance.
+AI analyzes structure, creates/updates essential files, scans for secrets, sets up CI/CD, organizes folders, configures Dependabot, generates documentation, adds badges/metadata—delivering a professional, clone-ready GitHub repository.
 
 ---
 
 ## **GitHub Ready Assessment Report**
 
-After running this prompt, you'll receive a detailed report:
-
 ### **Readiness Score**: X/100
 
-**Critical Issues** (Must Fix):
-- [ ] Missing LICENSE file
-- [ ] Secrets found in repository
-- [ ] No README.md
+**Critical Issues** (Must Fix): Missing LICENSE, secrets found, no README
 
-**Recommended Improvements**:
-- [ ] Add CI/CD workflow
-- [ ] Create CONTRIBUTING.md
-- [ ] Set up Dependabot
+**Recommended Improvements**: Add CI/CD, CONTRIBUTING.md, Dependabot
 
-**Optional Enhancements**:
-- [ ] Add project screenshots
-- [ ] Create CHANGELOG.md
-- [ ] Set up release automation
+**Optional Enhancements**: Screenshots, CHANGELOG, release automation
 
 ### **Next Steps**:
 1. Fix critical issues immediately
 2. Implement recommended improvements
-3. Consider optional enhancements
-4. Review generated files and customize
-5. Test the complete workflow (clone → build → run → test)
-6. Push to GitHub and verify all workflows pass
+3. Review generated files and customize
+4. Test complete workflow (clone → build → run → test)
+5. Push to GitHub and verify workflows pass
