@@ -36,8 +36,8 @@ Common obsolete files to remove:
 - `OLD_README.md`, `README.old.md`, `README_backup.md`
 - `INSTALL.md` (merge into README.md)
 - `USAGE.md` (merge into README.md)
-- `API.md` (move to `/docs/API_DOCUMENTATION.md`)
-- `DEPLOYMENT.md` (move to `/docs/`)
+- `API.md` (merge into `/docs/ARCHITECTURE.md`)
+- `DEPLOYMENT.md` (merge into `/docs/ROADMAP.md` or `/docs/ARCHITECTURE.md`)
 - Any dated or versioned docs: `README_2023.md`, `ARCHITECTURE_v1.md`
 
 ---
@@ -75,7 +75,7 @@ Any other documents in `/docs/` should be **deleted or merged** into one of thes
 2. Identify files NOT in the allowed list above
 3. For each non-allowed `.md` file:
    - If contains useful content: merge into appropriate standard file
-   - If obsolete/redundant: move to `/archive/docs-backup-YYYY-MM-DD/` folder
+   - If obsolete/redundant: move to `docs/archive/docs-backup-YYYY-MM-DD/` folder
    - If empty or trivial: delete permanently
 4. Ensure only allowed `.md` files remain in root
 

@@ -32,7 +32,7 @@ This folder contains prompts focused on creating, maintaining, and standardizing
 - Adjust automation rules based on your CI/CD setup
 - Review agent task flow requirements before implementation
 - Ensure your team understands the local testing requirements
-- ✅ **Platform-friendly**: At ~940 words, this prompt works well with all AI platforms. Best with Copilot Chat, excellent with ChatGPT/Claude/Gemini. See [Prompt Engineering Guide](../PROMPT_ENGINEERING_GUIDE.md)
+- ✅ **Platform-friendly**: At ~940 words, this prompt works well with all AI platforms. Best with Copilot Chat, excellent with ChatGPT/Claude/Gemini. See [Prompt Creation Guide](../PROMPT_CREATION_GUIDE.md)
 
 **Key Features**:
 - Follows industry-standard README guidelines (16 sections)

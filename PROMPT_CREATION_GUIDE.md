@@ -410,7 +410,7 @@ Run this prompt when:
 
 ### **Target Word Count**
 
-Based on our [Prompt Engineering Guide](./PROMPT_ENGINEERING_GUIDE.md):
+Based on our platform compatibility guidelines:
 
 | Prompt Complexity | Word Count | Platform Compatibility |
 |------------------|------------|----------------------|
@@ -418,8 +418,9 @@ Based on our [Prompt Engineering Guide](./PROMPT_ENGINEERING_GUIDE.md):
 | **Standard** | 600-1000 words | All platforms |
 | **Comprehensive** | 1000-1500 words | ChatGPT, Claude, Gemini (Copilot Chat) |
 | **Complex** | 1500-2000 words | ChatGPT, Claude, Gemini (Copilot Chat) |
+| **Extensive** | 2000-5000 words | ChatGPT, Claude, Gemini |
 
-**Current Repository Range**: 368-1630 words (all within optimal ranges)
+**Current Repository Range**: 1500-4800 words (comprehensive prompts optimized for major platforms)
 
 ### **How to Optimize Length**
 
@@ -849,7 +850,7 @@ After generating [feature], update:
 
 - [Vibe Coding Philosophy](./docs/vibe-coding.md) - Creative approach to prompting
 - [Meta-Prompt System](./docs/universal-meta-Level-prompt-system.md) - Universal prompt design
-- [Prompt Engineering Guide](./PROMPT_ENGINEERING_GUIDE.md) - Technical limits and best practices
+- [Prompt Creation Guide](./PROMPT_CREATION_GUIDE.md) - This guide (technical limits and best practices)
 
 ---
 

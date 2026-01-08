@@ -42,7 +42,7 @@ This repository uses **meta-prompts** — prompts that don't just solve one spec
 
 ---
 
-> 💡 **New to AI prompts?** Check out our [**Prompt Engineering Guide**](./PROMPT_ENGINEERING_GUIDE.md) to understand optimal prompt lengths and platform-specific recommendations for ChatGPT, GitHub Copilot, Claude, and Gemini.
+> 💡 **New to AI prompts?** Check out our [**Prompt Creation Guide**](./PROMPT_CREATION_GUIDE.md) to understand optimal prompt lengths and platform-specific recommendations for ChatGPT, GitHub Copilot, Claude, and Gemini.
 
 ## ⚡ Quick Selection Guide
 
@@ -409,7 +409,7 @@ The following prompts are planned for future releases. Contributions welcome!
 - **Test prompts** on non-critical projects first to understand their behavior
 - **Version control** your customized prompts alongside your code
 - **Share improvements** back to this repository when beneficial
-- **Consider prompt length** based on your AI platform - see [Prompt Engineering Guide](./PROMPT_ENGINEERING_GUIDE.md)
+- **Consider prompt length** based on your AI platform - see [Prompt Creation Guide](./PROMPT_CREATION_GUIDE.md)
 
 ## 🎯 Prompt Design Philosophy
 
@@ -469,7 +469,7 @@ Establish efficient development processes that maintain high code quality while 
 
 **New to prompt engineering or wondering about optimal prompt length?**
 
-Check out our [**Prompt Engineering Guide**](./PROMPT_ENGINEERING_GUIDE.md) for:
+Check out our [**Prompt Creation Guide**](./PROMPT_CREATION_GUIDE.md) for:
 - Optimal prompt lengths for different AI platforms (ChatGPT, Copilot, Claude, Gemini)
 - Technical limits and context windows
 - Platform-specific recommendations
@@ -484,7 +484,7 @@ Check out our [**Prompt Engineering Guide**](./PROMPT_ENGINEERING_GUIDE.md) for:
 | **Claude 3.5** | 1000-5000 words | ~200k tokens | Large context, entire codebases |
 | **Gemini 1.5 Pro** | Unlimited practical | 1M+ tokens | Complete documentation sets |
 
-✅ *All prompts in this repository (390-940 words) are optimized for **all platforms** - they work perfectly with Copilot, ChatGPT, Claude, and Gemini!*
+✅ *All prompts in this repository (1500-4800 words) are comprehensive and work excellently with **ChatGPT, Claude, and Gemini**. For Copilot, use Copilot Chat for best results!*
 
 ---
 
@@ -517,7 +517,7 @@ This repository is provided under an open license to encourage widespread use an
 - [Meta-Prompt System](./docs/universal-meta-Level-prompt-system.md) - How universal prompts work
 
 ### Technical Guides
-- [Prompt Engineering Guide](./PROMPT_ENGINEERING_GUIDE.md) - Technical limits and best practices
+- [Prompt Creation Guide](./PROMPT_CREATION_GUIDE.md) - Technical limits and best practices
 - [Prompt Creation Guide](./PROMPT_CREATION_GUIDE.md) - How to create effective prompts for this repository
 
 ---

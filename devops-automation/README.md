@@ -37,7 +37,7 @@ This folder contains prompts for automating CI/CD pipelines, deployments, and in
 - Customize branch strategy and tagging rules for your workflow
 - Review security scanning thresholds before implementation
 - Test with a non-production repository first
-- ✅ **Platform-friendly**: At ~640 words, this prompt works great with all AI platforms including GitHub Copilot. See [Prompt Engineering Guide](../PROMPT_ENGINEERING_GUIDE.md)
+- ✅ **Platform-friendly**: At ~640 words, this prompt works great with all AI platforms including GitHub Copilot. See [Prompt Creation Guide](../PROMPT_CREATION_GUIDE.md)
 
 ## When to Use DevOps Automation Prompts
 
