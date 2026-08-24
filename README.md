@@ -525,3 +525,8 @@ This repository is provided under an open license to encourage widespread use an
 **Note**: These prompts are designed to work with AI assistants and should be adapted to your specific context, technology stack, and requirements. Always review and test generated code before deploying to production environments.
 
 *Built for vibe coding — where creativity meets automation.* 🎧✨
+## Sponsor
+
+I build and maintain this in my own time. It is free, it stays free, and it gets maintained either way.
+
+If it saved you some time and you feel like saying thanks, you can do that at [github.com/sponsors/agigante80](https://github.com/sponsors/agigante80). Entirely optional, and nothing about the project changes either way.
