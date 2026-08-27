@@ -53,6 +53,33 @@ class ParseFrontMatterTests(unittest.TestCase):
             upi.parse_front_matter("---\nnot a key value pair\n---\nbody\n", "x.md")
 
 
+class ValueCleanupTests(unittest.TestCase):
+    def test_inline_comment_stripped(self):
+        text = "---\nname: x\nversion: 1.0.0                # bump on EVERY content change\n---\nbody"
+        fields, _ = upi.parse_front_matter(text, "x.md")
+        self.assertEqual(fields["version"], "1.0.0")
+
+    def test_surrounding_quotes_stripped(self):
+        text = '---\ndescription: "Logging: structured JSON"\n---\nbody'
+        fields, _ = upi.parse_front_matter(text, "x.md")
+        self.assertEqual(fields["description"], "Logging: structured JSON")
+
+    def test_space_hash_starts_comment_like_yaml(self):
+        # YAML plain scalars treat ' #' as a comment start; the parser matches that.
+        text = "---\ndescription: Use plans #see docs\n---\nbody"
+        fields, _ = upi.parse_front_matter(text, "x.md")
+        self.assertEqual(fields["description"], "Use plans")
+
+    def test_hash_without_preceding_space_kept(self):
+        text = "---\ndescription: Ranked as repo#1 by us\n---\nbody"
+        fields, _ = upi.parse_front_matter(text, "x.md")
+        self.assertEqual(fields["description"], "Ranked as repo#1 by us")
+
+    def test_utf8_bom_tolerated(self):
+        fields, _ = upi.parse_front_matter("\ufeff" + VALID, "x.md")
+        self.assertEqual(fields["name"], "sample-prompt")
+
+
 class ValidateTests(unittest.TestCase):
     def fields(self, **overrides):
         base = dict(
@@ -127,6 +154,15 @@ class InjectTests(unittest.TestCase):
 
 
 class RenderTableTests(unittest.TestCase):
+    def test_pipe_in_description_escaped(self):
+        entry = dict(name="p", category="c", version="1.0.0", updated="2026-08-27",
+                     description="Use Plan | Act mode.", words=1, path="./prompts/p.md")
+        table = upi.render_table([entry])
+        self.assertIn("Use Plan \\| Act mode.", table)
+        # every row still has exactly 6 cells (7 unescaped delimiters)
+        row = table.splitlines()[-1]
+        self.assertEqual(row.count("|") - row.count("\\|"), 7)
+
     def test_renders_linked_row(self):
         entry = dict(name="sample-prompt", category="testing", version="1.2.3",
                      updated="2026-08-27", description="Desc.", words=8,
@@ -163,6 +199,10 @@ class EndToEndTests(unittest.TestCase):
     def test_check_fails_on_stale_readme(self):
         code, _ = self.run_main(["--check"])
         self.assertEqual(code, 1)
+
+    def test_unknown_flag_rejected(self):
+        code, _ = self.run_main(["--chek"])
+        self.assertEqual(code, 2)
 
 
 if __name__ == "__main__":
