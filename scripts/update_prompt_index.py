@@ -15,6 +15,7 @@ Usage:
     python3 scripts/update_prompt_index.py --check    # exit 1 if stale
 """
 
+import datetime
 import re
 import sys
 from pathlib import Path
@@ -54,10 +55,10 @@ def parse_front_matter(text, source):
         value = value.strip()
         if value[:1] in ("'", '"'):
             quote = value[0]
-            closing = value.find(quote, 1)
-            if closing == -1:
+            close_quote = value.find(quote, 1)
+            if close_quote == -1:
                 raise PromptError(f"{source}: unterminated quote in line: {raw!r}")
-            value = value[1:closing]  # anything after the close quote is comment
+            value = value[1:close_quote]  # anything after the close is comment
         else:
             comment = value.find(" #")
             if comment != -1:
@@ -67,14 +68,26 @@ def parse_front_matter(text, source):
     return fields, body
 
 
+def valid_date(value):
+    """True for a real calendar date in YYYY-MM-DD form."""
+    if not DATE_RE.match(value):
+        return False
+    try:
+        datetime.date.fromisoformat(value)
+    except ValueError:
+        return False
+    return True
+
+
 def validate(fields, source):
     missing = [f for f in REQUIRED_FIELDS if not fields.get(f)]
     if missing:
         raise PromptError(f"{source}: missing front matter field(s): {', '.join(missing)}")
     if not VERSION_RE.match(fields["version"]):
         raise PromptError(f"{source}: version {fields['version']!r} is not MAJOR.MINOR.PATCH")
-    if not DATE_RE.match(fields["updated"]):
-        raise PromptError(f"{source}: updated {fields['updated']!r} is not YYYY-MM-DD")
+    if not valid_date(fields["updated"]):
+        raise PromptError(
+            f"{source}: updated {fields['updated']!r} is not a valid YYYY-MM-DD date")
 
 
 def collect(prompts_dir):

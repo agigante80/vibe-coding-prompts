@@ -825,7 +825,7 @@ After generating [feature], update:
 
 ### **Well-Structured Prompt**
 
-[Test Suite Generator](../prompts/test-suite-generator.md) (~1571 words)
+[Test Suite Generator](../prompts/test-suite-generator.md)
 - ✅ Clear objective
 - ✅ Comprehensive assessment
 - ✅ Multi-language support
@@ -835,7 +835,7 @@ After generating [feature], update:
 
 ### **Concise Yet Complete**
 
-[Project Reassessment](../prompts/project-reassessment.md) (~390 words)
+[Project Reassessment](../prompts/project-reassessment.md)
 - ✅ Short but actionable
 - ✅ Clear deliverables
 - ✅ All required sections
@@ -843,7 +843,7 @@ After generating [feature], update:
 
 ### **Comprehensive with Automation**
 
-[Dependency Update Manager](../prompts/dependency-update-manager.md) (~1630 words)
+[Dependency Update Manager](../prompts/dependency-update-manager.md)
 - ✅ Multi-ecosystem coverage
 - ✅ Automation configs included
 - ✅ Detailed workflows

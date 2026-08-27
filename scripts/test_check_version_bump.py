@@ -175,6 +175,40 @@ class CheckVersionBumpTests(unittest.TestCase):
         self.commit_all(repo)
         self.assertEqual(cvb.check("main", cwd=repo), [])
 
+    def test_non_ascii_filename_not_skipped(self):
+        """core.quotepath must not hide non-ASCII prompt paths from the gate."""
+        repo = self.make_repo()
+        src = repo / "prompts" / "sample-prompt.md"
+        dst = repo / "prompts" / "caf\u00e9-prompt.md"
+        dst.write_text(
+            src.read_text(encoding="utf-8")
+            .replace("sample-prompt", "caf\u00e9-prompt")
+            .replace("Original body", "Edited body"),
+            encoding="utf-8")
+        run_git(repo, "checkout", "-q", "main")
+        run_git(repo, "add", "-A")
+        run_git(repo, "commit", "-qm", "add unicode prompt")
+        run_git(repo, "checkout", "-q", "feature")
+        run_git(repo, "merge", "-q", "main")
+        edited = dst.read_text(encoding="utf-8").replace("Edited body", "Edited again")
+        dst.write_text(edited, encoding="utf-8")
+        self.commit_all(repo)
+        failures = cvb.check("main", cwd=repo)
+        self.assertEqual(len(failures), 1)
+
+    def test_impossible_calendar_date_fails(self):
+        repo = self.make_repo()
+        p = repo / "prompts" / "sample-prompt.md"
+        p.write_text(
+            PROMPT_V1.replace("Original body", "Edited body")
+            .replace("version: 1.0.0", "version: 1.0.1")
+            .replace("updated: 2026-08-27", "updated: 2026-31-01"),
+            encoding="utf-8")
+        self.commit_all(repo)
+        failures = cvb.check("main", cwd=repo)
+        self.assertEqual(len(failures), 1)
+        self.assertIn("not a valid YYYY-MM-DD date", failures[0])
+
     def test_new_prompt_exempt(self):
         repo = self.make_repo()
         (repo / "prompts" / "brand-new.md").write_text(PROMPT_V1.replace(
