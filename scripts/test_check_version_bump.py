@@ -13,6 +13,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import check_version_bump as cvb  # noqa: E402
+from test_update_prompt_index import VALID  # noqa: E402  (shared fixture)
 
 _original_run = subprocess.run
 
@@ -29,19 +30,11 @@ def setUpModule():
 def tearDownModule():
     cvb.subprocess.run = _original_run
 
-PROMPT_V1 = """---
-name: sample-prompt
-category: testing
-version: 1.0.0
-updated: 2026-08-27
-description: A sample prompt.
-platforms: [claude]
----
-
-# Sample Prompt
-
-Original body text.
-"""
+# One fixture for both suites: the index tests' VALID prompt, with a body
+# line this suite edits to simulate content changes.
+PROMPT_V1 = (VALID
+             .replace("One two three four five.", "Original body text.")
+             .replace("version: 1.2.3", "version: 1.0.0"))
 
 
 GIT_ENV = {
@@ -56,8 +49,9 @@ GIT_ENV = {
 
 
 def run_git(cwd, *args):
-    subprocess.run(["git", *args], cwd=cwd, check=True, capture_output=True,
-                   env=GIT_ENV)
+    # Uses the production git() wrapper (with the module-level env patch) so
+    # the tests exercise the same invocation path as the code under test.
+    cvb.git(*args, cwd=cwd)
 
 
 class CheckVersionBumpTests(unittest.TestCase):
@@ -166,12 +160,15 @@ class CheckVersionBumpTests(unittest.TestCase):
         self.assertIn("updated went backwards", failures[0])
 
     def test_same_day_second_bump_passes(self):
-        repo = self.make_repo()
+        """A second bump on the same updated date must not be rejected."""
+        first = (PROMPT_V1.replace("Original body", "Edited once")
+                 .replace("version: 1.0.0", "version: 1.0.1"))
+        repo = self.make_repo(initial_text=first)
         p = repo / "prompts" / "sample-prompt.md"
         p.write_text(
-            PROMPT_V1.replace("Original body", "Edited body")
-            .replace("version: 1.0.0", "version: 1.0.1"),
-            encoding="utf-8")
+            first.replace("Edited once", "Edited twice")
+            .replace("version: 1.0.1", "version: 1.0.2"),
+            encoding="utf-8")  # updated date deliberately unchanged
         self.commit_all(repo)
         self.assertEqual(cvb.check("main", cwd=repo), [])
 
@@ -209,12 +206,37 @@ class CheckVersionBumpTests(unittest.TestCase):
         self.assertEqual(len(failures), 1)
         self.assertIn("not a valid YYYY-MM-DD date", failures[0])
 
-    def test_new_prompt_exempt(self):
+    def test_new_prompt_at_seed_version_exempt(self):
         repo = self.make_repo()
         (repo / "prompts" / "brand-new.md").write_text(PROMPT_V1.replace(
             "sample-prompt", "brand-new"), encoding="utf-8")
         self.commit_all(repo)
         self.assertEqual(cvb.check("main", cwd=repo), [])
+
+    def test_new_prompt_above_seed_version_fails(self):
+        """Smuggling a bumped prompt in as a 'new' file is rejected."""
+        repo = self.make_repo()
+        (repo / "prompts" / "brand-new.md").write_text(
+            PROMPT_V1.replace("sample-prompt", "brand-new")
+            .replace("version: 1.0.0", "version: 2.3.0"),
+            encoding="utf-8")
+        self.commit_all(repo)
+        failures = cvb.check("main", cwd=repo)
+        self.assertEqual(len(failures), 1)
+        self.assertIn("start at 1.0.0", failures[0])
+
+    def test_head_ref_gates_the_named_ref_not_the_checkout(self):
+        """With an explicit head ref, the gate inspects that ref even when
+        a different (clean) branch is checked out."""
+        repo = self.make_repo()
+        p = repo / "prompts" / "sample-prompt.md"
+        p.write_text(PROMPT_V1.replace("Original body", "Edited body"),
+                     encoding="utf-8")
+        self.commit_all(repo)  # violation lives on 'feature'
+        run_git(repo, "checkout", "-q", "main")  # clean checkout
+        self.assertEqual(cvb.check("main", "main", cwd=repo), [])
+        failures = cvb.check("main", "feature", cwd=repo)
+        self.assertEqual(len(failures), 1)
 
 
 if __name__ == "__main__":

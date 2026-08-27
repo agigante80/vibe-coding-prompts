@@ -34,6 +34,16 @@ class PromptError(Exception):
     """A prompt file has missing or malformed front matter."""
 
 
+def is_prompt_path(path_str):
+    """The single definition of 'a prompt file' shared by all tooling layers.
+
+    Only files directly inside prompts/ count; subdirectories (drafts,
+    archives) are ignored by the index, the version gate, and the hooks
+    alike, so no layer sees a file another layer misses.
+    """
+    return bool(re.fullmatch(r"prompts/[^/]+\.md", path_str))
+
+
 def parse_front_matter(text, source):
     """Parse the leading front matter block. Returns (fields, body)."""
     lines = text.splitlines()
@@ -55,10 +65,21 @@ def parse_front_matter(text, source):
         value = value.strip()
         if value[:1] in ("'", '"'):
             quote = value[0]
-            close_quote = value.find(quote, 1)
-            if close_quote == -1:
+            chars, index, closed = [], 1, False
+            while index < len(value):
+                char = value[index]
+                if char == "\\" and index + 1 < len(value) and value[index + 1] == quote:
+                    chars.append(quote)
+                    index += 2
+                    continue
+                if char == quote:
+                    closed = True
+                    break
+                chars.append(char)
+                index += 1
+            if not closed:
                 raise PromptError(f"{source}: unterminated quote in line: {raw!r}")
-            value = value[1:close_quote]  # anything after the close is comment
+            value = "".join(chars)  # anything after the close is comment
         else:
             comment = value.find(" #")
             if comment != -1:

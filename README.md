@@ -42,8 +42,11 @@ This table is generated from each prompt's front matter by `scripts/update_promp
 | Inheriting an existing project | project-reassessment, security-audit-generator, dependency-update-manager, code-refactoring-plan |
 | Preparing a public release | github-ready-preparation, security-audit-generator, readme-generator, test-suite-generator |
 | Security incident response | security-audit-generator, dependency-update-manager, project-reassessment |
+| Monthly health check | project-reassessment, security-audit-generator |
 | Quarterly maintenance | project-reassessment, code-refactoring-plan, file-organization-refactoring, documentation-standardization |
 | Weekly upkeep | dependency-update-manager |
+
+When a scenario includes both, run file-organization-refactoring before test-suite-generator: moving files first avoids updating test imports twice.
 
 ## Philosophy: vibe coding and meta-prompts
 
