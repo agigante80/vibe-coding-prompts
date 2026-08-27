@@ -68,10 +68,15 @@ def parse_front_matter(text, source):
             chars, index, closed = [], 1, False
             while index < len(value):
                 char = value[index]
-                if char == "\\" and index + 1 < len(value) and value[index + 1] == quote:
-                    chars.append(quote)
-                    index += 2
-                    continue
+                if char == "\\" and index + 1 < len(value):
+                    nxt = value[index + 1]
+                    if nxt in (quote, "\\"):
+                        # \" is an escaped quote, \\ an escaped backslash;
+                        # consuming both keeps a trailing \\" parsing as
+                        # literal backslash plus CLOSING quote.
+                        chars.append(nxt)
+                        index += 2
+                        continue
                 if char == quote:
                     closed = True
                     break
@@ -114,7 +119,9 @@ def validate(fields, source):
 def collect(prompts_dir):
     """Read every prompt file and return sorted table entries."""
     entries = []
-    files = sorted(prompts_dir.glob("*.md"))
+    files = sorted(
+        p for p in prompts_dir.glob("*.md")
+        if is_prompt_path(f"prompts/{p.name}"))
     if not files:
         raise PromptError(f"no prompt files found in {prompts_dir}")
     for path in files:

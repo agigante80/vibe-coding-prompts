@@ -97,6 +97,12 @@ class ValueCleanupTests(unittest.TestCase):
         fields, _ = upi.parse_front_matter(text, "x.md")
         self.assertEqual(fields["description"], 'He said "hi" to us')
 
+    def test_trailing_literal_backslash_in_quoted_value(self):
+        """Regression: \\\\ then closing quote must not read as escaped quote."""
+        text = '---\ndescription: "ends with backslash \\\\"\n---\nbody'
+        fields, _ = upi.parse_front_matter(text, "x.md")
+        self.assertEqual(fields["description"], "ends with backslash \\")
+
     def test_is_prompt_path_top_level_only(self):
         self.assertTrue(upi.is_prompt_path("prompts/my-prompt.md"))
         self.assertFalse(upi.is_prompt_path("prompts/drafts/idea.md"))

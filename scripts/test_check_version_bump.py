@@ -225,6 +225,58 @@ class CheckVersionBumpTests(unittest.TestCase):
         self.assertEqual(len(failures), 1)
         self.assertIn("start at 1.0.0", failures[0])
 
+    def test_promotion_from_drafts_with_high_version_fails(self):
+        """A rename INTO prompts/ is a new prompt: arbitrary versions are
+        rejected even when the content is byte-identical."""
+        repo = self.make_repo()
+        drafts = repo / "prompts" / "drafts"
+        drafts.mkdir()
+        (drafts / "idea.md").write_text(
+            PROMPT_V1.replace("sample-prompt", "idea")
+            .replace("version: 1.0.0", "version: 9.9.9"),
+            encoding="utf-8")
+        run_git(repo, "checkout", "-q", "main")
+        run_git(repo, "add", "-A")
+        run_git(repo, "commit", "-qm", "draft on main")
+        run_git(repo, "checkout", "-q", "feature")
+        run_git(repo, "merge", "-q", "main")
+        run_git(repo, "mv", "prompts/drafts/idea.md", "prompts/idea.md")
+        self.commit_all(repo)
+        failures = cvb.check("main", cwd=repo)
+        self.assertEqual(len(failures), 1)
+        self.assertIn("start at 1.0.0", failures[0])
+
+    def test_restored_prompt_keeps_historical_version(self):
+        """Re-adding a previously deleted prompt keeps its earned version."""
+        repo = self.make_repo()
+        old = (PROMPT_V1.replace("sample-prompt", "veteran")
+               .replace("version: 1.0.0", "version: 3.2.0"))
+        run_git(repo, "checkout", "-q", "main")
+        (repo / "prompts" / "veteran.md").write_text(old, encoding="utf-8")
+        run_git(repo, "add", "-A")
+        run_git(repo, "commit", "-qm", "add veteran")
+        run_git(repo, "rm", "-q", "prompts/veteran.md")
+        run_git(repo, "commit", "-qm", "delete veteran")
+        run_git(repo, "checkout", "-q", "feature")
+        run_git(repo, "merge", "-q", "main")
+        (repo / "prompts" / "veteran.md").write_text(old, encoding="utf-8")
+        self.commit_all(repo, "restore veteran")
+        self.assertEqual(cvb.check("main", cwd=repo), [])
+
+    def test_unusable_base_skips(self):
+        repo = self.make_repo()
+        with self.assertRaises(cvb.SkipCheck):
+            cvb.check("refs/heads/does-not-exist", cwd=repo)
+        with self.assertRaises(cvb.SkipCheck):
+            cvb.check("0" * 40, cwd=repo)
+
+    def test_unrelated_histories_skip(self):
+        repo = self.make_repo()
+        run_git(repo, "checkout", "-q", "--orphan", "island")
+        run_git(repo, "commit", "-qm", "orphan root")
+        with self.assertRaises(cvb.SkipCheck):
+            cvb.check("main", "island", cwd=repo)
+
     def test_head_ref_gates_the_named_ref_not_the_checkout(self):
         """With an explicit head ref, the gate inspects that ref even when
         a different (clean) branch is checked out."""

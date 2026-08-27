@@ -8,15 +8,23 @@ pushed so the gate inspects the push, not the checkout.
 
 Compares the front matter `version` parsed from the base and head git blobs,
 so it cannot be fooled by version-like lines in prompt bodies, by renames,
-or by deleting the version line (a missing/invalid head version fails).
+or by deleting the version line.
+
+Skip semantics (exit 0 with a message, warning-annotated on GitHub Actions):
+an unusable base (unresolvable ref, the all-zero SHA, or histories with no
+common ancestor) means there is nothing meaningful to diff. All other git
+errors remain hard failures (exit 2).
 
 Rules:
-- Modified prompts and renamed-with-edits prompts need a version change.
-- Pure renames (identical content) pass.
-- Newly added prompts are exempt; front matter validity is enforced by
-  update_prompt_index.py --check.
+- Modified prompts and renamed-with-edits prompts need a strictly
+  increasing version; `updated` must be a real date and never go backwards.
+- Pure renames between prompt paths (identical content) pass.
+- A path NEW to prompts/ (added, or renamed in from outside prompts/) must
+  carry the seed version 1.0.0 UNLESS the path existed earlier in history
+  (restoring a deleted prompt keeps its earned version).
 """
 
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -29,8 +37,8 @@ from update_prompt_index import (  # noqa: E402
 SEED_VERSION = "1.0.0"
 
 
-def semver_tuple(version):
-    return tuple(int(part) for part in version.split("."))
+class SkipCheck(Exception):
+    """No usable base to diff against; the check is vacuous, not failed."""
 
 
 def git(*args, cwd=None):
@@ -42,33 +50,56 @@ def git(*args, cwd=None):
     ).stdout
 
 
-def changed_prompts(base_commit, head, cwd=None):
-    """Return (status, old_path, new_path) triples for changed prompts.
+def semver_tuple(version):
+    return tuple(int(part) for part in version.split("."))
 
-    status is 'M' (modified/renamed) or 'A' (added). A 25% similarity
-    threshold pairs even heavy rewrites as renames so they stay inside the
-    gate; below that, a rename is indistinguishable from delete plus add and
-    the added file falls under the new-prompt seed rule instead.
+
+def resolve_base(base_ref, head, cwd=None):
+    """Return the merge-base commit, or raise SkipCheck when unusable."""
+    probe = subprocess.run(
+        ["git", "rev-parse", "-q", "--verify", f"{base_ref}^{{commit}}"],
+        capture_output=True, encoding="utf-8", cwd=cwd)
+    if probe.returncode != 0:
+        raise SkipCheck(f"base {base_ref} is not a usable commit "
+                        "(unreachable, zero SHA, or unknown ref)")
+    merge_base = subprocess.run(
+        ["git", "merge-base", base_ref, head],
+        capture_output=True, encoding="utf-8", cwd=cwd)
+    if merge_base.returncode != 0:
+        raise SkipCheck(f"{base_ref} and {head} share no common ancestor")
+    return merge_base.stdout.strip()
+
+
+def changed_prompts(base_commit, head, cwd=None):
+    """Return (old_path, new_path) pairs for changed prompts.
+
+    old_path is None when the path is new to prompts/: a plain add, or a
+    rename whose SOURCE was outside prompts/ (e.g. promoted from a drafts
+    directory), which must not inherit rename treatment or an arbitrary
+    version would enter through that door. A 25% similarity threshold pairs
+    even heavy rewrites as renames so they stay inside the gate.
     core.quotepath=off keeps non-ASCII paths literal instead of quoted octal
-    escapes, which would silently fail the prompts/ prefix match.
+    escapes, which would silently fail the prompts/ path match.
     """
     out = git("-c", "core.quotepath=off", "diff", "--name-status",
               "--find-renames=25%", f"{base_commit}..{head}", cwd=cwd)
-    triples = []
+    pairs = []
     for line in out.splitlines():
         parts = line.split("\t")
         status = parts[0]
         if status == "M":
-            kind, old, new = "M", parts[1], parts[1]
+            old, new = parts[1], parts[1]
         elif status.startswith("R"):
-            kind, old, new = "M", parts[1], parts[2]
+            old, new = parts[1], parts[2]
+            if not is_prompt_path(old):
+                old = None  # entering prompts/ counts as a new prompt
         elif status == "A":
-            kind, old, new = "A", None, parts[1]
+            old, new = None, parts[1]
         else:
             continue
         if is_prompt_path(new):
-            triples.append((kind, old, new))
-    return triples
+            pairs.append((old, new))
+    return pairs
 
 
 def front_matter_of(text, source):
@@ -76,28 +107,34 @@ def front_matter_of(text, source):
     return fields.get("version", ""), fields.get("updated", "")
 
 
+def path_has_history(base_commit, path, cwd=None):
+    """True when the path existed at or before base (a restore, not new)."""
+    out = git("rev-list", "-1", base_commit, "--", path, cwd=cwd)
+    return bool(out.strip())
+
+
 def check(base_ref, head="HEAD", cwd=None):
     """Return a list of failure messages (empty means the check passes)."""
-    base_commit = git("merge-base", base_ref, head, cwd=cwd).strip()
+    base_commit = resolve_base(base_ref, head, cwd=cwd)
     failures = []
-    for kind, old, new in changed_prompts(base_commit, head, cwd=cwd):
+    for old, new in changed_prompts(base_commit, head, cwd=cwd):
         new_text = git("show", f"{head}:{new}", cwd=cwd)
-        if kind == "A":
-            # New path in history: exempt from bumping, but it must start at
-            # the seed version. This narrows the rename-plus-heavy-rewrite
-            # bypass: a previously bumped prompt smuggled in as "new" fails.
+        if old is None:
+            # New to prompts/: seed rule, with a restore escape hatch.
             try:
                 version, _ = front_matter_of(new_text, new)
             except PromptError as exc:
                 failures.append(f"{new}: head front matter unreadable ({exc})")
                 continue
-            if version != SEED_VERSION:
+            if version == SEED_VERSION:
+                print(f"ok: {new} (new prompt at {SEED_VERSION})")
+            elif path_has_history(base_commit, new, cwd=cwd):
+                print(f"ok: {new} (restored prompt at {version})")
+            else:
                 failures.append(
                     f"{new}: new prompt files start at {SEED_VERSION} "
                     f"(found {version}); if this is a rename, keep more "
                     f"similarity or split the rewrite into a separate commit")
-            else:
-                print(f"ok: {new} (new prompt at {SEED_VERSION})")
             continue
         old_text = git("show", f"{base_commit}:{old}", cwd=cwd)
         if old_text == new_text:
@@ -143,6 +180,12 @@ def main(argv):
         return 2
     try:
         failures = check(*argv)
+    except SkipCheck as reason:
+        message = f"version bump check: skipped ({reason})"
+        print(message)
+        if os.environ.get("GITHUB_ACTIONS"):
+            print(f"::warning::{message}")
+        return 0
     except subprocess.CalledProcessError as exc:
         print(f"error: git failed: {exc.stderr.strip()}", file=sys.stderr)
         return 2
