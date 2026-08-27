@@ -150,9 +150,6 @@ Most prompts in this repository fall into these categories:
 
 ## 🔗 Related Resources
 
-- [Main Repository README](./README.md)
-- [Documentation Prompts](./documentation/)
-- [DevOps Automation Prompts](./devops-automation/)
-- [Project Management Prompts](./project-management/)
-- [Development Workflow Prompts](./development-workflow/)
+- [Main Repository README](../README.md)
+- [All Prompts](../prompts/)
 

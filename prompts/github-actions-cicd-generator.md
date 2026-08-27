@@ -1,3 +1,12 @@
+---
+name: github-actions-cicd-generator
+category: devops-automation
+version: 1.0.0
+updated: 2026-08-27
+description: Versioning, branching and Docker tagging policy for GitHub Actions pipelines.
+platforms: [chatgpt, claude, gemini, copilot-chat]
+---
+
 # CI/CD GitHub Actions Generator
 
 ## Versioning Policy

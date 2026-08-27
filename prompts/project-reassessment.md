@@ -1,3 +1,12 @@
+---
+name: project-reassessment
+category: project-management
+version: 1.0.0
+updated: 2026-08-27
+description: Full repository health check aligning code, documentation and policies.
+platforms: [chatgpt, claude, gemini, copilot-chat]
+---
+
 # Project Reassessment & Synchronization
 
 ## **Objective**
@@ -244,7 +253,7 @@ All reassessment findings and updates must be documented in `/docs/`:
 * After security incidents or production issues
 
 ### **Initial Setup**
-1. Review the PROMPT_CREATION_GUIDE.md to understand documentation requirements
+1. Review the [Prompt Creation Guide](../docs/prompt-creation-guide.md) to understand documentation requirements
 2. Examine all existing `/docs/` files to understand documented state
 3. Ensure local development environment is properly configured
 4. Have access to run tests and security scans

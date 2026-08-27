@@ -1,3 +1,12 @@
+---
+name: dependency-update-manager
+category: security
+version: 1.0.0
+updated: 2026-08-27
+description: Automate dependency updates with risk classification, testing and rollback.
+platforms: [chatgpt, claude, gemini, copilot-chat]
+---
+
 # Dependency Update Manager
 
 ## **Objective**
@@ -380,7 +389,7 @@ All dependency updates and management procedures must be documented in `/docs/`:
 * Onboarding dependency management practices
 
 ### **Initial Setup**
-1. Review the PROMPT_CREATION_GUIDE.md to understand documentation requirements
+1. Review the [Prompt Creation Guide](../docs/prompt-creation-guide.md) to understand documentation requirements
 2. Examine existing `/docs/` files to understand current project state
 3. Identify package manager(s) in use (npm, pip, cargo, etc.)
 4. Ensure CI/CD pipeline exists for automated testing

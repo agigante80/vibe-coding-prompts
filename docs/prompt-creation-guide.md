@@ -10,7 +10,7 @@ A comprehensive guide for creating effective, reusable prompts that follow this 
 
 ### **Step 1: Review `/docs/` Directory**
 
-This repository follows a standardized documentation structure (see [Documentation Standardization](./documentation/documentation-standardization.md)):
+This repository follows a standardized documentation structure (see [Documentation Standardization](../prompts/documentation-standardization.md)):
 
 ```
 /docs/
@@ -64,7 +64,7 @@ Every prompt in this repository follows these fundamental principles:
 
 ## � Understanding the `/docs/` Structure
 
-This repository uses a **standardized 9-file documentation system** (from [Documentation Standardization](./documentation/documentation-standardization.md)):
+This repository uses a **standardized 9-file documentation system** (from [Documentation Standardization](../prompts/documentation-standardization.md)):
 
 | File | Purpose | Update When |
 |------|---------|-------------|
@@ -707,7 +707,7 @@ Remember: humans read it first, AI executes it
 
 ## � Documentation Requirements
 
-Every prompt must align with the repository's documentation standards defined in [Documentation Standardization](./documentation/documentation-standardization.md).
+Every prompt must align with the repository's documentation standards defined in [Documentation Standardization](../prompts/documentation-standardization.md).
 
 ### **Required Documentation Review**
 
@@ -820,7 +820,7 @@ After generating [feature], update:
 
 ### **Well-Structured Prompt**
 
-[Test Suite Generator](./development-workflow/test-suite-generator.md) (~1571 words)
+[Test Suite Generator](../prompts/test-suite-generator.md) (~1571 words)
 - ✅ Clear objective
 - ✅ Comprehensive assessment
 - ✅ Multi-language support
@@ -830,7 +830,7 @@ After generating [feature], update:
 
 ### **Concise Yet Complete**
 
-[Project Reassessment](./project-management/project-reassessment.md) (~390 words)
+[Project Reassessment](../prompts/project-reassessment.md) (~390 words)
 - ✅ Short but actionable
 - ✅ Clear deliverables
 - ✅ All required sections
@@ -838,7 +838,7 @@ After generating [feature], update:
 
 ### **Comprehensive with Automation**
 
-[Dependency Update Manager](./security/dependency-update-manager.md) (~1630 words)
+[Dependency Update Manager](../prompts/dependency-update-manager.md) (~1630 words)
 - ✅ Multi-ecosystem coverage
 - ✅ Automation configs included
 - ✅ Detailed workflows
@@ -848,9 +848,9 @@ After generating [feature], update:
 
 ## 🎓 Learning Resources
 
-- [Vibe Coding Philosophy](./docs/vibe-coding.md) - Creative approach to prompting
-- [Meta-Prompt System](./docs/universal-meta-Level-prompt-system.md) - Universal prompt design
-- [Prompt Creation Guide](./PROMPT_CREATION_GUIDE.md) - This guide (technical limits and best practices)
+- [Vibe Coding Philosophy](./vibe-coding.md) - Creative approach to prompting
+- [Meta-Prompt System](./universal-meta-level-prompt-system.md) - Universal prompt design
+- [Prompt Creation Guide](./prompt-creation-guide.md) - This guide (technical limits and best practices)
 
 ---
 

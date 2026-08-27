@@ -1,3 +1,12 @@
+---
+name: documentation-standardization
+category: documentation
+version: 1.0.0
+updated: 2026-08-27
+description: Standardize project documentation into the 9-file /docs/ structure with auditing and cleanup.
+platforms: [chatgpt, claude, gemini, copilot-chat]
+---
+
 # Documentation Standardization Prompt
 
 ## 🎯 **Goal**
@@ -216,7 +225,7 @@ All 9 `/docs/` files regenerated/updated to match current state, cross-reference
 ## 📋 **Usage Instructions**
 
 ### **Initial Setup**
-1. Review the PROMPT_CREATION_GUIDE.md to understand documentation requirements
+1. Review the [Prompt Creation Guide](../docs/prompt-creation-guide.md) to understand documentation requirements
 2. Examine current documentation structure (if any exists)
 3. Identify which content needs migration vs. deletion
 4. Ensure project has basic testing and CI/CD in place

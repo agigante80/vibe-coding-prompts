@@ -1,8 +1,17 @@
+---
+name: version-management
+category: development-workflow
+version: 1.0.0
+updated: 2026-08-27
+description: Semantic versioning strategy with a VERSION file, conventional commits and automated releases.
+platforms: [chatgpt, claude, gemini, copilot-chat]
+---
+
 # Version Management & Automated Releases
 
 ## Overview
 
-This guide covers semantic versioning concepts, strategies, and best practices for managing software versions. For complete CI/CD workflow implementation including dynamic versioning scripts and automation, see [GitHub Actions CI/CD Generator](../devops-automation/github-actions-cicd-generator.md).
+This guide covers semantic versioning concepts, strategies, and best practices for managing software versions. For complete CI/CD workflow implementation including dynamic versioning scripts and automation, see [GitHub Actions CI/CD Generator](./github-actions-cicd-generator.md).
 
 ## Purpose
 
@@ -110,7 +119,7 @@ For projects using `standard-version` or `semantic-release`:
 
 ### Phase 2: GitHub Actions Workflows
 
-**For complete CI/CD workflow setup**, run **[GitHub Actions CI/CD Generator](../devops-automation/github-actions-cicd-generator.md)**
+**For complete CI/CD workflow setup**, run **[GitHub Actions CI/CD Generator](./github-actions-cicd-generator.md)**
 
 **Version-specific workflows needed**:
 - **Dev Build** (`.github/workflows/dev-build.yml`): Generate version as `BASE-dev-COMMITHASH`, run tests, upload artifacts
@@ -186,9 +195,9 @@ Create `VERSIONING.md` documenting version format, release process, and automate
 ---
 
 **Related Prompts:**
-- [GitHub Actions CI/CD Generator](../devops-automation/github-actions-cicd-generator.md) - Complete CI/CD pipeline with dynamic versioning
-- [GitHub Ready Preparation](../project-management/github-ready-preparation.md) - Prepare for repository publishing
-- [Documentation Creation](./documentation-creation.md) - Generate comprehensive documentation
+- [GitHub Actions CI/CD Generator](./github-actions-cicd-generator.md) - Complete CI/CD pipeline with dynamic versioning
+- [GitHub Ready Preparation](./github-ready-preparation.md) - Prepare for repository publishing
+- [Documentation Creation](./documentation-standardization.md) - Generate comprehensive documentation
 
 **Dependencies:**
 - Git (with conventional commits)
