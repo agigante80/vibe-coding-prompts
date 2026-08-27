@@ -591,13 +591,19 @@ Before finalizing:
 
 ### **Choosing a Category**
 
-Place your prompt in the appropriate folder:
+All prompt files live flat in `prompts/`; the category is the `category` field
+in the front matter and becomes a column in the generated README index.
+Current categories:
 
-- **`documentation/`** - Creating, maintaining, standardizing docs
-- **`devops-automation/`** - CI/CD, deployment, infrastructure
-- **`project-management/`** - Assessment, planning, coordination
-- **`development-workflow/`** - Development processes, testing, automation
-- **`security/`** - Security audits, compliance, vulnerability management
+- **`documentation`** - Creating, maintaining, standardizing docs
+- **`devops-automation`** - CI/CD, deployment, infrastructure
+- **`project-management`** - Assessment, planning, coordination
+- **`development-workflow`** - Development processes, testing, automation
+- **`security`** - Security audits, compliance, vulnerability management
+- **`operations`** - Logging, monitoring, production operations
+
+New categories are allowed: set a new `category` value and it appears in the
+index automatically.
 
 **Not sure?** Consider:
 - What's the **primary purpose**?
@@ -621,14 +627,21 @@ Every prompt file starts with YAML front matter:
 
 ```yaml
 ---
-name: my-prompt-name          # matches the filename, kebab-case
+name: my-prompt-name
 category: development-workflow
-version: 1.0.0                # bump on EVERY content change
-updated: 2026-08-27           # date of the last content change
+version: 1.0.0
+updated: 2026-08-27
 description: One sentence shown in the README index table.
 platforms: [chatgpt, claude, gemini, copilot-chat]
 ---
 ```
+
+Field rules:
+
+- `name` matches the filename (kebab-case, without `.md`).
+- `version` is bumped on EVERY content change; `updated` is the date of that change.
+- `platforms` uses the inline list form shown above (not a YAML block list).
+- Keep values YAML-safe: no unquoted `: ` inside a value, no `|` characters, and note that a space followed by `#` starts a comment.
 
 **Version bump rules (SemVer-lite):**
 
@@ -810,10 +823,9 @@ After generating [feature], update:
 - [ ] Success criteria measurable
 
 **Repository Integration**:
-- [ ] Category README updated
-- [ ] Main README updated
-- [ ] Quick Selection Guide entry added
-- [ ] TODO list updated (if applicable)
+- [ ] Front matter complete (name, category, version, updated, description, platforms)
+- [ ] Version bumped if this changes an existing prompt
+- [ ] README index regenerated (`python3 scripts/update_prompt_index.py`)
 - [ ] Links all working
 - [ ] No TODOs or placeholders
 
@@ -827,9 +839,9 @@ After generating [feature], update:
 1. **Review documentation first**: Check `/docs/` for context and updates needed
 2. **Update `/docs/` if needed**: Keep project documentation synchronized
 3. **Create branch**: `git checkout -b prompts/add-[prompt-name]`
-4. **Add prompt file**: Place in appropriate category folder
+4. **Add prompt file**: Place in `prompts/` with complete front matter
 5. **Include doc requirements**: Specify `/docs/` updates in deliverables
-6. **Update READMEs**: Category and main README
+6. **Regenerate the index**: `python3 scripts/update_prompt_index.py` (CI rejects a stale index)
 7. **Test thoroughly**: Run on sample projects, verify doc generation
 8. **Verify `/docs/` compliance**: Ensure outputs follow standardization
 9. **Create PR**: With description of prompt purpose, testing, and doc changes

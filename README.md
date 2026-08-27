@@ -27,7 +27,7 @@ This table is generated from each prompt's front matter by `scripts/update_promp
 | [github-actions-cicd-generator](./prompts/github-actions-cicd-generator.md) | devops-automation | 1.0.0 | 2026-08-27 | 189 | Versioning, branching and Docker tagging policy for GitHub Actions pipelines. |
 | [documentation-standardization](./prompts/documentation-standardization.md) | documentation | 1.0.0 | 2026-08-27 | 1724 | Standardize project documentation into the 9-file /docs/ structure with auditing and cleanup. |
 | [readme-generator](./prompts/readme-generator.md) | documentation | 1.0.0 | 2026-08-27 | 1513 | Generate or update a professional README, preserving images and validating Docker Hub descriptions. |
-| [logging-implementation-best-practices](./prompts/logging-implementation-best-practices.md) | operations | 1.0.0 | 2026-08-27 | 1524 | Production logging: structured JSON, PII redaction, rotation, retention and observability. |
+| [logging-implementation-best-practices](./prompts/logging-implementation-best-practices.md) | operations | 1.0.0 | 2026-08-27 | 1521 | Production logging with structured JSON, PII redaction, rotation, retention and observability. |
 | [github-ready-preparation](./prompts/github-ready-preparation.md) | project-management | 1.0.0 | 2026-08-27 | 1572 | Prepare a repository for professional public release on GitHub. |
 | [project-reassessment](./prompts/project-reassessment.md) | project-management | 1.0.0 | 2026-08-27 | 1536 | Full repository health check aligning code, documentation and policies. |
 | [dependency-update-manager](./prompts/dependency-update-manager.md) | security | 1.0.0 | 2026-08-27 | 1513 | Automate dependency updates with risk classification, testing and rollback. |

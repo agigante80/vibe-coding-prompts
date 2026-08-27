@@ -2,3 +2,4 @@
 .autopilot.json
 __pycache__/
 *.pyc
+.private-journal/
