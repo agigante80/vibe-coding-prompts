@@ -68,13 +68,15 @@ go list -m all 2>/dev/null
 
 **Secrets Detection** (history-aware scanners first; a keyword grep floods with false positives and misses high-entropy secrets):
 ```bash
-# Scan working tree AND full git history with gitleaks
+# gitleaks: full commit history, then the current working tree
 gitleaks git .
+gitleaks dir .
 
-# List any .env files ever committed (shell needs globstar for **)
-shopt -s globstar; git log --all --oneline -- **/.env
+# List every .env ever committed, including later-deleted ones
+# (a git pathspec asterisk matches across directories)
+git log --all --oneline -- '*.env'
 ```
-Also enable GitHub secret scanning with push protection in the repository settings. Fallback when no scanner can be installed: a keyword grep for `api_key|secret|password|token` across source files.
+Enable GitHub secret scanning with push protection in repository settings. No-install fallback: keyword grep for `api_key|secret|password|token`.
 
 **Vulnerability Scanning**: Run `npm audit` (Node.js), `pip-audit` (Python), or ecosystem equivalent
 
