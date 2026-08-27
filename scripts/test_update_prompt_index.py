@@ -80,6 +80,11 @@ class ValueCleanupTests(unittest.TestCase):
         fields, _ = upi.parse_front_matter(text, "x.md")
         self.assertEqual(fields["version"], "1.0.1")
 
+    def test_content_after_closing_quote_raises(self):
+        text = '---\ndescription: "Vibe" coding guide for teams\n---\nbody'
+        with self.assertRaises(upi.PromptError):
+            upi.parse_front_matter(text, "x.md")
+
     def test_unterminated_quote_raises(self):
         text = '---\ndescription: "half quoted\n---\nbody'
         with self.assertRaises(upi.PromptError):
@@ -154,6 +159,13 @@ class CollectTests(unittest.TestCase):
         self.assertEqual([e["category"] for e in entries], ["alpha", "testing"])
         # body: "# Sample Prompt" (3 words) + "One two three four five." (5 words)
         self.assertEqual(entries[1]["words"], 8)
+
+    def test_non_kebab_filename_raises(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            bad = VALID.replace("name: sample-prompt", "name: my prompt (v2)")
+            write_prompt(tmp, "my prompt (v2).md", bad)
+            with self.assertRaises(upi.PromptError):
+                upi.collect(Path(tmp))
 
     def test_name_filename_mismatch_raises(self):
         with tempfile.TemporaryDirectory() as tmp:
