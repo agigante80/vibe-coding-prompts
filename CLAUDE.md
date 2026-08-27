@@ -4,37 +4,41 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this repository is
 
-A library of reusable AI "meta-prompts" for software development workflows. There is no application code, build system, or test suite; every deliverable is a Markdown file. The prompts are platform-agnostic (ChatGPT, Claude, Copilot, Gemini) and follow a shared structure so they auto-detect a target project's stack rather than assuming one.
+A library of reusable AI "meta-prompts" for software development workflows. The only code is the index tooling in `scripts/`; every other deliverable is a Markdown file. Prompts are platform-agnostic (ChatGPT, Claude, Copilot, Gemini) and auto-detect a target project's stack rather than assuming one.
 
-`PROMPT_CREATION_GUIDE.md` is the authoritative authoring standard. Read it before creating or significantly editing any prompt.
+`docs/prompt-creation-guide.md` is the authoritative authoring standard. Read it before creating or significantly editing any prompt.
+
+## Commands
+
+- Run the test suite: `python3 -m unittest discover -s scripts -p "test_*.py"`
+- Regenerate the README prompt index: `python3 scripts/update_prompt_index.py` (`--check` verifies without writing)
+- Check version bumps against a base: `python3 scripts/check_version_bump.py <base-ref>`
 
 ## Structure
 
-- Category directories, each with its own `README.md` listing its prompts:
-  `documentation/`, `devops-automation/`, `development-workflow/`, `project-management/`, `security/`, `operations/`
-- `docs/`: concept docs (vibe coding philosophy, meta-prompt system, prompt engineering guide), not prompts
-- `.github/REPOSITORY_METADATA.md`: GitHub description and topics
-- Root `README.md`: the main index holding the Quick Selection Guide table, workflow/cadence tables, and per-prompt descriptions
+- `prompts/`: all prompt files, flat; the category lives in each file's front matter
+- `docs/`: concept docs (vibe coding, meta-prompt system, prompt engineering) plus the prompt creation guide
+- `scripts/`: index generator, version-bump gate, and their unittest suites
+- `.github/workflows/prompt-index.yml`: CI that runs the tests, the index freshness check, and the bump gate on PRs
+- Root `README.md`: short page whose prompt table is GENERATED between the `prompts-index` markers; never hand-edit that region
 
 ## Prompt conventions
 
-- Filenames: `kebab-case-descriptive-name.md`
+- Filenames: `kebab-case-descriptive-name.md`, matching the front matter `name`
+- Every prompt starts with YAML front matter: `name`, `category`, `version` (SemVer), `updated` (YYYY-MM-DD), `description`, `platforms`
+- **Any content change to a prompt requires a version bump** and an `updated` refresh in the same commit; CI enforces this on PRs
 - Required sections: **Objective**, **Assessment Phase** (starting with project/stack auto-detection), **Deliverables**, **Success Criteria**
-- Header hierarchy H1 → H2 → H3; H2 section titles are bolded (`## **Objective**`)
-- Length: keep prompts **under ~1600 words** (repo-wide policy from a deliberate trim; the guide's broader 400 to 2000 range is the outer bound). Check with `wc -w <file>`.
-- Prompts must be universal: auto-detect context, provide fallbacks when detection fails, work across languages/stacks without modification
+- Length: keep prompts **under ~1600 words** (`wc -w`, minus front matter)
+- Prompts must be universal: auto-detect context, provide fallbacks, work across stacks
 
-## The `/docs/` standardization system
+## When adding or editing a prompt
 
-Prompts here instruct AI agents to maintain a standardized 9-file `/docs/` structure in *target* projects (`PROJECT_OVERVIEW.md`, `ARCHITECTURE.md`, `AI_INTERACTION_GUIDE.md`, `REFACTORING_PLAN.md`, `TESTING_AND_RELIABILITY.md`, `IMPROVEMENT_AREAS.md`, `SECURITY_AND_PRIVACY.md`, `ROADMAP.md`, plus `docs/README.md`; `VERSIONING.md` is optional). `documentation/documentation-standardization.md` defines this system. When writing a prompt, its Deliverables should specify which of these `/docs/` files the prompt's output updates; this keeps all prompts consistent with each other.
+1. Edit or create the file in `prompts/` with complete front matter (bump `version` on edits)
+2. Run `python3 scripts/update_prompt_index.py` to refresh the README table
+3. Commit both together; CI fails on a stale index or a missing bump
 
-## When adding or renaming a prompt, update all indexes
+## The `/docs/` standardization system (in target projects)
 
-A new prompt touches at least four files:
+Prompts instruct AI agents to maintain a standardized 9-file `/docs/` structure in *target* projects (defined by `prompts/documentation-standardization.md`). This repository itself is exempt: it is a content library, and its own `/docs/` holds concept guides (the README states this explicitly). When writing a prompt, its Deliverables should specify which target-project `/docs/` files the output updates.
 
-1. The prompt file itself in the right category directory
-2. The category's `README.md` ("Available Prompts" entry)
-3. Root `README.md`: Quick Selection Guide table, Available Prompts section, and workflow tables if it fits a cadence
-4. `PROMPT_CREATION_GUIDE.md` if it changes stated word counts or examples
-
-Cross-file consistency matters: past commits fixed contradictions between prompts and docs, so when changing a convention (e.g. `/docs/` file list, word limits), sweep every prompt that states it.
+Cross-file consistency matters: when changing a convention (the `/docs/` file list, word limits, front matter fields), sweep every prompt and doc that states it.

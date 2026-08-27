@@ -7,7 +7,7 @@ repos:
         name: regenerate README prompt index
         entry: python3 scripts/update_prompt_index.py
         language: system
-        files: ^(prompts/.*\.md|README\.md)$
+        always_run: true
         pass_filenames: false
       - id: prompt-index-tests
         name: prompt index generator tests

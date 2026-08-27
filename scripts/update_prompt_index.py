@@ -36,6 +36,8 @@ class PromptError(Exception):
 def parse_front_matter(text, source):
     """Parse the leading front matter block. Returns (fields, body)."""
     lines = text.splitlines()
+    if lines and lines[0].startswith("\ufeff"):
+        lines[0] = lines[0].lstrip("\ufeff")
     if not lines or lines[0].strip() != "---":
         raise PromptError(f"{source}: missing front matter (file must start with ---)")
     try:
@@ -49,7 +51,14 @@ def parse_front_matter(text, source):
         if ":" not in raw:
             raise PromptError(f"{source}: malformed front matter line: {raw!r}")
         key, _, value = raw.partition(":")
-        fields[key.strip()] = value.strip()
+        value = value.strip()
+        if len(value) > 1 and value[0] == value[-1] and value[0] in "'\"":
+            value = value[1:-1]
+        else:
+            comment = value.find(" #")
+            if comment != -1:
+                value = value[:comment].rstrip()
+        fields[key.strip()] = value
     body = "\n".join(lines[closing + 1:])
     return fields, body
 
@@ -71,7 +80,7 @@ def collect(prompts_dir):
     if not files:
         raise PromptError(f"no prompt files found in {prompts_dir}")
     for path in files:
-        fields, body = parse_front_matter(path.read_text(encoding="utf-8"), path.name)
+        fields, body = parse_front_matter(path.read_text(encoding="utf-8-sig"), path.name)
         validate(fields, path.name)
         if fields["name"] != path.stem:
             raise PromptError(f"{path.name}: front matter name {fields['name']!r} does not match filename")
@@ -88,6 +97,11 @@ def collect(prompts_dir):
     return entries
 
 
+def _cell(value):
+    """Escape characters that would break a GFM table cell."""
+    return str(value).replace("|", "\\|")
+
+
 def render_table(entries):
     rows = [
         "| Prompt | Category | Version | Updated | Words | Description |",
@@ -95,8 +109,9 @@ def render_table(entries):
     ]
     for e in entries:
         rows.append(
-            f"| [{e['name']}]({e['path']}) | {e['category']} | {e['version']} "
-            f"| {e['updated']} | {e['words']} | {e['description']} |"
+            f"| [{_cell(e['name'])}]({e['path']}) | {_cell(e['category'])} "
+            f"| {_cell(e['version'])} | {_cell(e['updated'])} | {e['words']} "
+            f"| {_cell(e['description'])} |"
         )
     return "\n".join(rows)
 
@@ -111,6 +126,10 @@ def inject(readme_text, table):
 
 
 def main(argv):
+    unknown = [a for a in argv if a != "--check"]
+    if unknown:
+        print(f"error: unknown argument(s): {' '.join(unknown)}", file=sys.stderr)
+        return 2
     check = "--check" in argv
     try:
         entries = collect(PROMPTS_DIR)
