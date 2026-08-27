@@ -1,530 +1,71 @@
-# Generic Coding Prompts Repository
+# Vibe Coding Prompts
 
-A curated collection of reusable AI prompts designed to streamline software development workflows, improve code quality, and automate common development tasks.
+A curated collection of reusable, versioned AI meta-prompts for software development workflows: documentation, testing, CI/CD, security, refactoring, and operations.
 
-## 🎯 Purpose
+Each prompt is a self-contained Markdown file you paste into your AI assistant (Claude, ChatGPT, Gemini, or Copilot Chat). Prompts auto-detect your project's stack instead of assuming one, so the same prompt works across languages and frameworks.
 
-This repository contains battle-tested prompts that help developers and AI assistants work together more effectively on coding projects. Each prompt is designed to be generic enough to apply to various projects while being specific enough to produce actionable results.
+## Quick start
 
-## 🎧 The Philosophy: Vibe Coding
+1. Pick a prompt from the index below and open it.
+2. Copy the prompt body (everything below the front matter) into your AI assistant, inside your project's context.
+3. Answer the prompt's short intake questions (project type, stack, constraints).
+4. Review everything the AI produces before committing it.
 
-This repository is built around the concept of **"vibe coding"**: a creative, conversational, exploratory way of programming where you collaborate with AI to build by intuition and iteration, rather than rigid planning.
+Each prompt's front matter carries a `version` and `updated` date, so you can tell at a glance whether the copy you saved earlier is still current.
 
-### What is Vibe Coding?
+## Prompt index
 
-**Vibe coding** is like **"jamming with code"**, similar to how musicians improvise to discover melodies. Instead of writing detailed specifications, you:
+This table is generated from each prompt's front matter by `scripts/update_prompt_index.py` and verified in CI. Do not edit it by hand.
 
-- 💬 **Describe intent in natural language** ("make this more secure", "add comprehensive tests")
-- 🎨 **Iterate rapidly** based on AI suggestions and output quality
-- 🔁 **Refine through feedback** until the solution "feels right"
-- ⚡ **Move fast** with minimal boilerplate and maximum creativity
-- 🧠 **Let AI understand context** and adapt to your project's style
+<!-- prompts-index:start -->
+| Prompt | Category | Version | Updated | Words | Description |
+|--------|----------|---------|---------|-------|-------------|
+| [code-refactoring-plan](./prompts/code-refactoring-plan.md) | development-workflow | 1.0.0 | 2026-08-27 | 1597 | Analyze code smells and technical debt, producing a prioritized refactoring roadmap. |
+| [file-organization-refactoring](./prompts/file-organization-refactoring.md) | development-workflow | 1.0.0 | 2026-08-27 | 1584 | Reorganize project files and folders safely with tested, incremental migrations. |
+| [test-suite-generator](./prompts/test-suite-generator.md) | development-workflow | 1.0.0 | 2026-08-27 | 1587 | Generate a comprehensive test suite with unit, integration and e2e coverage, plus skipped-test cleanup. |
+| [version-management](./prompts/version-management.md) | development-workflow | 1.0.0 | 2026-08-27 | 858 | Semantic versioning strategy with a VERSION file, conventional commits and automated releases. |
+| [github-actions-cicd-generator](./prompts/github-actions-cicd-generator.md) | devops-automation | 1.0.0 | 2026-08-27 | 189 | Versioning, branching and Docker tagging policy for GitHub Actions pipelines. |
+| [documentation-standardization](./prompts/documentation-standardization.md) | documentation | 1.0.0 | 2026-08-27 | 1724 | Standardize project documentation into the 9-file /docs/ structure with auditing and cleanup. |
+| [readme-generator](./prompts/readme-generator.md) | documentation | 1.0.0 | 2026-08-27 | 1513 | Generate or update a professional README, preserving images and validating Docker Hub descriptions. |
+| [logging-implementation-best-practices](./prompts/logging-implementation-best-practices.md) | operations | 1.0.0 | 2026-08-27 | 1524 | Production logging: structured JSON, PII redaction, rotation, retention and observability. |
+| [github-ready-preparation](./prompts/github-ready-preparation.md) | project-management | 1.0.0 | 2026-08-27 | 1572 | Prepare a repository for professional public release on GitHub. |
+| [project-reassessment](./prompts/project-reassessment.md) | project-management | 1.0.0 | 2026-08-27 | 1536 | Full repository health check aligning code, documentation and policies. |
+| [dependency-update-manager](./prompts/dependency-update-manager.md) | security | 1.0.0 | 2026-08-27 | 1513 | Automate dependency updates with risk classification, testing and rollback. |
+| [security-audit-generator](./prompts/security-audit-generator.md) | security | 1.0.0 | 2026-08-27 | 1578 | Comprehensive security audit with OWASP-based checks and prioritized remediation. |
+<!-- prompts-index:end -->
 
-**Traditional approach**: "Implement a test suite with Jest, covering these specific edge cases..."  
-**Vibe coding approach**: "Add solid test coverage that catches the important stuff" → Use our [Test Suite Generator](./development-workflow/test-suite-generator.md)
+## When to run what
 
-### Meta-Prompts: The Foundation
+| Situation | Suggested order |
+|-----------|-----------------|
+| Starting a new project | documentation-standardization, file-organization-refactoring, readme-generator, test-suite-generator, github-actions-cicd-generator |
+| Inheriting an existing project | project-reassessment, security-audit-generator, dependency-update-manager, code-refactoring-plan |
+| Preparing a public release | github-ready-preparation, security-audit-generator, readme-generator, test-suite-generator |
+| Security incident response | security-audit-generator, dependency-update-manager, project-reassessment |
+| Quarterly maintenance | project-reassessment, code-refactoring-plan, file-organization-refactoring, documentation-standardization |
+| Weekly upkeep | dependency-update-manager |
 
-This repository uses **meta-prompts**: prompts that don't just solve one specific problem, but define *how to solve entire categories of problems*.
+## Philosophy: vibe coding and meta-prompts
 
-**Meta-prompt** = A prompt framework that adapts to any project, language, or stack by:
-- Auto-detecting project context and requirements
-- Applying universal best practices
-- Generating customized, production-ready solutions
-- Being reusable across your entire organization
+This collection is built around two ideas:
 
-**Example**: Our [GitHub Actions CI/CD Generator](./devops-automation/github-actions-cicd-generator.md) doesn't just create *one* pipeline; it detects your tech stack and generates the *right* pipeline for your specific project.
+- **Vibe coding**: a conversational, iterative way of programming where you describe intent in natural language and refine through feedback. Read more in [What is Vibe Coding?](./docs/vibe-coding.md)
+- **Meta-prompts**: prompts that define how to solve a whole category of problems, adapting to any stack, rather than solving one instance. Read more in the [Universal Meta-Prompt System](./docs/universal-meta-level-prompt-system.md).
 
-### Learn More
+For prompt-length limits per platform, see the [Prompt Engineering Guide](./docs/prompt-engineering-guide.md).
 
-- 📖 [Vibe Coding Deep Dive](./docs/vibe-coding.md) - Full explanation with examples
-- 🧠 [Universal Meta-Level Prompt System](./docs/universal-meta-Level-prompt-system.md) - How meta-prompts work
+## A note on this repository's own standards
 
----
+Several prompts here define standards for target software projects (a 9-file `/docs/` structure, test suites, CI/CD pipelines). This repository itself is a content library, not a software project: its `/docs/` holds concept guides, its tests cover the index tooling in `scripts/`, and the documentation standards its prompts enforce apply to the projects you run them on, not to this repo.
 
-> 💡 **New to AI prompts?** Check out our [**Prompt Creation Guide**](./PROMPT_CREATION_GUIDE.md) to understand optimal prompt lengths and platform-specific recommendations for ChatGPT, GitHub Copilot, Claude, and Gemini.
+## Contributing
 
-## ⚡ Quick Selection Guide
+New prompts and improvements are welcome. Start with [CONTRIBUTING.md](./CONTRIBUTING.md) and the [Prompt Creation Guide](./docs/prompt-creation-guide.md), which define the required structure, front matter, versioning rules, and the generated index workflow. Planned prompt ideas are tracked in the [issue tracker](https://github.com/agigante80/vibe-coding-prompts/issues).
 
-| Need to... | Use This Prompt | Category |
-|-----------|----------------|----------|
-| **Understand the philosophy** | [What is Vibe Coding?](./docs/vibe-coding.md) | 📚 Concepts |
-| **Learn about meta-prompts** | [Universal Meta-Prompt System](./docs/universal-meta-Level-prompt-system.md) | 📚 Concepts |
-| **Create your own prompt** | [Prompt Creation Guide](./PROMPT_CREATION_GUIDE.md) | 📚 Guides |
-| Set up project documentation | [Documentation Standardization](./documentation/documentation-standardization.md) | 📖 Documentation |
-| Create/update README | [README Generator](./documentation/readme-generator.md) | 📖 Documentation |
-| Update Docker descriptions | [README Generator](./documentation/readme-generator.md) | 📖 Documentation |
-| Create CI/CD pipeline | [GitHub Actions CI/CD Generator](./devops-automation/github-actions-cicd-generator.md) | 🚀 DevOps |
-| Audit project security | [Security Audit Generator](./security/security-audit-generator.md) | 🔐 Security |
-| Update dependencies safely | [Dependency Update Manager](./security/dependency-update-manager.md) | 🔐 Security |
-| Assess existing project | [Project Reassessment](./project-management/project-reassessment.md) | 📊 Management |
-| Prepare for GitHub | [GitHub Ready Preparation](./project-management/github-ready-preparation.md) | 📊 Management |
-| Add comprehensive tests | [Test Suite Generator](./development-workflow/test-suite-generator.md) | 🔄 Workflow |
-| Fix skipped/failing tests | [Test Suite Generator](./development-workflow/test-suite-generator.md) | 🔄 Workflow |
-| Improve code quality | [Code Refactoring Plan Generator](./development-workflow/code-refactoring-plan.md) | 🔄 Workflow |
-| Analyze technical debt | [Code Refactoring Plan Generator](./development-workflow/code-refactoring-plan.md) | 🔄 Workflow |
-| Organize project files | [File & Folder Organization Refactoring](./development-workflow/file-organization-refactoring.md) | 🔄 Workflow |
-| Remove obsolete files | [File & Folder Organization Refactoring](./development-workflow/file-organization-refactoring.md) | 🔄 Workflow |
-| Implement logging best practices | [Logging Implementation & Best Practices](./operations/logging-implementation-best-practices.md) | 🔧 Operations |
-| Set up log rotation & retention | [Logging Implementation & Best Practices](./operations/logging-implementation-best-practices.md) | 🔧 Operations |
-| Establish observability | [Logging Implementation & Best Practices](./operations/logging-implementation-best-practices.md) | 🔧 Operations |
+## License
 
----
+Released under the [MIT License](./LICENSE).
 
-## 🔄 Recommended Workflow & Re-run Cadence
-
-### For New Projects (Initial Setup)
-
-| Order | Prompt | When to Run | Re-run Frequency | Purpose |
-|-------|--------|-------------|------------------|---------|
-| **1** | [Documentation Standardization](./documentation/documentation-standardization.md) | Project start | Once (then maintain) | Establish documentation foundation |
-| **2** | [File & Folder Organization Refactoring](./development-workflow/file-organization-refactoring.md) | After initial code | Once (at setup) | Establish clean structure from start |
-| **3** | [README Generator](./documentation/readme-generator.md) | After structure set | On major changes | Professional project introduction |
-| **4** | [Test Suite Generator](./development-workflow/test-suite-generator.md) | After core features | When adding features | Ensure code reliability |
-| **5** | [GitHub Actions CI/CD Generator](./devops-automation/github-actions-cicd-generator.md) | After tests pass | On workflow changes | Automate testing & deployment |
-| **6** | [Security Audit Generator](./security/security-audit-generator.md) | Before first release | Monthly / Pre-release | Identify vulnerabilities |
-| **7** | [GitHub Ready Preparation](./project-management/github-ready-preparation.md) | Before going public | Before each release | Final polish & compliance |
-
-### For Existing Projects (Maintenance & Improvement)
-
-| Order | Prompt | When to Run | Re-run Frequency | Purpose |
-|-------|--------|-------------|------------------|---------|
-| **1** | [Project Reassessment](./project-management/project-reassessment.md) | Taking over project / Major milestone | Monthly or Quarterly | Comprehensive health check |
-| **2** | [Security Audit Generator](./security/security-audit-generator.md) | After reassessment | Monthly / After incidents | Security posture validation |
-| **3** | [Dependency Update Manager](./security/dependency-update-manager.md) | After security audit | Weekly or Monthly | Keep dependencies current |
-| **4** | [Code Refactoring Plan Generator](./development-workflow/code-refactoring-plan.md) | When tech debt accumulates | Quarterly | Improve code quality |
-| **5** | [File & Folder Organization Refactoring](./development-workflow/file-organization-refactoring.md) | After refactoring plan | Quarterly / As needed | Organize files, remove obsolete code |
-| **6** | [Test Suite Generator](./development-workflow/test-suite-generator.md) | After file organization | After major changes | Update test coverage |
-| **7** | [README Generator](./documentation/readme-generator.md) | After significant changes | On feature releases | Keep documentation current |
-
-### Periodic Maintenance Schedule
-
-| Frequency | Prompts to Run | Reason |
-|-----------|---------------|---------|
-| **Weekly** | [Dependency Update Manager](./security/dependency-update-manager.md) | Stay current with security patches |
-| **Monthly** | [Security Audit Generator](./security/security-audit-generator.md)<br>[Project Reassessment](./project-management/project-reassessment.md) | Regular security & health checks |
-| **Quarterly** | [Code Refactoring Plan Generator](./development-workflow/code-refactoring-plan.md)<br>[File & Folder Organization Refactoring](./development-workflow/file-organization-refactoring.md)<br>[Documentation Standardization](./documentation/documentation-standardization.md) | Address technical debt, organize files & doc drift |
-| **Pre-Release** | [GitHub Ready Preparation](./project-management/github-ready-preparation.md)<br>[Security Audit Generator](./security/security-audit-generator.md)<br>[Test Suite Generator](./development-workflow/test-suite-generator.md) | Ensure release quality |
-| **As Needed** | [README Generator](./documentation/readme-generator.md)<br>[GitHub Actions CI/CD Generator](./devops-automation/github-actions-cicd-generator.md) | When documentation or workflows need updates |
-
-### Quick Reference by Scenario
-
-| Scenario | Prompts to Run (in order) |
-|----------|---------------------------|
-| **🚀 Starting brand new project** | Documentation Standardization → File Organization → README Generator → Test Suite Generator → CI/CD Generator |
-| **📦 Inheriting existing project** | Project Reassessment → Security Audit → Dependency Update → Code Refactoring Plan → File Organization → Test Suite Generator |
-| **🔐 Security incident response** | Security Audit Generator → Dependency Update Manager → Project Reassessment |
-| **📢 Preparing public release** | GitHub Ready Preparation → File Organization → Security Audit → README Generator → Test Suite Generator |
-| **🔧 Major refactoring planned** | Project Reassessment → Code Refactoring Plan → File Organization → Test Suite Generator → Documentation Update |
-| **📈 Quarterly maintenance** | Project Reassessment → Security Audit → Code Refactoring Plan → File Organization → Dependency Update |
-| **🧹 Cleanup & organization** | Project Reassessment → File Organization → Code Refactoring Plan → Documentation Standardization |
-
-### 💡 Why File Organization Matters
-
-**File & Folder Organization is a critical step** that should be run:
-
-- **Early in new projects** (Step 2) - Establish clean structure before code grows
-- **After code refactoring plans** - Implement the organizational changes identified
-- **Before test suite updates** - Ensure tests can find and import reorganized files
-- **Quarterly as maintenance** - Remove accumulated obsolete files and maintain structure
-- **Before public releases** - Clean up clutter, remove backup files, standardize naming
-
-**Key Benefits**:
-- 🗂️ **Clear Navigation** - Easy to find files and understand project layout
-- 🧹 **Remove Clutter** - Delete obsolete backups, temp files, deprecated code
-- 📏 **Consistency** - Standardized naming conventions across entire project
-- 🎯 **Separation of Concerns** - Logical grouping (src/, tests/, config/, docs/)
-- 👥 **Team Onboarding** - New developers understand structure immediately
-- 🔧 **Enable Refactoring** - Clean structure makes code improvements easier
-
-**Warning**: Always run File Organization **before** updating tests, as moving files requires updating import paths and test file locations.
-
----
-
-## � Available Prompts
-
-### 📖 Documentation
-
-#### [Documentation Standardization](./documentation/documentation-standardization.md)
-**Word Count**: ~940 words | **Platform**: All
-
-**What it does**: Establishes a comprehensive, synchronized documentation ecosystem for any project.
-
-**Ideal for**:
-- ✅ New projects needing professional documentation standards
-- ✅ Existing projects with inconsistent or outdated documentation
-- ✅ Teams wanting to automate documentation maintenance
-- ✅ Projects requiring strict compliance and audit trails
-- ✅ Establishing living documentation that evolves with code
-
-**Outputs**: 9 standardized documentation files, automation rules, quality gates, agent task flows
-
-#### [README Generator](./documentation/readme-generator.md)
-**Word Count**: ~2065 words | **Platform**: ChatGPT, Claude, Gemini (use Copilot Chat)
-
-**What it does**: Generates or updates comprehensive, professional README.md files following industry best practices, including Docker Hub descriptions.
-
-**Ideal for**:
-- ✅ Creating professional READMEs for new projects
-- ✅ Updating outdated or incomplete documentation
-- ✅ Preparing for public release or open source
-- ✅ Generating Docker Hub short (≤100 chars) and long descriptions
-- ✅ Preserving existing screenshots and images while updating content
-- ✅ Improving project discoverability and SEO
-- ✅ Meeting documentation standards for professional projects
-
-**Outputs**: Complete README.md with 16 sections, badges, Docker descriptions (short ≤100 chars, long markdown), preserved images/screenshots, character count validation
-
----
-
-### 🚀 DevOps Automation
-
-#### [GitHub Actions CI/CD Generator](./devops-automation/github-actions-cicd-generator.md)
-**Word Count**: ~642 words | **Platform**: All
-
-**What it does**: Creates or modernizes GitHub Actions workflows with full CI/CD capabilities.
-
-**Ideal for**:
-- ✅ Setting up CI/CD for new projects from scratch
-- ✅ Modernizing legacy deployment processes
-- ✅ Implementing Docker Hub + GHCR publishing
-- ✅ Adding security scanning (Trivy, SARIF uploads)
-- ✅ Establishing automated release processes
-- ✅ Multi-stage pipelines (lint, test, build, deploy)
-
-**Outputs**: Complete `.github/workflows/ci-cd.yml`, secrets documentation, manual trigger support
-
----
-
-### 📊 Project Management
-
-#### [Project Reassessment](./project-management/project-reassessment.md)
-**Word Count**: ~390 words | **Platform**: All
-
-**What it does**: Performs comprehensive project analysis and documentation synchronization.
-
-**Ideal for**:
-- ✅ Taking over inherited or existing projects
-- ✅ Periodic project health checks (monthly/quarterly)
-- ✅ Pre-release quality assurance and validation
-- ✅ Team onboarding and knowledge transfer
-- ✅ Compliance audits and gap analysis
-- ✅ Preparing for major releases or handovers
-
-**Outputs**: Assessment report, updated documentation, test results, prioritized action plan
-
-#### [GitHub Ready Preparation](./project-management/github-ready-preparation.md)
-**Word Count**: ~2610 words | **Platform**: ChatGPT, Claude, Gemini (use Copilot Chat)
-
-**What it does**: Prepares projects for professional GitHub publication with proper structure, documentation, automation, security, and community guidelines.
-
-**Ideal for**:
-- ✅ First-time public GitHub release preparation
-- ✅ Converting private repositories to public
-- ✅ Open source project setup and best practices
-- ✅ Job application portfolio preparation
-- ✅ Pre-release quality and security audits
-- ✅ Establishing community contribution guidelines
-- ✅ CI/CD and automation setup for GitHub
-
-**Outputs**: Essential files (LICENSE, .gitignore, README, CONTRIBUTING), CI/CD workflows, security configuration, issue/PR templates, comprehensive documentation, GitHub-ready structure
-
----
-
-### 🔄 Development Workflow
-
-#### [Test Suite Generator](./development-workflow/test-suite-generator.md)
-**Word Count**: ~2561 words | **Platform**: ChatGPT, Claude, Gemini (use Copilot Chat)
-
-**What it does**: Generates comprehensive test suites with unit, integration, and E2E tests, including extensive variable validation testing.
-
-**Ideal for**:
-- ✅ Adding tests to legacy projects without coverage
-- ✅ Establishing test infrastructure for new projects
-- ✅ Fixing projects with many skipped/disabled tests
-- ✅ Implementing test-driven development (TDD)
-- ✅ Meeting quality assurance requirements
-- ✅ Improving existing test suites with best practices
-- ✅ Creating reliable CI/CD test pipelines
-- ✅ Comprehensive variable validation testing (defaults, valid values, error handling)
-
-**Outputs**: Complete test suite, fixtures, mocking infrastructure, CI/CD integration, skipped test analysis, comprehensive variable validation tests
-
-#### [Code Refactoring Plan Generator](./development-workflow/code-refactoring-plan.md)
-**Word Count**: ~2485 words | **Platform**: ChatGPT, Claude, Gemini (use Copilot Chat)
-
-**What it does**: Analyzes codebase to identify code smells, technical debt, and architectural issues, generating a prioritized refactoring roadmap.
-
-**Ideal for**:
-- ✅ Legacy codebase modernization
-- ✅ Addressing accumulated technical debt
-- ✅ Quarterly code quality assessments
-- ✅ Improving developer velocity through better code
-- ✅ Pre-planning major architectural changes
-- ✅ Onboarding teams to complex codebases
-- ✅ Establishing code quality baselines
-
-**Outputs**: Code quality metrics, code smell analysis, prioritized refactoring roadmap, effort estimates, risk assessments, automated linting setup
-
-#### [File & Folder Organization Refactoring](./development-workflow/file-organization-refactoring.md)
-**Word Count**: ~4850 words | **Platform**: ChatGPT, Claude, Gemini (use Copilot Chat)
-
-**What it does**: Systematically reorganizes project files and folders, removes obsolete files, standardizes naming conventions, and establishes clear structure while ensuring application functionality.
-
-**Ideal for**:
-- ✅ Projects with cluttered root directories and flat structures
-- ✅ Codebases where files are scattered without clear organization
-- ✅ Removing obsolete backup files and deprecated code
-- ✅ Standardizing naming conventions across the project
-- ✅ Preparing for major refactoring or architectural changes
-- ✅ Improving project navigability for team members
-- ✅ Establishing clear separation of concerns (src, tests, config)
-
-**Outputs**: File organization plan, safe migration scripts, import path updates, test verification, updated refactoring documentation, new directory structure
-
----
-
-### � Operations
-
-#### [Logging Implementation & Best Practices](./operations/logging-implementation-best-practices.md)
-**Word Count**: ~2850 words | **Platform**: ChatGPT, Claude, Gemini (use Copilot Chat)
-
-**What it does**: Assesses current logging practices and generates a comprehensive implementation plan including structured logging, log rotation, retention policies, security controls, and observability integration.
-
-**Ideal for**:
-- ✅ Establishing logging standards for new projects
-- ✅ Migrating from unstructured to structured logging
-- ✅ Implementing compliance requirements (HIPAA, PCI-DSS, GDPR)
-- ✅ Setting up centralized logging infrastructure (ELK, Loki, CloudWatch)
-- ✅ Establishing log rotation and long-term retention (1-7 years)
-- ✅ Integrating logs with distributed tracing and metrics
-- ✅ Implementing PII redaction and security best practices
-- ✅ Quarterly logging practice reviews and improvements
-
-**Outputs**: Structured logging configuration (multi-language), log rotation configs (logrotate/Docker), archive automation (S3/GCS lifecycle), ingestion pipeline setup (Fluent Bit/Vector), monitoring/alerting, comprehensive documentation
-
----
-
-### �🔐 Security
-
-#### [Security Audit Generator](./security/security-audit-generator.md)
-**Word Count**: ~1286 words | **Platform**: ChatGPT, Claude, Gemini (use Copilot Chat)
-
-**What it does**: Performs comprehensive security audit with vulnerability scanning and compliance validation.
-
-**Ideal for**:
-- ✅ Pre-production security assessments
-- ✅ Quarterly security review cycles
-- ✅ Compliance audit preparation (GDPR, HIPAA, PCI-DSS)
-- ✅ Vulnerability scanning and remediation
-- ✅ Post-incident security reviews
-- ✅ Penetration testing preparation
-- ✅ Security baseline for new projects
-
-**Outputs**: Security audit report, CVSS risk scoring, remediation plan, CI/CD security integration, compliance checklist
-
-#### [Dependency Update Manager](./security/dependency-update-manager.md)
-**Word Count**: ~1630 words | **Platform**: ChatGPT, Claude, Gemini (use Copilot Chat)
-
-**What it does**: Automates dependency updates with breaking change detection, automated testing, and safe rollback.
-
-**Ideal for**:
-- ✅ Responding to security vulnerabilities in dependencies
-- ✅ Setting up automated dependency management (Dependabot/Renovate)
-- ✅ Major version upgrade planning with impact analysis
-- ✅ Reducing technical debt from outdated packages
-- ✅ Establishing regular update cycles (weekly/monthly)
-- ✅ Multi-ecosystem projects (npm, pip, Maven, Cargo, etc.)
-- ✅ CI/CD integration for dependency checks
-
-**Outputs**: Dependency audit report, prioritized update plan, breaking change analysis, automation config (Dependabot/Renovate), rollback procedures
-
----
-
-## 🚧 TODO: Upcoming Prompts
-
-The following prompts are planned for future releases. Contributions welcome!
-
-### 🔐 Security & Compliance
-- [x] **Security Audit Generator** - Comprehensive security review with vulnerability scanning ✅
-- [x] **Dependency Update Manager** - Automated dependency updates with breaking change analysis ✅
-- [ ] **GDPR/Compliance Documentation** - Generate privacy policies and compliance docs
-
-### 🏗️ Code Quality
-- [x] **Code Refactoring Plan Generator** - Identify code smells and generate refactoring roadmap ✅
-- [ ] **API Documentation Generator** - Auto-generate OpenAPI/Swagger specs from code
-- [ ] **Code Review Checklist** - Customizable code review guidelines and automation
-
-### 📊 Monitoring & Observability
-- [x] **Logging & Monitoring Setup** - Configure structured logging, metrics, and alerts ✅
-- [ ] **Performance Optimization** - Identify bottlenecks and generate optimization plan
-- [ ] **Error Tracking Integration** - Set up Sentry, Datadog, or similar tools
-
-### 🗄️ Database & Data
-- [ ] **Database Migration Generator** - Create safe, reversible database migrations
-- [ ] **Data Validation Layer** - Generate input validation and sanitization
-- [ ] **Database Optimization** - Index recommendations, query optimization
-
-### 🎨 Frontend & UI
-- [ ] **Component Library Setup** - Bootstrap design system and component library
-- [ ] **Accessibility Audit** - WCAG compliance checking and remediation
-- [ ] **Responsive Design Testing** - Multi-device testing strategy
-
-### 📦 Project Setup
-- [ ] **Monorepo Setup** - Configure monorepo with proper tooling (Nx, Turborepo, Lerna)
-- [ ] **Microservices Architecture** - Design and scaffold microservices structure
-- [ ] **Docker Compose Environment** - Local development environment with all services
-
-### 📖 Documentation Specialized
-- [ ] **API Client Generator** - Generate client libraries with documentation
-- [ ] **Tutorial & Guide Creator** - Step-by-step tutorials from code examples
-- [ ] **Changelog Generator** - Semantic versioning and automated changelogs
-
-### 🤖 AI/ML Specific
-- [ ] **Model Training Pipeline** - MLOps setup with training, validation, deployment
-- [ ] **Dataset Preparation** - Data cleaning, augmentation, and validation
-- [ ] **Model Monitoring** - Drift detection and performance tracking
-
----
-
-## 📁 Repository Structure
-
-## 🚀 How to Use These Prompts
-
-### For Individual Projects
-1. Choose a relevant prompt from the appropriate category
-2. Copy the prompt content to your AI assistant
-3. Customize any project-specific details mentioned in the prompt
-4. Execute the prompt in the context of your project
-
-### For Team Adoption
-1. Review prompts with your team to ensure alignment
-2. Customize prompts to match your team's standards and tools
-3. Create project-specific versions in your repositories
-4. Document which prompts are used for different scenarios
-
-### Best Practices
-- **Read the full prompt** before using it to understand its scope and requirements
-- **Customize as needed** for your specific technology stack and requirements  
-- **Test prompts** on non-critical projects first to understand their behavior
-- **Version control** your customized prompts alongside your code
-- **Share improvements** back to this repository when beneficial
-- **Consider prompt length** based on your AI platform - see [Prompt Creation Guide](./PROMPT_CREATION_GUIDE.md)
-
-## 🎯 Prompt Design Philosophy
-
-Each prompt in this collection follows these principles:
-
-- **Generic but Actionable** - Works across different projects while producing specific results
-- **Comprehensive** - Covers the complete workflow, not just isolated tasks
-- **Quality-Focused** - Includes testing, security, and documentation requirements
-- **Automation-Ready** - Designed to work with minimal human intervention
-- **Iterative** - Can be run multiple times to improve results
-
-## 🤝 Contributing
-
-This repository welcomes contributions of new prompts and improvements to existing ones!
-
-### Want to Create a Prompt?
-
-📖 **Read the [Prompt Creation Guide](./PROMPT_CREATION_GUIDE.md)** - Comprehensive guidelines covering:
-- Prompt structure template
-- Writing best practices
-- Length guidelines (400-2000 words)
-- Formatting standards
-- Multi-language support
-- Testing and validation
-- File organization
-- Publication process
-
-### Adding New Prompts
-1. **Read the guide** - Follow [Prompt Creation Guide](./PROMPT_CREATION_GUIDE.md)
-2. **Choose category** - Select appropriate folder or propose new one
-3. **Use the template** - Follow standard structure
-4. **Test thoroughly** - Run on at least one real project
-5. **Update READMEs** - Category and main README
-6. **Submit PR** - With clear description and testing notes
-
-### Improving Existing Prompts
-1. Test the existing prompt and identify areas for improvement
-2. Make targeted changes that enhance clarity or effectiveness
-3. Update any related documentation
-4. Submit a pull request explaining the benefits of your changes
-
-## 📋 Prompt Categories Explained
-
-### Documentation
-Focus on creating maintainable, synchronized documentation that evolves with your codebase. These prompts help establish documentation standards and automate updates.
-
-### DevOps Automation  
-Streamline your deployment and integration processes with prompts that generate robust CI/CD pipelines, automate testing, and manage infrastructure as code.
-
-### Project Management
-Keep projects organized and aligned with prompts that help assess current state, plan improvements, and maintain quality standards throughout development.
-
-### Development Workflow
-Establish efficient development processes that maintain high code quality while enabling rapid iteration and continuous improvement.
-
-## � Prompt Engineering Guide
-
-**New to prompt engineering or wondering about optimal prompt length?**
-
-Check out our [**Prompt Creation Guide**](./PROMPT_CREATION_GUIDE.md) for:
-- Optimal prompt lengths for different AI platforms (ChatGPT, Copilot, Claude, Gemini)
-- Technical limits and context windows
-- Platform-specific recommendations
-- How to structure prompts for maximum effectiveness
-
-### Quick Reference: Prompt Length Guidelines
-
-| AI Platform | Optimal Length | Max Context | Best For |
-|------------|---------------|-------------|----------|
-| **ChatGPT (GPT-4/5)** | 800-3000 words | ~100k words | Complex meta-prompts, full specifications |
-| **GitHub Copilot** | 300-700 words | ~4-8k tokens | Focused, modular prompts |
-| **Claude 3.5** | 1000-5000 words | ~200k tokens | Large context, entire codebases |
-| **Gemini 1.5 Pro** | Unlimited practical | 1M+ tokens | Complete documentation sets |
-
-✅ *All prompts in this repository (1500-4800 words) are comprehensive and work excellently with **ChatGPT, Claude, and Gemini**. For Copilot, use Copilot Chat for best results!*
-
----
-
-## �🔧 Requirements
-
-Most prompts in this repository assume:
-
-- Access to an AI assistant with code generation capabilities
-- Basic familiarity with software development concepts
-- Ability to customize prompts for your specific technology stack
-- Understanding of version control and collaborative development
-
-## 📄 License
-
-This repository is provided under an open license to encourage widespread use and contribution. See LICENSE file for details.
-
-## 🌟 Getting Started
-
-1. **Understand the philosophy** - Read about [vibe coding](./docs/vibe-coding.md) and [meta-prompts](./docs/universal-meta-Level-prompt-system.md)
-2. **Browse the categories** to find prompts relevant to your current needs
-3. **Start with documentation prompts** if you're beginning a new project
-4. **Use DevOps prompts** to establish reliable deployment processes  
-5. **Apply workflow prompts** to establish sustainable development practices
-6. **Embrace the vibe** - Iterate, refine, and let AI help you discover solutions
-
-## 📚 Additional Resources
-
-### Understanding the Philosophy
-- [Vibe Coding Explained](./docs/vibe-coding.md) - Understanding the creative, conversational approach
-- [Meta-Prompt System](./docs/universal-meta-Level-prompt-system.md) - How universal prompts work
-
-### Technical Guides
-- [Prompt Creation Guide](./PROMPT_CREATION_GUIDE.md) - Technical limits and best practices
-- [Prompt Creation Guide](./PROMPT_CREATION_GUIDE.md) - How to create effective prompts for this repository
-
----
-
-**Note**: These prompts are designed to work with AI assistants and should be adapted to your specific context, technology stack, and requirements. Always review and test generated code before deploying to production environments.
-
-*Built for vibe coding, where creativity meets automation.* 🎧✨
 ## Sponsor
 
 I build and maintain this in my own time. It is free, it stays free, and it gets maintained either way.
