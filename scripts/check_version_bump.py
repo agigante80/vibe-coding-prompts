@@ -20,7 +20,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from update_prompt_index import (  # noqa: E402
-    DATE_RE, VERSION_RE, PromptError, parse_front_matter,
+    VERSION_RE, PromptError, parse_front_matter, valid_date,
 )
 
 
@@ -40,8 +40,10 @@ def changed_prompts(base_commit, cwd=None):
     # stay inside the gate. A rewrite below that is indistinguishable from a
     # delete plus a new prompt and is treated as one (new prompts are exempt;
     # update_prompt_index.py --check still validates their front matter).
-    out = git("diff", "--name-status", "--find-renames=25%",
-              f"{base_commit}..HEAD", cwd=cwd)
+    # core.quotepath=off keeps non-ASCII paths literal instead of quoted
+    # octal escapes, which would silently fail the prompts/ prefix match.
+    out = git("-c", "core.quotepath=off", "diff", "--name-status",
+              "--find-renames=25%", f"{base_commit}..HEAD", cwd=cwd)
     pairs = []
     for line in out.splitlines():
         parts = line.split("\t")
@@ -80,8 +82,9 @@ def check(base_ref, cwd=None):
             failures.append(
                 f"{new}: version {new_version!r} is not MAJOR.MINOR.PATCH")
             continue
-        if not DATE_RE.match(new_updated):
-            failures.append(f"{new}: updated {new_updated!r} is not YYYY-MM-DD")
+        if not valid_date(new_updated):
+            failures.append(
+                f"{new}: updated {new_updated!r} is not a valid YYYY-MM-DD date")
             continue
         try:
             old_version, old_updated = front_matter_of(old_text, old)
@@ -96,7 +99,7 @@ def check(base_ref, cwd=None):
             failures.append(
                 f"{new}: content changed but version did not increase "
                 f"({old_version} to {new_version})")
-        elif DATE_RE.match(old_updated) and new_updated < old_updated:
+        elif valid_date(old_updated) and new_updated < old_updated:
             failures.append(
                 f"{new}: updated went backwards ({old_updated} to {new_updated})")
         else:
