@@ -1,3 +1,12 @@
+---
+name: github-ready-preparation
+category: project-management
+version: 1.0.0
+updated: 2026-08-27
+description: Prepare a repository for professional public release on GitHub.
+platforms: [chatgpt, claude, gemini, copilot-chat]
+---
+
 # GitHub Ready Preparation
 
 ## **Objective**
@@ -26,7 +35,7 @@ Prepare a project for professional GitHub publication by establishing proper str
 
 ### 3. **File Organization Verification**
 
-**For comprehensive file organization**, run **[File Organization Refactoring](../development-workflow/file-organization-refactoring.md)**
+**For comprehensive file organization**, run **[File Organization Refactoring](./file-organization-refactoring.md)**
 
 **Quick checks**:
 - Find obsolete files: `find . -name "*.bak" -o -name "*.old"`
@@ -35,7 +44,7 @@ Prepare a project for professional GitHub publication by establishing proper str
 
 ### 3.1. **Documentation Sanitization & Standardization**
 
-**For comprehensive documentation cleanup**, run **[Documentation Standardization](../documentation/documentation-standardization.md)** which covers:
+**For comprehensive documentation cleanup**, run **[Documentation Standardization](./documentation-standardization.md)** which covers:
 - Standard 9-file `/docs/` structure enforcement
 - Duplicate/outdated file identification and archiving
 - Contradiction detection and resolution
@@ -72,7 +81,7 @@ git log --all --full-history -- **/.env
 
 ### 6. **CI/CD Infrastructure**
 
-**For comprehensive CI/CD setup**, run **[GitHub Actions CI/CD Generator](../devops-automation/github-actions-cicd-generator.md)**
+**For comprehensive CI/CD setup**, run **[GitHub Actions CI/CD Generator](./github-actions-cicd-generator.md)**
 
 ---
 
@@ -92,7 +101,7 @@ git log --all --full-history -- **/.env
 | **Recommended** | `CHANGELOG.md` | Version history and notable changes | ⬜ |
 | **Optional** | `.gitattributes` | Consistent line endings and text normalization | ⬜ |
 
-**For detailed file organization**, run **[File Organization Refactoring](../development-workflow/file-organization-refactoring.md)**
+**For detailed file organization**, run **[File Organization Refactoring](./file-organization-refactoring.md)**
 
 ### 🏷️ **2. Repository Metadata**
 
@@ -102,14 +111,14 @@ git log --all --full-history -- **/.env
 | **Critical** | Repository topics (10-15 keywords) | ⬜ |
 | **Recommended** | Homepage URL | ⬜ |
 
-**See [.github/REPOSITORY_METADATA.md](./.github/REPOSITORY_METADATA.md) for detailed guidance on:**
+**See [.github/REPOSITORY_METADATA.md](../.github/REPOSITORY_METADATA.md) for detailed guidance on:**
 - Description formatting best practices
 - Topic selection strategies
 - Application via Web UI or GitHub CLI
 
 ### 🚀 **3. Build & Run**
 
-**See [.github/REPOSITORY_METADATA.md](./.github/REPOSITORY_METADATA.md) for detailed guidance on:**
+**See [.github/REPOSITORY_METADATA.md](../.github/REPOSITORY_METADATA.md) for detailed guidance on:**
 - Description formatting best practices
 - Topic selection strategies
 - Application via Web UI or GitHub CLI
@@ -128,7 +137,7 @@ git log --all --full-history -- **/.env
 | **Critical** | Automated tests (runnable with single command) | ⬜ |
 | **Recommended** | 70%+ coverage & CI integration | ⬜ |
 
-**For comprehensive test setup**, run **[Test Suite Generator](../development-workflow/test-suite-generator.md)**
+**For comprehensive test setup**, run **[Test Suite Generator](./test-suite-generator.md)**
 
 ### 🧰 **5. Automation / CI/CD**
 
@@ -137,7 +146,7 @@ git log --all --full-history -- **/.env
 | **Critical** | CI workflow (`.github/workflows/ci.yml`) | ⬜ |
 | **Recommended** | Release automation & Dependabot | ⬜ |
 
-**For comprehensive CI/CD setup**, run **[GitHub Actions CI/CD Generator](../devops-automation/github-actions-cicd-generator.md)** which provides:
+**For comprehensive CI/CD setup**, run **[GitHub Actions CI/CD Generator](./github-actions-cicd-generator.md)** which provides:
 - Complete workflow templates (build, test, lint, deploy)
 - Docker publishing automation
 - Security scanning integration
@@ -150,7 +159,7 @@ git log --all --full-history -- **/.env
 | **Critical** | Professional `README.md` | ⬜ |
 | **Critical** | `/docs/` standardization (9 files) | ⬜ |
 
-**For README generation**, run **[README Generator](../documentation/readme-generator.md)**
+**For README generation**, run **[README Generator](./readme-generator.md)**
 **For documentation standardization**, already covered in Step 4 above
 
 ### 👥 **7. Community & Contribution**
@@ -169,7 +178,7 @@ git log --all --full-history -- **/.env
 | **Critical** | `.env.example` with required variables | ⬜ |
 | **Recommended** | `SECURITY.md` & Dependabot enabled | ⬜ |
 
-**For comprehensive security audit**, run **[Security Audit Generator](../security/security-audit-generator.md)**
+**For comprehensive security audit**, run **[Security Audit Generator](./security-audit-generator.md)**
 
 ### 🧱 **9. Releases & Distribution**
 
@@ -178,7 +187,7 @@ git log --all --full-history -- **/.env
 | **Critical** | Semantic versioning (`MAJOR.MINOR.PATCH`) | ⬜ |
 | **Recommended** | GitHub Releases & `CHANGELOG.md` | ⬜ |
 
-**For version management**, run **[Version Management](../development-workflow/version-management.md)** which covers:
+**For version management**, run **[Version Management](./version-management.md)** which covers:
 - Dynamic Git-based versioning
 - Release automation
 - Changelog generation
@@ -310,7 +319,7 @@ Thumbs.db
 5. Dependabot configuration
 
 ### **Documentation Updates**
-Update `/docs/` files per [Documentation Standardization](../documentation/documentation-standardization.md):
+Update `/docs/` files per [Documentation Standardization](./documentation-standardization.md):
 - `/docs/README.md` - Repository setup and contribution workflow
 - `/docs/PROJECT_OVERVIEW.md` - GitHub visibility and release strategy
 - `/docs/SECURITY_AND_PRIVACY.md` - Security policies and vulnerability reporting
@@ -353,7 +362,7 @@ Update `/docs/` files per [Documentation Standardization](../documentation/docum
 * Before major version releases (v1.0, v2.0)
 
 ### **Initial Setup**
-1. Review the PROMPT_CREATION_GUIDE.md to understand documentation requirements
+1. Review the [Prompt Creation Guide](../docs/prompt-creation-guide.md) to understand documentation requirements
 2. Ensure you have a clean working directory (commit or stash changes)
 3. Backup your repository before making structural changes
 4. Have GitHub account and repository URL ready

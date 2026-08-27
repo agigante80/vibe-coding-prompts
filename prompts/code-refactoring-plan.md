@@ -1,3 +1,12 @@
+---
+name: code-refactoring-plan
+category: development-workflow
+version: 1.0.0
+updated: 2026-08-27
+description: Analyze code smells and technical debt, producing a prioritized refactoring roadmap.
+platforms: [chatgpt, claude, gemini, copilot-chat]
+---
+
 # Code Refactoring Plan Generator
 
 ## **Objective**

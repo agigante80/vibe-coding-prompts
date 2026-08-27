@@ -1,3 +1,12 @@
+---
+name: readme-generator
+category: documentation
+version: 1.0.0
+updated: 2026-08-27
+description: Generate or update a professional README, preserving images and validating Docker Hub descriptions.
+platforms: [chatgpt, claude, gemini, copilot-chat]
+---
+
 # README Generator
 
 ## **Objective**
@@ -291,7 +300,7 @@ All README updates must be documented in `/docs/`:
 * Documentation audit, updating Docker Hub descriptions
 
 ### **Initial Setup**
-1. Review PROMPT_CREATION_GUIDE.md, examine existing README.md
+1. Review the [Prompt Creation Guide](../docs/prompt-creation-guide.md), examine existing README.md
 2. Check for Docker description files in `./docker/description/`
 3. Have project metadata ready (package.json, GitHub URL, license)
 

@@ -1,3 +1,12 @@
+---
+name: security-audit-generator
+category: security
+version: 1.0.0
+updated: 2026-08-27
+description: Comprehensive security audit with OWASP-based checks and prioritized remediation.
+platforms: [chatgpt, claude, gemini, copilot-chat]
+---
+
 # Security Audit Generator
 
 ## **Objective**
@@ -337,7 +346,7 @@ Classify vulnerabilities by severity:
 * When adding authentication or payment processing
 
 ### **Initial Setup**
-1. Review the PROMPT_CREATION_GUIDE.md to understand documentation requirements
+1. Review the [Prompt Creation Guide](../docs/prompt-creation-guide.md) to understand documentation requirements
 2. Examine existing `/docs/SECURITY_AND_PRIVACY.md` if it exists
 3. Ensure security scanning tools are available (or will be recommended)
 4. Have access to dependency management tools for your project

@@ -1,3 +1,12 @@
+---
+name: logging-implementation-best-practices
+category: operations
+version: 1.0.0
+updated: 2026-08-27
+description: Production logging: structured JSON, PII redaction, rotation, retention and observability.
+platforms: [chatgpt, claude, gemini, copilot-chat]
+---
+
 # Logging Implementation & Best Practices Generator
 
 ## **Objective**

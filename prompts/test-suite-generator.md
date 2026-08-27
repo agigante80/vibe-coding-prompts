@@ -1,3 +1,12 @@
+---
+name: test-suite-generator
+category: development-workflow
+version: 1.0.0
+updated: 2026-08-27
+description: Generate a comprehensive test suite with unit, integration and e2e coverage, plus skipped-test cleanup.
+platforms: [chatgpt, claude, gemini, copilot-chat]
+---
+
 # Test Suite Generator
 
 ## **Objective**
