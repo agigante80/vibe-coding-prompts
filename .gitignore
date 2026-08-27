@@ -1,2 +1,4 @@
 .cursor/
 .autopilot.json
+__pycache__/
+*.pyc
