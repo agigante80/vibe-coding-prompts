@@ -55,8 +55,9 @@ Apply appropriate security standards based on project type:
 
 **Scan**:
 ```bash
-# Prefer a real scanner: gitleaks covers working tree AND git history
+# Prefer a real scanner: gitleaks (git = commit history, dir = working tree)
 gitleaks git .
+gitleaks dir .
 
 # Keyword fallback (grep --include takes ONE glob; repeat the flag)
 grep -rn "password\|secret\|api_key\|token" \
@@ -92,7 +93,7 @@ Referrer-Policy: strict-origin-when-cross-origin
 Permissions-Policy: geolocation=(), microphone=()
 Cross-Origin-Opener-Policy: same-origin
 Cross-Origin-Embedder-Policy: require-corp
-Cross-Origin-Resource-Policy: same-origin
+Cross-Origin-Resource-Policy: same-site
 ```
 Do NOT set `X-XSS-Protection` (deprecated; the XSS Auditor it controlled could CREATE vulnerabilities). If a legacy scanner demands it, send `X-XSS-Protection: 0`.
 
@@ -223,8 +224,8 @@ snyk test --severity-threshold=high
 # SAST (Static Application Security Testing)
 semgrep --config=auto
 
-# Secret scanning
-gitleaks detect --source . --verbose
+# Secret scanning (history plus working tree)
+gitleaks git . && gitleaks dir .
 
 # Infrastructure as Code
 checkov -d .
@@ -321,12 +322,9 @@ Score with CVSS v4.0 (v3.1 acceptable where tooling requires it; state which is 
 
 ### **Preventive Measures**
 
-* Implement security from the start (shift-left security)
-* Use security linters and automated scanning
-* Regular dependency updates and patch management
-* Security training for development team
-* Code review focusing on security concerns
-* Threat modeling for new features
+* Shift-left: security from the start, linters and automated scanning in CI
+* Regular dependency updates and patch management; security-focused code review
+* Security training for the team; threat modeling for new features
 
 ### **Continuous Security**
 

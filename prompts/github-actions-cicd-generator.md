@@ -1,7 +1,7 @@
 ---
 name: github-actions-cicd-generator
 category: devops-automation
-version: 1.0.0
+version: 1.1.0
 updated: 2026-08-27
 description: Versioning, branching and Docker tagging policy for GitHub Actions pipelines.
 platforms: [chatgpt, claude, gemini, copilot-chat]
@@ -22,10 +22,10 @@ platforms: [chatgpt, claude, gemini, copilot-chat]
 ### Docker Tagging Policy
 - The Docker images should be tagged with the following conventions:
   - `latest` for the images built from the `main` branch.
-  - Version tags (e.g., `v1.0.0`) for tagged releases.
-- Example of tagging:
-  - For the latest image: `agigante80/vibe-coding-prompts:latest`
-  - For a specific release: `agigante80/vibe-coding-prompts:v1.0.0`
+  - Unprefixed version tags (e.g., `1.0.0`) for tagged releases: the git tag carries the `v` prefix (`v1.0.0`), the Docker tag does not (see the Version Management prompt's tag mapping).
+- Example of tagging for an image named `ORG/PROJECT`:
+  - Latest: `ORG/PROJECT:latest`
+  - Release: `ORG/PROJECT:1.0.0` (from git tag `v1.0.0`)
 
 ## Best Practices
 - Ensure that the `VERSION` file is updated in every pull request that introduces version changes.
