@@ -14,9 +14,13 @@ repos:
         pass_filenames: false
       - id: prompt-version-bump
         name: check prompt version bumps (vs origin/main)
-        entry: python3 scripts/check_version_bump.py origin/main
+        # Runs at pre-push: at pre-commit time the commits being gated do not
+        # exist yet, so the check would inspect the wrong state. Skips quietly
+        # when origin/main is absent (fresh fork, shallow clone).
+        entry: bash -c 'git rev-parse -q --verify origin/main >/dev/null && exec python3 scripts/check_version_bump.py origin/main; echo "prompt-version-bump: skipped (no origin/main)"'
         language: system
-        files: ^prompts/.*\.md$
+        stages: [pre-push]
+        always_run: true
         pass_filenames: false
       - id: prompt-index-tests
         name: prompt index generator tests

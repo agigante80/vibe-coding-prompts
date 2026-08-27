@@ -23,6 +23,14 @@ jobs:
       - name: Verify README prompt index is fresh
         run: python3 scripts/update_prompt_index.py --check
 
-      - name: Verify changed prompts were version bumped
+      - name: Verify changed prompts were version bumped (PR)
         if: github.event_name == 'pull_request'
-        run: python3 scripts/check_version_bump.py "origin/${{ github.base_ref }}"
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: python3 scripts/check_version_bump.py "origin/$BASE_REF"
+
+      - name: Verify changed prompts were version bumped (push)
+        # Direct pushes to main are gated against the previous tip. The
+        # all-zero SHA (branch creation, force push) has no valid base.
+        if: github.event_name == 'push' && github.event.before != '0000000000000000000000000000000000000000'
+        run: python3 scripts/check_version_bump.py "${{ github.event.before }}"

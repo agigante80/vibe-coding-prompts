@@ -85,6 +85,13 @@ class ValueCleanupTests(unittest.TestCase):
         with self.assertRaises(upi.PromptError):
             upi.parse_front_matter(text, "x.md")
 
+    def test_quoted_value_does_not_corrupt_body(self):
+        """Regression: the quote scan must not clobber the block-end index."""
+        text = '---\nname: x\ndescription: "Quoted value"\n---\n\nOne two three four five.\n'
+        fields, body = upi.parse_front_matter(text, "x.md")
+        self.assertEqual(fields["description"], "Quoted value")
+        self.assertEqual(len(body.split()), 5)
+
     def test_utf8_bom_tolerated(self):
         fields, _ = upi.parse_front_matter("\ufeff" + VALID, "x.md")
         self.assertEqual(fields["name"], "sample-prompt")
@@ -113,6 +120,10 @@ class ValidateTests(unittest.TestCase):
     def test_bad_date_raises(self):
         with self.assertRaises(upi.PromptError):
             upi.validate(self.fields(updated="27/08/2026"), "x.md")
+
+    def test_impossible_calendar_date_raises(self):
+        with self.assertRaises(upi.PromptError):
+            upi.validate(self.fields(updated="2026-31-01"), "x.md")
 
 
 class CollectTests(unittest.TestCase):
