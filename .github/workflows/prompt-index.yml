@@ -33,7 +33,7 @@ jobs:
         if: github.event_name == 'pull_request'
         env:
           BASE_REF: ${{ github.base_ref }}
-        run: python3 scripts/check_version_bump.py "origin/$BASE_REF"
+        run: python3 scripts/check_version_bump.py --require-base "origin/$BASE_REF"
 
       - name: Verify changed prompts were version bumped (push)
         # Direct pushes to main are gated against the previous tip. The
