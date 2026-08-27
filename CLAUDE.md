@@ -27,7 +27,7 @@ A library of reusable AI "meta-prompts" for software development workflows. The 
 - Filenames: `kebab-case-descriptive-name.md`, matching the front matter `name`
 - Every prompt starts with YAML front matter: `name`, `category`, `version` (SemVer), `updated` (YYYY-MM-DD), `description`, `platforms`
 - **Any content change to a prompt requires a version bump** (strictly increasing SemVer; CI enforces this on PRs and on pushes to main) and an `updated` refresh in the same commit (CI enforces the format and that the date never goes backwards)
-- Required sections: **Objective**, **Assessment Phase** (starting with project/stack auto-detection), **Deliverables**, **Success Criteria**. Two legacy prompts predate this rule (github-actions-cicd-generator, version-management); their rewrites are tracked in #4 and #10
+- Required sections: **Objective**, **Assessment Phase** (starting with project/stack auto-detection), **Deliverables**, **Success Criteria**. Three legacy prompts predate this rule (github-actions-cicd-generator, version-management, documentation-standardization); their reworks are tracked in #4, #10 and #5
 - Length: keep prompts **under ~1600 words** (`wc -w`, minus front matter)
 - Prompts must be universal: auto-detect context, provide fallbacks, work across stacks
 
