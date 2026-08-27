@@ -18,13 +18,14 @@ repos:
         pass_filenames: false
       - id: prompt-version-bump
         name: check prompt version bumps
-        # Push stage: gates the refs actually being pushed (pre-commit exposes
+        # Push stage: gates refs being pushed (pre-commit exposes
         # PRE_COMMIT_FROM_REF = remote revision, PRE_COMMIT_TO_REF = local
-        # revision). The script handles every unusable-base case itself (new
-        # remote branch zero SHA, missing origin/main, unrelated histories)
-        # by skipping with exit 0. Upstream limit: pre-commit derives the
-        # env pair from the FIRST pushed ref only, so a multi-ref push gates
-        # one ref locally; CI gates each PR and push authoritatively.
+        # revision; for a new branch it resolves an ancestor, never the
+        # zero SHA). The script skips unusable bases (missing origin/main,
+        # unrelated histories) with exit 0. Upstream limit: pre-commit uses
+        # the FIRST eligible pushed ref, so in a multi-ref push the hook may
+        # run against a ref with no prompt changes and skip entirely; CI
+        # gates every PR and push authoritatively.
         entry: bash -c 'exec python3 scripts/check_version_bump.py "${PRE_COMMIT_FROM_REF:-origin/main}" "${PRE_COMMIT_TO_REF:-HEAD}"'
         language: system
         stages: [pre-push]

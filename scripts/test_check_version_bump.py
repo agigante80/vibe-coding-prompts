@@ -263,6 +263,55 @@ class CheckVersionBumpTests(unittest.TestCase):
         self.commit_all(repo, "restore veteran")
         self.assertEqual(cvb.check("main", cwd=repo), [])
 
+    def test_typechange_to_symlink_fails(self):
+        """Replacing a prompt with a symlink must not slip past the gate."""
+        repo = self.make_repo()
+        target = repo / "prompts" / "other-content.txt"
+        target.write_text("different content entirely", encoding="utf-8")
+        p = repo / "prompts" / "sample-prompt.md"
+        p.unlink()
+        p.symlink_to("other-content.txt")
+        self.commit_all(repo, "swap for symlink")
+        failures = cvb.check("main", cwd=repo)
+        self.assertEqual(len(failures), 1)
+        self.assertIn("front matter unreadable", failures[0])
+
+    def test_restore_after_merge_delete_uses_true_last_version(self):
+        """History simplification around a merge must not hand the hatch a
+        stale blob: the prompt earned 2.0.0 on a merged branch, was deleted
+        through a merge, and a bumpless re-add of new content must fail
+        against 2.0.0, not pass against the stale 1.0.0 side."""
+        repo = self.make_repo()
+        run_git(repo, "checkout", "-q", "main")
+        # bump branch: prompt reaches 2.0.0 and merges to main
+        run_git(repo, "checkout", "-qb", "bump")
+        p = repo / "prompts" / "sample-prompt.md"
+        p.write_text(PROMPT_V1.replace("version: 1.0.0", "version: 2.0.0")
+                     .replace("Original body", "Big rewrite"), encoding="utf-8")
+        self.commit_all(repo, "bump to 2.0.0")
+        run_git(repo, "checkout", "-q", "main")
+        run_git(repo, "merge", "-q", "--no-ff", "bump")
+        # delete branch: branched BEFORE the bump, deletes the prompt
+        run_git(repo, "checkout", "-qb", "deleter", "main~1")
+        run_git(repo, "rm", "-q", "prompts/sample-prompt.md")
+        self.commit_all(repo, "delete prompt")
+        run_git(repo, "checkout", "-q", "main")
+        # modify/delete conflict resolved as delete
+        merge = subprocess.run(["git", "merge", "--no-ff", "deleter"],
+                               cwd=repo, capture_output=True, env=GIT_ENV)
+        if merge.returncode != 0:
+            run_git(repo, "rm", "-q", "prompts/sample-prompt.md")
+            run_git(repo, "commit", "-qm", "merge deleter, resolve as delete")
+        # feature: re-add with new content at a version below the earned 2.0.0
+        run_git(repo, "checkout", "-qB", "feature", "main")
+        p.parent.mkdir(exist_ok=True)  # dir vanished with its last file
+        p.write_text(PROMPT_V1.replace("version: 1.0.0", "version: 1.0.1")
+                     .replace("Original body", "Fresh content"), encoding="utf-8")
+        self.commit_all(repo, "re-add low")
+        failures = cvb.check("main", cwd=repo)
+        self.assertEqual(len(failures), 1)
+        self.assertIn("did not increase", failures[0])
+
     def test_unusable_base_skips(self):
         repo = self.make_repo()
         with self.assertRaises(cvb.SkipCheck):
