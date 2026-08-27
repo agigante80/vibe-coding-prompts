@@ -168,7 +168,7 @@ Enable GitHub secret scanning with push protection in repository settings. No-in
 
 | Priority | Item | Status |
 |----------|------|--------|
-| **Critical** | No secrets in repo (scan with `git-secrets`) | ⬜ |
+| **Critical** | No secrets in repo or history (scan with `gitleaks`) | ⬜ |
 | **Critical** | `.env.example` with required variables | ⬜ |
 | **Recommended** | `SECURITY.md` & Dependabot enabled | ⬜ |
 
