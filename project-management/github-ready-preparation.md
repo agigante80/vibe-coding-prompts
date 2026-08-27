@@ -375,7 +375,7 @@ Special considerations: [AI integration/MCP/sensitive data/etc.]
 ```
 
 ### **Expected Outcome**
-AI analyzes structure, creates/updates essential files, scans for secrets, sets up CI/CD, organizes folders, configures Dependabot, generates documentation, adds badges/metadata—delivering a professional, clone-ready GitHub repository.
+AI analyzes structure, creates/updates essential files, scans for secrets, sets up CI/CD, organizes folders, configures Dependabot, generates documentation, adds badges/metadata, delivering a professional, clone-ready GitHub repository.
 
 ---
 

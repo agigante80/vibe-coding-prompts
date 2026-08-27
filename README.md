@@ -8,11 +8,11 @@ This repository contains battle-tested prompts that help developers and AI assis
 
 ## 🎧 The Philosophy: Vibe Coding
 
-This repository is built around the concept of **"vibe coding"** — a creative, conversational, exploratory way of programming where you collaborate with AI to build by intuition and iteration, rather than rigid planning.
+This repository is built around the concept of **"vibe coding"**: a creative, conversational, exploratory way of programming where you collaborate with AI to build by intuition and iteration, rather than rigid planning.
 
 ### What is Vibe Coding?
 
-**Vibe coding** is like **"jamming with code"** — similar to how musicians improvise to discover melodies. Instead of writing detailed specifications, you:
+**Vibe coding** is like **"jamming with code"**, similar to how musicians improvise to discover melodies. Instead of writing detailed specifications, you:
 
 - 💬 **Describe intent in natural language** ("make this more secure", "add comprehensive tests")
 - 🎨 **Iterate rapidly** based on AI suggestions and output quality
@@ -25,7 +25,7 @@ This repository is built around the concept of **"vibe coding"** — a creative,
 
 ### Meta-Prompts: The Foundation
 
-This repository uses **meta-prompts** — prompts that don't just solve one specific problem, but define *how to solve entire categories of problems*.
+This repository uses **meta-prompts**: prompts that don't just solve one specific problem, but define *how to solve entire categories of problems*.
 
 **Meta-prompt** = A prompt framework that adapts to any project, language, or stack by:
 - Auto-detecting project context and requirements
@@ -33,7 +33,7 @@ This repository uses **meta-prompts** — prompts that don't just solve one spec
 - Generating customized, production-ready solutions
 - Being reusable across your entire organization
 
-**Example**: Our [GitHub Actions CI/CD Generator](./devops-automation/github-actions-cicd-generator.md) doesn't just create *one* pipeline — it detects your tech stack and generates the *right* pipeline for your specific project.
+**Example**: Our [GitHub Actions CI/CD Generator](./devops-automation/github-actions-cicd-generator.md) doesn't just create *one* pipeline; it detects your tech stack and generates the *right* pipeline for your specific project.
 
 ### Learn More
 
@@ -524,7 +524,7 @@ This repository is provided under an open license to encourage widespread use an
 
 **Note**: These prompts are designed to work with AI assistants and should be adapted to your specific context, technology stack, and requirements. Always review and test generated code before deploying to production environments.
 
-*Built for vibe coding — where creativity meets automation.* 🎧✨
+*Built for vibe coding, where creativity meets automation.* 🎧✨
 ## Sponsor
 
 I build and maintain this in my own time. It is free, it stays free, and it gets maintained either way.

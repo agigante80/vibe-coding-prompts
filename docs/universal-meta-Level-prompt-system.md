@@ -1,17 +1,17 @@
-## 🧠 1. What It Is — The Core Idea
+## 🧠 1. What It Is: The Core Idea
 
-A **Universal, Meta-Level CI/CD Prompt System** is a **prompt framework** that uses AI (like ChatGPT, Copilot, or Claude) to automatically **generate, review, and improve CI/CD workflows** — across *any* project, *any* language, and *any* stack.
+A **Universal, Meta-Level CI/CD Prompt System** is a **prompt framework** that uses AI (like ChatGPT, Copilot, or Claude) to automatically **generate, review, and improve CI/CD workflows** across *any* project, *any* language, and *any* stack.
 
 It’s called **“meta-level”** because:
 
-> It doesn’t define a *specific pipeline* — it defines *how pipelines should be defined.*
+> It doesn’t define a *specific pipeline*; it defines *how pipelines should be defined.*
 
 In other words:
 
 * A normal prompt says: “Create a CI/CD workflow for Node.js.”
 * A meta-level prompt says:
 
-  > “Given any repository, detect its tech stack and create or review a CI/CD pipeline that follows best practices — modular, fast, secure, and maintainable — including Docker builds, tests, and releases.”
+  > “Given any repository, detect its tech stack and create or review a CI/CD pipeline that follows best practices (modular, fast, secure, and maintainable), including Docker builds, tests, and releases.”
 
 So instead of generating one YAML file, it generates **the logic to generate or optimize many pipelines**.
 
@@ -60,7 +60,7 @@ Traditional prompts are **task-level**:
 
 Meta-level prompts are **instructional frameworks**:
 
-> “Whenever you’re asked to create or review a workflow, ensure it includes caching, modular jobs, Docker build & push, description validation, secure secrets handling, and release automation — adjusting to the repo’s language automatically.”
+> “Whenever you’re asked to create or review a workflow, ensure it includes caching, modular jobs, Docker build & push, description validation, secure secrets handling, and release automation, adjusting to the repo’s language automatically.”
 
 That means your prompt:
 
@@ -129,10 +129,10 @@ All from one universal prompt.
 
 ## 🧠 8. Why It’s “Meta”
 
-Because it’s not just *a CI/CD config* — it’s a **CI/CD configuration system**.
+Because it’s not just *a CI/CD config*; it’s a **CI/CD configuration system**.
 It defines *how to define CI/CD*, not just *what to define.*
 
-That’s the “meta” layer — prompting at the **policy and reasoning level** rather than the execution level.
+That’s the “meta” layer: prompting at the **policy and reasoning level** rather than the execution level.
 
 ---
 
@@ -144,7 +144,7 @@ That’s the “meta” layer — prompting at the **policy and reasoning level*
 | **Prompt**      | A cook who can make a recipe.                                            |
 | **Meta-prompt** | A *master chef* who can teach anyone how to make any recipe, adaptively. |
 
-Your system is the master chef — it defines *how to think about* CI/CD creation and improvement, not just the recipe itself.
+Your system is the master chef: it defines *how to think about* CI/CD creation and improvement, not just the recipe itself.
 
 ---
 
