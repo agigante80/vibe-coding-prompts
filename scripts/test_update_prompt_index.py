@@ -75,6 +75,16 @@ class ValueCleanupTests(unittest.TestCase):
         fields, _ = upi.parse_front_matter(text, "x.md")
         self.assertEqual(fields["description"], "Ranked as repo#1 by us")
 
+    def test_quoted_value_with_trailing_comment(self):
+        text = '---\nversion: "1.0.1" # note\n---\nbody'
+        fields, _ = upi.parse_front_matter(text, "x.md")
+        self.assertEqual(fields["version"], "1.0.1")
+
+    def test_unterminated_quote_raises(self):
+        text = '---\ndescription: "half quoted\n---\nbody'
+        with self.assertRaises(upi.PromptError):
+            upi.parse_front_matter(text, "x.md")
+
     def test_utf8_bom_tolerated(self):
         fields, _ = upi.parse_front_matter("\ufeff" + VALID, "x.md")
         self.assertEqual(fields["name"], "sample-prompt")

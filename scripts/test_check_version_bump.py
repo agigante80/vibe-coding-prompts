@@ -4,6 +4,7 @@
 Run: python3 -m unittest discover -s scripts -p "test_*.py"
 """
 
+import os
 import subprocess
 import sys
 import tempfile
@@ -12,6 +13,21 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import check_version_bump as cvb  # noqa: E402
+
+_original_run = subprocess.run
+
+
+def _isolated_run(cmd, **kwargs):
+    kwargs.setdefault("env", GIT_ENV)
+    return _original_run(cmd, **kwargs)
+
+
+def setUpModule():
+    cvb.subprocess.run = _isolated_run
+
+
+def tearDownModule():
+    cvb.subprocess.run = _original_run
 
 PROMPT_V1 = """---
 name: sample-prompt
@@ -28,8 +44,20 @@ Original body text.
 """
 
 
+GIT_ENV = {
+    **os.environ,
+    # Isolate from the developer's global/system git config (gpgsign,
+    # hooksPath, templates) so the fixtures behave identically everywhere.
+    "GIT_CONFIG_GLOBAL": os.devnull,
+    "GIT_CONFIG_SYSTEM": os.devnull,
+    "GIT_AUTHOR_NAME": "t", "GIT_AUTHOR_EMAIL": "t@example.com",
+    "GIT_COMMITTER_NAME": "t", "GIT_COMMITTER_EMAIL": "t@example.com",
+}
+
+
 def run_git(cwd, *args):
-    subprocess.run(["git", *args], cwd=cwd, check=True, capture_output=True)
+    subprocess.run(["git", *args], cwd=cwd, check=True, capture_output=True,
+                   env=GIT_ENV)
 
 
 class CheckVersionBumpTests(unittest.TestCase):
@@ -58,7 +86,7 @@ class CheckVersionBumpTests(unittest.TestCase):
         self.commit_all(repo)
         failures = cvb.check("main", cwd=repo)
         self.assertEqual(len(failures), 1)
-        self.assertIn("version is still 1.0.0", failures[0])
+        self.assertIn("version did not increase", failures[0])
 
     def test_edit_with_bump_passes(self):
         repo = self.make_repo()
@@ -102,13 +130,48 @@ class CheckVersionBumpTests(unittest.TestCase):
         self.commit_all(repo)
         failures = cvb.check("main", cwd=repo)
         self.assertEqual(len(failures), 1)
-        self.assertIn("no version field", failures[0])
+        self.assertIn("is not MAJOR.MINOR.PATCH", failures[0])
 
     def test_front_matter_introduced_passes(self):
         """Seeding front matter onto a bare prompt counts as the initial version."""
         repo = self.make_repo(initial_text="# Bare prompt\n\nNo front matter yet.\n")
         p = repo / "prompts" / "sample-prompt.md"
         p.write_text(PROMPT_V1, encoding="utf-8")
+        self.commit_all(repo)
+        self.assertEqual(cvb.check("main", cwd=repo), [])
+
+    def test_downgrade_fails(self):
+        repo = self.make_repo()
+        p = repo / "prompts" / "sample-prompt.md"
+        p.write_text(
+            PROMPT_V1.replace("Original body", "Edited body")
+            .replace("version: 1.0.0", "version: 0.9.0"),
+            encoding="utf-8")
+        self.commit_all(repo)
+        failures = cvb.check("main", cwd=repo)
+        self.assertEqual(len(failures), 1)
+        self.assertIn("did not increase", failures[0])
+
+    def test_updated_going_backwards_fails(self):
+        repo = self.make_repo()
+        p = repo / "prompts" / "sample-prompt.md"
+        p.write_text(
+            PROMPT_V1.replace("Original body", "Edited body")
+            .replace("version: 1.0.0", "version: 1.0.1")
+            .replace("updated: 2026-08-27", "updated: 2025-01-01"),
+            encoding="utf-8")
+        self.commit_all(repo)
+        failures = cvb.check("main", cwd=repo)
+        self.assertEqual(len(failures), 1)
+        self.assertIn("updated went backwards", failures[0])
+
+    def test_same_day_second_bump_passes(self):
+        repo = self.make_repo()
+        p = repo / "prompts" / "sample-prompt.md"
+        p.write_text(
+            PROMPT_V1.replace("Original body", "Edited body")
+            .replace("version: 1.0.0", "version: 1.0.1"),
+            encoding="utf-8")
         self.commit_all(repo)
         self.assertEqual(cvb.check("main", cwd=repo), [])
 
