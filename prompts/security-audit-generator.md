@@ -1,7 +1,7 @@
 ---
 name: security-audit-generator
 category: security
-version: 1.0.0
+version: 1.1.0
 updated: 2026-08-27
 description: Comprehensive security audit with OWASP-based checks and prioritized remediation.
 platforms: [chatgpt, claude, gemini, copilot-chat]
@@ -32,7 +32,7 @@ Apply appropriate security standards based on project type:
 
 | Project Type | Primary Standards | Key Focus Areas |
 |-------------|------------------|-----------------|
-| **Web Applications** | OWASP Top 10, CSP | XSS, CSRF, injection attacks, session management |
+| **Web Applications** | OWASP Top 10 (2025 edition), CSP | XSS, CSRF, injection, supply chain, session management |
 | **APIs** | OWASP API Security | Authentication, rate limiting, input validation |
 | **Mobile Apps** | OWASP Mobile | Data storage, network security, code obfuscation |
 | **Cloud Services** | CIS Benchmarks | IAM, encryption, network security, logging |
@@ -55,9 +55,12 @@ Apply appropriate security standards based on project type:
 
 **Scan**:
 ```bash
-# Common patterns to search
-grep -r "password\|secret\|api_key\|token" --include="*.{js,py,java,env}"
-grep -r "admin\|root" --include="*.config"
+# Prefer a real scanner: gitleaks covers working tree AND git history
+gitleaks git .
+
+# Keyword fallback (grep --include takes ONE glob; repeat the flag)
+grep -rn "password\|secret\|api_key\|token" \
+  --include="*.js" --include="*.py" --include="*.java" --include="*.env"
 ```
 
 ### 🛡️ **Input Validation & Injection**
@@ -79,16 +82,19 @@ grep -r "admin\|root" --include="*.config"
 
 ### 🌐 **Web Security Headers**
 
-**Required headers**:
+**Required headers** (per the OWASP HTTP Headers Cheat Sheet):
 ```
 Content-Security-Policy: default-src 'self'
 X-Frame-Options: DENY
 X-Content-Type-Options: nosniff
 Strict-Transport-Security: max-age=31536000; includeSubDomains
-X-XSS-Protection: 1; mode=block
 Referrer-Policy: strict-origin-when-cross-origin
 Permissions-Policy: geolocation=(), microphone=()
+Cross-Origin-Opener-Policy: same-origin
+Cross-Origin-Embedder-Policy: require-corp
+Cross-Origin-Resource-Policy: same-origin
 ```
+Do NOT set `X-XSS-Protection` (deprecated; the XSS Auditor it controlled could CREATE vulnerabilities). If a legacy scanner demands it, send `X-XSS-Protection: 0`.
 
 ### 🔒 **Data Protection**
 
@@ -119,12 +125,12 @@ Permissions-Policy: geolocation=(), microphone=()
 **Tools to use**:
 ```bash
 # Node.js
-npm audit --production
+npm audit --omit=dev
 npm outdated
 
 # Python
 pip-audit
-safety check
+safety scan
 
 # Java
 mvn dependency-check:check
@@ -285,7 +291,7 @@ All security audit findings and remediation plans must be documented in `/docs/`
 
 ## **Risk Scoring**
 
-Classify vulnerabilities by severity:
+Score with CVSS v4.0 (v3.1 acceptable where tooling requires it; state which is used):
 
 | Severity | CVSS Score | Response Time | Examples |
 |----------|-----------|---------------|----------|
@@ -324,12 +330,8 @@ Classify vulnerabilities by severity:
 
 ### **Continuous Security**
 
-* Schedule regular security audits (quarterly)
-* Monitor security advisories for dependencies
-* Implement security incident response procedures
-* Maintain security changelog
-* Perform penetration testing before major releases
-* Bug bounty program for external security research
+* Quarterly audits; monitor dependency advisories; maintain a security changelog
+* Incident response procedures; penetration testing before major releases; bug bounty for external research
 
 ---
 
@@ -337,19 +339,14 @@ Classify vulnerabilities by severity:
 
 ### **When to Run This Audit**
 
-* Starting a new project (baseline security assessment)
-* Before production deployment or major releases
-* After security incidents or breach attempts
-* Quarterly security review cycles
-* Compliance audit requirements
-* After major dependency updates
-* When adding authentication or payment processing
+* New project baseline; before production deployment or major releases
+* After security incidents, breach attempts, or major dependency updates
+* Quarterly review cycles and compliance audits
+* When adding authentication, payment processing, or new integrations
 
 ### **Initial Setup**
-1. Review the [Prompt Creation Guide](../docs/prompt-creation-guide.md) to understand documentation requirements
-2. Examine existing `/docs/SECURITY_AND_PRIVACY.md` if it exists
-3. Ensure security scanning tools are available (or will be recommended)
-4. Have access to dependency management tools for your project
+1. Examine existing `/docs/SECURITY_AND_PRIVACY.md` if it exists
+2. Ensure security scanning and dependency management tools are available (or will be recommended)
 
 ### **Execution**
 ```
@@ -365,5 +362,3 @@ Current security measures: [describe existing security if any]
 
 ### **Expected Outcome**
 The AI will perform a comprehensive security analysis using OWASP Top 10 and industry best practices, scan for vulnerabilities in code and dependencies, check for security misconfigurations, analyze authentication and authorization mechanisms, generate a detailed security audit report with CVSS-scored vulnerabilities, provide a prioritized remediation plan with specific fix recommendations, set up automated security scanning in CI/CD, and document all findings and procedures in `/docs/` files. You'll receive a complete security assessment with actionable steps to improve your security posture.
-* Adding new features or integrations
-* Onboarding security-focused team members

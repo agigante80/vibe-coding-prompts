@@ -1,7 +1,7 @@
 ---
 name: version-management
 category: development-workflow
-version: 1.0.0
+version: 1.1.0
 updated: 2026-08-27
 description: Semantic versioning strategy with a VERSION file, conventional commits and automated releases.
 platforms: [chatgpt, claude, gemini, copilot-chat]
@@ -22,6 +22,10 @@ Establish a consistent, automated versioning system that:
 - Supports pre-release tags (alpha, beta, RC)
 - Maintains traceability through commit hashes
 
+## Universality Note
+
+The core of this strategy is stack-agnostic: a VERSION file plus git tags plus conventional commits, driven by CI. The npm scripts below are ONE worked example; for Python use hatch or setuptools-scm, for Go use tags alone, for Rust bump Cargo.toml, keeping the same VERSION file and tag flow.
+
 ## When to Use This Prompt
 
 - Setting up a new project's versioning strategy
@@ -34,14 +38,16 @@ Establish a consistent, automated versioning system that:
 
 ### Version Format
 
-Follow semantic versioning: `MAJOR.MINOR.PATCH[-PRERELEASE][-METADATA]`
+Follow semantic versioning: `MAJOR.MINOR.PATCH[-PRERELEASE][+BUILD]`
 
 **Components:**
 - **MAJOR**: Breaking changes (increment when incompatible API changes)
 - **MINOR**: New features (backward-compatible)
 - **PATCH**: Bug fixes (backward-compatible)
-- **PRERELEASE**: Optional stage identifier (alpha, beta, rc)
-- **METADATA**: Build information (commit hash, build number)
+- **PRERELEASE**: Optional stage identifier appended with a hyphen (alpha, beta, rc); affects precedence
+- **BUILD**: Build metadata appended with a PLUS sign (commit hash, build number); ignored for precedence
+
+**Docker tag mapping**: Docker tags cannot contain `+`. When a version carries build metadata, encode the tag by replacing `+` with `-` (version `1.4.1+abcdef7` becomes tag `1.4.1-abcdef7`). Dev builds like `1.4.1-dev-abcdef7` are pre-release identifiers, not build metadata, and need no mapping.
 
 ### Version Examples by Stage
 
@@ -78,9 +84,9 @@ git commit -m "chore: initialize version file"
 1.4.0
 ```
 
-#### 1.2 Create .versionrc Configuration
+#### 1.2 Choose release tooling and configuration
 
-For projects using `standard-version` or `semantic-release`:
+`standard-version` is deprecated; its README recommends [release-please](https://github.com/googleapis/release-please) for GitHub users. Use release-please (GitHub-native, PR-based releases) as the default, or the drop-in fork [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) when GitHub Actions is unavailable. The `.versionrc` below works with commit-and-tag-version and semantic-release style tooling:
 
 ```json
 {
@@ -123,7 +129,7 @@ For projects using `standard-version` or `semantic-release`:
 
 **Version-specific workflows needed**:
 - **Dev Build** (`.github/workflows/dev-build.yml`): Generate version as `BASE-dev-COMMITHASH`, run tests, upload artifacts
-- **Stable Release** (`.github/workflows/release.yml`): On merge to main, bump version with `standard-version` or commit message analysis, create tag, generate CHANGELOG, publish to registry
+- **Stable Release** (`.github/workflows/release.yml`): On merge to main, bump version with release-please (or commit-and-tag-version), create tag, generate CHANGELOG, publish to registry
 - **Pre-release** (`.github/workflows/pre-release.yml`): Generate alpha/beta/rc versions, create pre-release tags
 
 Use conventional commits to determine version bump: `fix:` (patch), `feat:` (minor), `BREAKING CHANGE:` (major)
@@ -188,9 +194,9 @@ Create `VERSIONING.md` documenting version format, release process, and automate
 5. VERSIONING.md documentation
 6. CHANGELOG.md automatically generated
 7. Git tags for all releases (pushed to GitHub)
-8. GitHub Releases created with `make_latest: true`
-11. **Multi-platform builds** (linux/amd64, linux/arm64)
-12. **Multiple Docker tags** per release (`:1.5.0`, `:1.5`, `:1`, `:latest`)
+8. GitHub Releases created and marked as latest
+9. **Multi-platform builds** (linux/amd64, linux/arm64)
+10. **Multiple Docker tags** per release (`:1.5.0`, `:1.5`, `:1`, `:latest`)
 
 ---
 

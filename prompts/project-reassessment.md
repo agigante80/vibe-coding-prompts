@@ -1,7 +1,7 @@
 ---
 name: project-reassessment
 category: project-management
-version: 1.0.0
+version: 1.1.0
 updated: 2026-08-27
 description: Full repository health check aligning code, documentation and policies.
 platforms: [chatgpt, claude, gemini, copilot-chat]
@@ -46,15 +46,19 @@ Perform a full reassessment of the current repository against its documentation 
 - **Cross-Reference Validation**: Ensure all internal links between docs are valid
 - **Version Consistency**: All docs should reflect the same version of the project
 
-**Conflict Resolution Process**:
-```bash
-# Find duplicate or similar documentation
-find docs/ -name "*.md" -exec basename {} \; | sort | uniq -d
+**Conflict Detection: fact-diff checklist**. For each fact below, extract every statement of it across `/docs/` and the code, then diff the values; any mismatch is a finding:
 
-# Check for contradictory statements (manual review needed)
-grep -r "architecture" docs/
-grep -r "framework" docs/
-grep -r "version" docs/
+| Fact | Extract from |
+|------|--------------|
+| Version string | package manifests, VERSION file, all docs |
+| Language/framework names and versions | manifests, ARCHITECTURE.md, README |
+| Setup commands | README, docs/README.md, CI workflows |
+| Ports, service names, env var names | config files, ARCHITECTURE.md, examples |
+| Branching strategy and release flow | CONTRIBUTING, VERSIONING.md, workflows |
+
+```bash
+# Example: find every stated version and compare
+grep -rhoE "v?[0-9]+\.[0-9]+\.[0-9]+" docs/ README.md | sort | uniq -c
 ```
 
 **Common Conflict Patterns to Resolve**:
@@ -83,7 +87,7 @@ grep -r "version" docs/
 - `SECURITY_AND_PRIVACY.md` - Security policies and data protection
 - `ROADMAP.md` - Priority-based future improvement plan
 
-**Note**: `/docs/` must contain exactly these 9 files. Any other documentation should be deleted, merged into these files, or archived to `docs/archive/docs-backup-YYYY-MM-DD/`.
+**Note**: `/docs/` must contain these 9 files (plus optional `VERSIONING.md` if it already exists, per the Documentation Standardization prompt). Other documentation should be deleted, merged into these files, or archived to `docs/archive/docs-backup-YYYY-MM-DD/`.
 
 **Detect Contradictions**:
 - Compare version numbers across all docs
@@ -110,28 +114,17 @@ grep -r "version" docs/
 * Validate that all CI/CD pipelines are functional
 * Check code quality and adherence to standards
 
-### 4. **.gitignore Review**
+### 4. **.gitignore and File Organization**
 
-* Verify `.gitignore` is not excluding files that are needed for the project
-* Check for missing patterns that should ignore build artifacts, temporary files, or sensitive data
-* Organize entries into logical sections with comments (Dependencies, Build Output, IDE, OS, etc.)
-* Identify obsolete patterns that no longer match project structure
-* Ensure environment-specific files (`.env.example`) are tracked while secrets (`.env`) are ignored
-* Validate that documentation, configuration, and source files are not accidentally ignored
+Delegate the detailed audits to their owning prompts and fold their findings into this report:
 
-### 5. **File Organization Verification**
+* **.gitignore review**: run the checks in [GitHub Ready Preparation](./github-ready-preparation.md) (needed files tracked, secrets ignored, sections organized)
+* **File organization**: run [File Organization Refactoring](./file-organization-refactoring.md) for the full audit (obsolete files, duplicates, structure vs documented architecture)
+* Record both prompts' findings in the reassessment report rather than re-auditing here
 
-* Audit all files in the repository to identify their purpose and relevance
-* Document the purpose of any ambiguous or unclear files
-* Flag files that are most probably not needed anymore (old scripts, deprecated code, unused configurations)
-* Identify duplicate files or functionality
-* Verify logical directory structure aligns with documented architecture
-* Check for orphaned files that should be organized into appropriate directories
-* Ensure file naming conventions are consistent across the project
+### 5. **Reporting & Planning**
 
-### 6. **Reporting & Planning**
-
-* Generate or update `/docs/PROJECT_REASSESSMENT_REPORT.md`
+* Write the full report to `docs/archive/reassessment-YYYY-MM-DD.md` (dated, outside the standard file set) and append a dated summary section to `/docs/IMPROVEMENT_AREAS.md`
 * Update relevant `/docs` files as needed
 * Propose the **next logical step** for continued development
 * Identify priority items for immediate attention

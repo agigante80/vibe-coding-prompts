@@ -1,7 +1,7 @@
 ---
 name: file-organization-refactoring
 category: development-workflow
-version: 1.0.0
+version: 1.1.0
 updated: 2026-08-27
 description: Reorganize project files and folders safely with tested, incremental migrations.
 platforms: [chatgpt, claude, gemini, copilot-chat]
@@ -99,8 +99,8 @@ EOF
 **2. Analyze Dependencies**:
 ```bash
 # Find all import/require statements
-grep -r "require\|import\|from" --include="*.js" --include="*.ts" \
-  --include="*.py" . > imports.txt
+grep -rnE "^\s*(import|from .+ import|const .+ = require)" \
+  --include="*.js" --include="*.ts" --include="*.py" . > imports.txt
 
 # Identify what needs updating when files move
 ```
@@ -116,8 +116,9 @@ grep -r "require\|import\|from" --include="*.js" --include="*.ts" \
 ### **Phase 2: Safe Execution**
 
 **Critical Rules**:
-- Move ONE file at a time, test after each
-- Use `git mv` to preserve history
+- Small repos: move ONE file at a time, test after each
+- Large repos: batch moves by cohesive module (one directory per batch), run the affected test subset per move and the full suite per batch; per-file full-suite runs do not scale past a few dozen files
+- Use `git mv`, and keep moves in move-only commits (no content edits in the same commit): git detects renames heuristically, and mixing heavy edits into a move can break detection. Verify with `git log --follow <file>`
 - Update all import paths immediately
 - Run tests before committing
 - Commit with clear message: `refactor: move X to Y`
@@ -130,12 +131,12 @@ grep -r "require\|import\|from" --include="*.js" --include="*.ts" \
 5. If tests pass: commit; if fail: revert with `git reset --hard`
 6. Repeat for next file
 
-**For deleting obsolete files**: Search for references first (`grep -r filename`), only delete if unreferenced
+**For deleting obsolete files**: Search for references first (`grep -rn "filename" --include="*.{js,ts,py,json}" .`), delete only if unreferenced:
 
-# Delete only confirmed obsolete files
-delete_file "old_app.js.bak"
-delete_file "temp.js"
-delete_file "config.old.json"
+```bash
+# Delete only confirmed obsolete files (git rm stages the deletion)
+git rm old_app.js.bak temp.js config.old.json
+git commit -m "refactor: remove obsolete files"
 ```
 
 ### **Phase 3: Verification**
@@ -160,7 +161,7 @@ npx tsc --noEmit           # TypeScript check
 npm run lint
 
 # Python
-python -m py_compile **/*.py
+find . -name "*.py" -not -path "*/.venv/*" -exec python3 -m py_compile {} +
 pylint **/*.py
 
 # Check for common issues
@@ -235,15 +236,11 @@ Add file organization section with:
 
 ## **Best Practices**
 
-**Safety**: Move one file at a time, always use `git mv`, commit frequently, backup branch
+**Safety**: small move-only commits via `git mv`, commit frequently, keep a backup branch
 
-**Communication**: Notify team before starting, document changes with clear commit messages, conduct team walkthrough
+**Incremental**: start with least-coupled leaf files, update imports progressively, validate with the test suite as you go
 
-**Incremental Approach**: Start with least-coupled files, move leaf nodes first, update imports progressively
-
-**Validation**: Run full test suite after each change, verify in all environments, add tests if missing before reorganizing
-
-**Documentation**: Update docs in same commit, explain reasoning, document new conventions
+**Communication**: notify the team first, use clear commit messages, document new conventions in the same commit
 
 ---
 
@@ -251,22 +248,16 @@ Add file organization section with:
 
 ### **When to Run This Refactoring**
 
-* Project has grown organically with unclear structure
-* Files scattered across directories with no organization
-* Root directory cluttered with many files
-* Tests mixed with source code
-* Difficult to find files or understand project layout
-* Onboarding new developers is challenging
+* Project grew organically: unclear structure, cluttered root, tests mixed with source
+* Hard to find files; onboarding new developers is challenging
 * Preparing for major refactoring or feature development
 * Before transitioning to monorepo or microservices
 
 ### **Initial Setup**
-1. Review current project structure and identify issues
-2. Ensure comprehensive test suite exists (add tests if needed)
-3. Create feature branch for reorganization work
-4. Back up current state (tag or branch)
-5. Review with team and get approval for target structure
-6. Schedule reorganization during low-activity period
+1. Review current structure; ensure a comprehensive test suite exists (add tests first if needed)
+2. Create a feature branch for the reorganization work
+3. Review the target structure with the team and get approval
+4. Schedule the work during a low-activity period
 
 ### **Execution**
 ```
@@ -282,7 +273,7 @@ Urgency: [low/medium/high]
 ```
 
 ### **Expected Outcome**
-The AI will analyze your current project structure, identify organizational issues and obsolete files, propose a clear target structure aligned with best practices for your project type, generate a detailed migration plan with file moves/renames/deletions, provide safe execution scripts that test after each change, update all import paths automatically, verify the application works correctly throughout, integrate the plan into `/docs/REFACTORING_PLAN.md`, and provide complete documentation of the new structure. You'll have a well-organized codebase with logical file placement, consistent naming, and no obsolete files, while maintaining full application functionality.
+The AI analyzes the current structure, proposes a target layout for your project type, generates a tested migration plan (moves, renames, deletions, import updates), verifies the application throughout, and documents everything in `/docs/REFACTORING_PLAN.md`.
 
 ---
 
@@ -299,8 +290,8 @@ The AI will analyze your current project structure, identify organizational issu
 ### **Pitfall 2: Losing Git History**
 **Problem**: Using `rm` + `add` instead of `git mv` loses file history
 **Solution**:
-- Always use `git mv` for moves and renames
-- Use `git log --follow` to verify history preserved
+- Use `git mv` in move-only commits; git rename detection is a similarity heuristic, not recorded metadata
+- Use `git log --follow` to verify history is still traceable after each move
 - Avoid bulk operations without git awareness
 
 ### **Pitfall 3: Circular Dependencies**
@@ -366,7 +357,7 @@ move_and_test() {
     git commit -m "refactor: move $source to $target"
   else
     echo "❌ Tests failed, reverting"
-    git reset --hard HEAD~1
+    git reset --hard HEAD  # discard the staged move; nothing was committed yet
     exit 1
   fi
 }
