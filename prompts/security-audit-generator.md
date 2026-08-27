@@ -108,10 +108,7 @@ Do NOT set `X-XSS-Protection` (deprecated; the XSS Auditor it controlled could C
 - Personal Identifiable Information (PII) exposure
 - Missing data retention and deletion policies
 
-**Compliance checks**:
-- GDPR: Right to erasure, data portability, consent
-- HIPAA: PHI encryption, access logs, audit trails
-- PCI-DSS: Credit card data handling, network segmentation
+**Compliance checks**: GDPR (erasure, portability, consent), HIPAA (PHI encryption, access logs, audit trails), PCI-DSS (card data handling, network segmentation)
 
 ### 📦 **Dependencies & Supply Chain**
 
@@ -155,11 +152,7 @@ cargo audit
 - Exposed admin panels or debug endpoints
 - Unnecessary services or ports exposed
 
-**Best practices**:
-- Use environment variables or secret management (Vault, AWS Secrets Manager)
-- Implement .gitignore for sensitive files
-- Rotate secrets regularly
-- Use least privilege principle
+**Best practices**: environment variables or secret managers (Vault, AWS Secrets Manager); .gitignore for sensitive files; regular rotation; least privilege
 
 ### 🐳 **Container & Infrastructure**
 
@@ -224,8 +217,10 @@ snyk test --severity-threshold=high
 # SAST (Static Application Security Testing)
 semgrep --config=auto
 
-# Secret scanning (history plus working tree)
-gitleaks git . && gitleaks dir .
+# Secret scanning: history, then working tree (run both even when the
+# first finds leaks; -v gives per-finding file/line detail)
+gitleaks git . -v
+gitleaks dir . -v
 
 # Infrastructure as Code
 checkov -d .
