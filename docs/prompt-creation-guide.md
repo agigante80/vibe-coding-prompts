@@ -4,47 +4,35 @@ A comprehensive guide for creating effective, reusable prompts that follow this 
 
 ---
 
-## ⚠️ START HERE: Documentation Review
+## ⚠️ START HERE: Context Review
 
-**BEFORE writing your prompt**, review and update repository documentation:
+**BEFORE writing your prompt**, get the context right:
 
-### **Step 1: Review `/docs/` Directory**
+### **Step 1: Know what the `/docs/` standard is FOR**
 
-This repository follows a standardized documentation structure (see [Documentation Standardization](../prompts/documentation-standardization.md)):
+The standardized 9-file `/docs/` structure (defined by
+[Documentation Standardization](../prompts/documentation-standardization.md))
+applies to the TARGET projects your prompt runs against, not to this
+repository. This repo is a content library: its own `/docs/` holds concept
+guides and this authoring guide (see the exemption note in the root README
+and CLAUDE.md). Your prompt's Deliverables should state which target-project
+`/docs/` files its output updates.
 
-```
-/docs/
-├── README.md                  # Entry point and doc index
-├── PROJECT_OVERVIEW.md        # Goals, features, technology
-├── ARCHITECTURE.md            # System structure and prompts
-├── AI_INTERACTION_GUIDE.md    # AI agent usage patterns
-├── REFACTORING_PLAN.md        # Ongoing improvements
-├── TESTING_AND_RELIABILITY.md # Testing strategies
-├── IMPROVEMENT_AREAS.md       # Known gaps and tech debt
-├── SECURITY_AND_PRIVACY.md    # Security policies
-└── ROADMAP.md                 # Future plans
-```
+### **Step 2: Check for relevant context in this repo**
 
-### **Step 2: Check for Relevant Context**
+- [ ] **Is this prompt already planned or proposed?** Check the
+      [issue tracker](https://github.com/agigante80/vibe-coding-prompts/issues)
+      (label: enhancement) and the generated prompt index in the root README.
+- [ ] **Does an existing prompt already cover it?** Extend that prompt
+      (with a version bump) instead of duplicating it.
+- [ ] **Does it overlap another prompt's scope?** Cross-link the prompts and
+      keep each one's Deliverables distinct.
 
-Before creating your prompt, check:
+### **Step 3: Keep repo docs in sync**
 
-- [ ] **Is this prompt already planned?** → Check `ROADMAP.md` and `IMPROVEMENT_AREAS.md`
-- [ ] **Does it address a known gap?** → Review `IMPROVEMENT_AREAS.md`
-- [ ] **Does it change the architecture?** → Note updates needed for `ARCHITECTURE.md`
-- [ ] **Does it introduce new workflows?** → Plan updates for `AI_INTERACTION_GUIDE.md`
-- [ ] **Is there existing documentation?** → Review all `/docs/` files for context
-
-### **Step 3: Update Documentation First**
-
-Update relevant `/docs/` files BEFORE writing your prompt:
-
-- Remove completed items from `IMPROVEMENT_AREAS.md` and `ROADMAP.md`
-- Add new features to `PROJECT_OVERVIEW.md`
-- Document new workflows in `AI_INTERACTION_GUIDE.md`
-- Update `ARCHITECTURE.md` with new prompt categories or structures
-
-**Why this matters**: Your prompt should integrate with existing documentation and generate outputs that align with the standardized `/docs/` structure.
+If your prompt changes a convention (front matter fields, categories, length
+policy), sweep every doc that states it: this guide, `CLAUDE.md`,
+`CONTRIBUTING.md`, and the affected prompts.
 
 ---
 
@@ -62,9 +50,12 @@ Every prompt in this repository follows these fundamental principles:
 
 ---
 
-## � Understanding the `/docs/` Structure
+## 📚 Understanding the `/docs/` Structure (in target projects)
 
-This repository uses a **standardized 9-file documentation system** (from [Documentation Standardization](../prompts/documentation-standardization.md)):
+Prompts in this collection instruct AI agents to maintain a **standardized
+9-file documentation system** in the projects they run against (defined by
+[Documentation Standardization](../prompts/documentation-standardization.md)).
+Your prompt's outputs must fit this structure:
 
 | File | Purpose | Update When |
 |------|---------|-------------|
@@ -97,7 +88,7 @@ After generating test suite, update:
 
 ---
 
-## �📐 Structure Template
+## 📐 Structure Template
 
 ### Standard Prompt Structure
 
@@ -420,7 +411,7 @@ Based on our platform compatibility guidelines:
 | **Complex** | 1500-2000 words | ChatGPT, Claude, Gemini (Copilot Chat) |
 | **Extensive** | 2000-5000 words | ChatGPT, Claude, Gemini |
 
-**Current Repository Range**: 1500-4800 words (comprehensive prompts optimized for major platforms)
+**Repository policy**: keep prompts under 1600 words (body text, measured with `wc -w` minus front matter). One legacy prompt is currently over the cap; see issue #5.
 
 ### **How to Optimize Length**
 
@@ -561,7 +552,7 @@ Before submitting a prompt, verify:
 - [ ] Clear usage instructions
 
 **Quality**:
-- [ ] Word count within guidelines (400-2000)
+- [ ] Word count under 1600 (repo policy; `wc -w` minus front matter)
 - [ ] No spelling or grammar errors
 - [ ] Code examples are syntactically correct
 - [ ] Commands are tested and working
@@ -739,36 +730,17 @@ Remember: humans read it first, AI executes it
 
 ---
 
-## � Documentation Requirements
+## 📋 Documentation Requirements
 
 Every prompt must align with the repository's documentation standards defined in [Documentation Standardization](../prompts/documentation-standardization.md).
 
 ### **Required Documentation Review**
 
-**BEFORE creating your prompt**, review and update `/docs/` if needed:
+**BEFORE creating your prompt**, decide how it interacts with the target
+project's `/docs/` structure (the table above): which files its outputs
+update, and what content each update adds.
 
-#### **Step 1: Review Existing Documentation**
-
-Check these files in `/docs/`:
-
-| File | What to Check | Update If |
-|------|---------------|-----------|
-| `README.md` | Entry point and doc index | Adding new concepts or categories |
-| `PROJECT_OVERVIEW.md` | Goals and features | New prompt changes project scope |
-| `ARCHITECTURE.md` | Prompt system structure | Adding new category or workflow |
-| `REFACTORING_PLAN.md` | Ongoing improvements | Your prompt addresses planned work |
-| `IMPROVEMENT_AREAS.md` | Known gaps | Your prompt fills a documented gap |
-| `ROADMAP.md` | Future plans | Your prompt aligns with roadmap |
-
-#### **Step 2: Update Documentation**
-
-If your prompt introduces:
-- **New category** → Update `ARCHITECTURE.md` with category structure
-- **New workflow** → Update `AI_INTERACTION_GUIDE.md` with usage patterns
-- **Fills a gap** → Remove from `IMPROVEMENT_AREAS.md` and `ROADMAP.md`
-- **New capability** → Add to `PROJECT_OVERVIEW.md` features list
-
-#### **Step 3: Document Your Prompt**
+#### **Document Your Prompt's `/docs/` Impact**
 
 Within your prompt, ensure outputs include:
 - Generated files follow `/docs/` structure
@@ -804,7 +776,7 @@ After generating [feature], update:
 
 ---
 
-## �🚀 Publishing Your Prompt
+## 🚀 Publishing Your Prompt
 
 ### **Pre-Publication Checklist**
 
@@ -816,7 +788,7 @@ After generating [feature], update:
 
 **Prompt Quality**:
 - [ ] Prompt tested on real project
-- [ ] Word count within guidelines (400-2000)
+- [ ] Word count under 1600 (repo policy; `wc -w` minus front matter)
 - [ ] All sections complete per template
 - [ ] Code examples verified
 - [ ] Multi-language support included

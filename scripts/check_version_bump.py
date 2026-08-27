@@ -19,7 +19,13 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from update_prompt_index import PromptError, parse_front_matter  # noqa: E402
+from update_prompt_index import (  # noqa: E402
+    DATE_RE, VERSION_RE, PromptError, parse_front_matter,
+)
+
+
+def semver_tuple(version):
+    return tuple(int(part) for part in version.split("."))
 
 
 def git(*args, cwd=None):
@@ -30,7 +36,11 @@ def git(*args, cwd=None):
 
 def changed_prompts(base_commit, cwd=None):
     """Return (old_path, new_path) pairs for modified or renamed prompts."""
-    out = git("diff", "--name-status", "--find-renames",
+    # A 25% similarity threshold pairs even heavy rewrites as renames so they
+    # stay inside the gate. A rewrite below that is indistinguishable from a
+    # delete plus a new prompt and is treated as one (new prompts are exempt;
+    # update_prompt_index.py --check still validates their front matter).
+    out = git("diff", "--name-status", "--find-renames=25%",
               f"{base_commit}..HEAD", cwd=cwd)
     pairs = []
     for line in out.splitlines():
@@ -47,9 +57,9 @@ def changed_prompts(base_commit, cwd=None):
     return pairs
 
 
-def version_of(text, source):
+def front_matter_of(text, source):
     fields, _ = parse_front_matter(text, source)
-    return fields.get("version", "")
+    return fields.get("version", ""), fields.get("updated", "")
 
 
 def check(base_ref, cwd=None):
@@ -62,22 +72,33 @@ def check(base_ref, cwd=None):
         if old_text == new_text:
             continue  # pure rename, no content change
         try:
-            new_version = version_of(new_text, new)
+            new_version, new_updated = front_matter_of(new_text, new)
         except PromptError as exc:
             failures.append(f"{new}: head front matter unreadable ({exc})")
             continue
-        if not new_version:
-            failures.append(f"{new}: front matter has no version field")
+        if not VERSION_RE.match(new_version):
+            failures.append(
+                f"{new}: version {new_version!r} is not MAJOR.MINOR.PATCH")
+            continue
+        if not DATE_RE.match(new_updated):
+            failures.append(f"{new}: updated {new_updated!r} is not YYYY-MM-DD")
             continue
         try:
-            old_version = version_of(old_text, old)
+            old_version, old_updated = front_matter_of(old_text, old)
         except PromptError:
             # Base copy predates front matter; the new version is the seed.
             print(f"ok: {new} (front matter introduced at {new_version})")
             continue
-        if old_version == new_version:
+        if not VERSION_RE.match(old_version):
+            print(f"ok: {new} (base version unparseable; seeded {new_version})")
+            continue
+        if semver_tuple(new_version) <= semver_tuple(old_version):
             failures.append(
-                f"{new}: content changed but version is still {new_version}")
+                f"{new}: content changed but version did not increase "
+                f"({old_version} to {new_version})")
+        elif DATE_RE.match(old_updated) and new_updated < old_updated:
+            failures.append(
+                f"{new}: updated went backwards ({old_updated} to {new_updated})")
         else:
             print(f"ok: {new} ({old_version} to {new_version})")
     return failures
