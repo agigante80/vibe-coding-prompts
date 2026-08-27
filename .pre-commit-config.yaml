@@ -1,8 +1,11 @@
-# Optional convenience layer; CI is the enforcement layer (see #20).
+# Optional convenience layer; CI is the enforcement layer (see #20, #24).
 # Install once per clone:  pip install pre-commit && pre-commit install
+# (default_install_hook_types below makes that one command install both the
+#  commit-stage and push-stage hooks.)
 #
 # Known limit: a commit that ONLY deletes a prompt does not trigger the
 # index hook (pre-commit skips deleted paths); CI's --check catches it.
+default_install_hook_types: [pre-commit, pre-push]
 repos:
   - repo: local
     hooks:
@@ -10,17 +13,18 @@ repos:
         name: regenerate README prompt index
         entry: python3 scripts/update_prompt_index.py
         language: system
-        files: ^(prompts/.*\.md|README\.md|scripts/update_prompt_index\.py)$
+        files: ^(prompts/[^/]+\.md|README\.md|scripts/update_prompt_index\.py)$
         pass_filenames: false
       - id: prompt-version-bump
-        name: check prompt version bumps (vs origin/main)
-        # Runs at pre-push: at pre-commit time the commits being gated do not
-        # exist yet, so the check would inspect the wrong state. Skips quietly
-        # when origin/main is absent (fresh fork, shallow clone).
-        entry: bash -c 'git rev-parse -q --verify origin/main >/dev/null && exec python3 scripts/check_version_bump.py origin/main; echo "prompt-version-bump: skipped (no origin/main)"'
+        name: check prompt version bumps
+        # Push stage: gates the refs actually being pushed (pre-commit exposes
+        # PRE_COMMIT_FROM_REF = remote revision, PRE_COMMIT_TO_REF = local
+        # revision). Skips quietly when there is no usable base (new remote
+        # branch, missing origin/main on a fresh fork or shallow clone).
+        entry: bash -c 'base="${PRE_COMMIT_FROM_REF:-origin/main}"; head="${PRE_COMMIT_TO_REF:-HEAD}"; case "$base" in 0000000000000000000000000000000000000000) echo "prompt-version-bump: skipped (new remote branch)"; exit 0;; esac; git rev-parse -q --verify "$base^{commit}" >/dev/null || { echo "prompt-version-bump: skipped (no base ref $base)"; exit 0; }; exec python3 scripts/check_version_bump.py "$base" "$head"'
         language: system
         stages: [pre-push]
-        always_run: true
+        files: ^prompts/[^/]+\.md$
         pass_filenames: false
       - id: prompt-index-tests
         name: prompt index generator tests

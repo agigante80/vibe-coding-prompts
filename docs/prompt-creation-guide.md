@@ -582,8 +582,10 @@ Before finalizing:
 
 ### **Choosing a Category**
 
-All prompt files live flat in `prompts/`; the category is the `category` field
-in the front matter and becomes a column in the generated README index.
+All prompt files live flat in `prompts/`; subdirectories under `prompts/`
+are ignored by the index, the version gate, and the hooks alike, so do not
+use them. The category is the `category` field in the front matter and
+becomes a column in the generated README index.
 Current categories:
 
 - **`documentation`** - Creating, maintaining, standardizing docs

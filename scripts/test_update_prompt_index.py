@@ -92,6 +92,17 @@ class ValueCleanupTests(unittest.TestCase):
         self.assertEqual(fields["description"], "Quoted value")
         self.assertEqual(len(body.split()), 5)
 
+    def test_escaped_quote_inside_quoted_value(self):
+        text = '---\ndescription: "He said \\"hi\\" to us"\n---\nbody'
+        fields, _ = upi.parse_front_matter(text, "x.md")
+        self.assertEqual(fields["description"], 'He said "hi" to us')
+
+    def test_is_prompt_path_top_level_only(self):
+        self.assertTrue(upi.is_prompt_path("prompts/my-prompt.md"))
+        self.assertFalse(upi.is_prompt_path("prompts/drafts/idea.md"))
+        self.assertFalse(upi.is_prompt_path("docs/vibe-coding.md"))
+        self.assertFalse(upi.is_prompt_path("prompts/notes.txt"))
+
     def test_utf8_bom_tolerated(self):
         fields, _ = upi.parse_front_matter("\ufeff" + VALID, "x.md")
         self.assertEqual(fields["name"], "sample-prompt")
