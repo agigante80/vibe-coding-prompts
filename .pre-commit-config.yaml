@@ -1,0 +1,17 @@
+# Optional convenience layer; CI is the enforcement layer (see #20).
+# Install once per clone:  pip install pre-commit && pre-commit install
+repos:
+  - repo: local
+    hooks:
+      - id: prompt-index
+        name: regenerate README prompt index
+        entry: python3 scripts/update_prompt_index.py
+        language: system
+        files: ^(prompts/.*\.md|README\.md)$
+        pass_filenames: false
+      - id: prompt-index-tests
+        name: prompt index generator tests
+        entry: python3 -m unittest discover -s scripts -p "test_*.py"
+        language: system
+        files: ^scripts/.*\.py$
+        pass_filenames: false
