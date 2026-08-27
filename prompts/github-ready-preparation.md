@@ -1,7 +1,7 @@
 ---
 name: github-ready-preparation
 category: project-management
-version: 1.0.0
+version: 1.1.0
 updated: 2026-08-27
 description: Prepare a repository for professional public release on GitHub.
 platforms: [chatgpt, claude, gemini, copilot-chat]
@@ -66,16 +66,15 @@ go list -m all 2>/dev/null
 
 ### 5. **Security Scan**
 
-**Secrets Detection**:
+**Secrets Detection** (history-aware scanners first; a keyword grep floods with false positives and misses high-entropy secrets):
 ```bash
-# Scan for hardcoded secrets
-grep -r "api_key\|API_KEY\|secret\|SECRET\|password\|PASSWORD\|token\|TOKEN" \
-  --include="*.js" --include="*.py" --include="*.java" --include="*.go" \
-  --exclude-dir=node_modules --exclude-dir=vendor
+# Scan working tree AND full git history with gitleaks
+gitleaks git .
 
-# Check for common secret patterns
-git log --all --full-history -- **/.env
+# List any .env files ever committed (shell needs globstar for **)
+shopt -s globstar; git log --all --oneline -- **/.env
 ```
+Also enable GitHub secret scanning with push protection in the repository settings. Fallback when no scanner can be installed: a keyword grep for `api_key|secret|password|token` across source files.
 
 **Vulnerability Scanning**: Run `npm audit` (Node.js), `pip-audit` (Python), or ecosystem equivalent
 
@@ -110,13 +109,6 @@ git log --all --full-history -- **/.env
 | **Critical** | Repository description (≤350 chars) | ⬜ |
 | **Critical** | Repository topics (10-15 keywords) | ⬜ |
 | **Recommended** | Homepage URL | ⬜ |
-
-**See [.github/REPOSITORY_METADATA.md](../.github/REPOSITORY_METADATA.md) for detailed guidance on:**
-- Description formatting best practices
-- Topic selection strategies
-- Application via Web UI or GitHub CLI
-
-### 🚀 **3. Build & Run**
 
 **See [.github/REPOSITORY_METADATA.md](../.github/REPOSITORY_METADATA.md) for detailed guidance on:**
 - Description formatting best practices
@@ -201,7 +193,7 @@ git log --all --full-history -- **/.env
 
 **Already covered in Section 2 above**
 
-### 🤖 **10. AI/Agent Integration** (Optional)
+### 🤖 **11. AI/Agent Integration** (Optional)
 
 | Priority | Item | Description | Status |
 |----------|------|-------------|--------|
@@ -247,7 +239,6 @@ build/
 target/
 *.class
 *.jar
-*.war
 .gradle/
 build/
 .env
@@ -255,21 +246,13 @@ build/
 
 ### **Go**
 ```gitignore
-# Binaries
 *.exe
-*.exe~
 *.dll
 *.so
 *.dylib
-
-# Test binary
 *.test
-
-# Output
 bin/
 dist/
-
-# Env
 .env
 .env.local
 ```
@@ -277,11 +260,11 @@ dist/
 ### **Rust**
 ```gitignore
 target/
-Cargo.lock
 *.pdb
 .env
 .env.local
 ```
+Commit `Cargo.lock`: since Aug 2023 the Cargo team recommends committing lockfiles even for libraries, and `cargo new` no longer ignores it.
 
 ### **Universal**
 ```gitignore
@@ -341,12 +324,9 @@ Update `/docs/` files per [Documentation Standardization](./documentation-standa
 
 ## **Best Practices**
 
-* Keep repository root clean, consistent naming
-* Write README for newcomers, sync docs with code
-* Never commit secrets, enable branch protection
-* Automate everything, fail fast in CI
-* Respond to issues/PRs promptly, welcome contributors
-* Use semantic versioning, write clear release notes, maintain CHANGELOG
+* Keep the root clean; write the README for newcomers; sync docs with code
+* Never commit secrets; enable branch protection; automate everything and fail fast in CI
+* Use semantic versioning, clear release notes, and a maintained CHANGELOG
 
 ---
 
@@ -354,19 +334,13 @@ Update `/docs/` files per [Documentation Standardization](./documentation-standa
 
 ### **When to Run This Preparation**
 
-* Before first public push to GitHub
-* When converting private repo to public
-* Before submitting to showcases or job applications
-* When preparing for open source release
+* Before a first public push, converting a private repo to public, or an open source release
+* Before showcases, job applications, or major version releases (v1.0, v2.0)
 * During project audits or quality reviews
-* Before major version releases (v1.0, v2.0)
 
 ### **Initial Setup**
-1. Review the [Prompt Creation Guide](../docs/prompt-creation-guide.md) to understand documentation requirements
-2. Ensure you have a clean working directory (commit or stash changes)
-3. Backup your repository before making structural changes
-4. Have GitHub account and repository URL ready
-5. Know your preferred license (MIT, Apache-2.0, GPL, etc.)
+1. Ensure a clean working directory (commit or stash changes) and a backup before structural changes
+2. Have the repository URL ready and know your preferred license (MIT, Apache-2.0, GPL, etc.)
 
 ### **Execution**
 ```
@@ -390,7 +364,9 @@ AI analyzes structure, creates/updates essential files, scans for secrets, sets 
 
 ## **GitHub Ready Assessment Report**
 
-### **Readiness Score**: X/100
+### **Readiness Score**
+
+For an objective, reproducible score, run [OpenSSF Scorecard](https://securityscorecards.dev/) (18 automated checks: branch protection, token permissions, pinned dependencies, security policy, CI tests) and report its 0 to 10 aggregate alongside the checklist below.
 
 **Critical Issues** (Must Fix): Missing LICENSE, secrets found, no README
 

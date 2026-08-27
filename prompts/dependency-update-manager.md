@@ -1,7 +1,7 @@
 ---
 name: dependency-update-manager
 category: security
-version: 1.0.0
+version: 1.1.0
 updated: 2026-08-27
 description: Automate dependency updates with risk classification, testing and rollback.
 platforms: [chatgpt, claude, gemini, copilot-chat]
@@ -196,18 +196,34 @@ updates:
           - "minor"
           - "patch"
     
-    # Security updates always separate
+    # Which dependencies receive update PRs (grouping above handles batching;
+    # security updates are always raised individually by Dependabot itself)
     allow:
       - dependency-type: "direct"
       - dependency-type: "indirect"
-    
-    # Auto-approve and merge patch updates
+
     labels:
       - "dependencies"
       - "automated"
-    
-    reviewers:
-      - "team-name"
+```
+
+**Auto-merge** cannot be expressed in `dependabot.yml`. It requires GitHub's auto-merge feature plus branch protection, wired by a small workflow:
+
+```yaml
+# .github/workflows/dependabot-automerge.yml
+name: Dependabot auto-merge
+on: pull_request
+permissions: {contents: write, pull-requests: write}
+jobs:
+  automerge:
+    if: github.actor == 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: dependabot/fetch-metadata@v2
+        id: meta
+      - if: steps.meta.outputs.update-type == 'version-update:semver-patch'
+        run: gh pr merge --auto --squash "$PR_URL"
+        env: {PR_URL: '${{ github.event.pull_request.html_url }}', GH_TOKEN: '${{ secrets.GITHUB_TOKEN }}'}
 ```
 
 ### **Renovate Bot Configuration**
@@ -216,78 +232,34 @@ Create `renovate.json`:
 
 ```json
 {
-  "extends": ["config:base"],
+  "extends": ["config:recommended"],
   "schedule": ["before 10am on monday"],
-  "automerge": true,
-  "automergeType": "pr",
-  "automergeStrategy": "squash",
+  "automerge": false,
   "packageRules": [
     {
       "matchUpdateTypes": ["patch", "pin", "digest"],
-      "automerge": true
+      "automerge": true,
+      "automergeType": "pr",
+      "automergeStrategy": "squash",
+      "groupName": "all patch dependencies"
     },
     {
       "matchUpdateTypes": ["minor"],
-      "automerge": false,
       "labels": ["review-required"]
     },
     {
       "matchUpdateTypes": ["major"],
-      "automerge": false,
       "labels": ["breaking-change", "review-required"]
-    },
-    {
-      "matchPackagePatterns": ["*"],
-      "matchUpdateTypes": ["patch"],
-      "groupName": "all patch dependencies",
-      "groupSlug": "all-patch"
     }
   ]
 }
 ```
 
+Note: `config:base` was renamed to `config:recommended` in Renovate v36; the default stays `automerge: false` so only the explicit patch rule merges unattended.
+
 ### **CI Integration**
 
-Add to `.github/workflows/dependencies.yml`:
-
-```yaml
-name: Dependency Updates
-
-on:
-  schedule:
-    - cron: '0 9 * * 1'  # Every Monday at 9 AM
-  workflow_dispatch:
-
-jobs:
-  update-dependencies:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-      
-      - name: Check for updates
-        run: |
-          npm outdated || true
-          npm audit || true
-      
-      - name: Update patch versions
-        run: npm update
-      
-      - name: Run tests
-        run: npm test
-      
-      - name: Create PR if changes
-        uses: peter-evans/create-pull-request@v5
-        with:
-          commit-message: 'chore(deps): update dependencies'
-          title: 'chore(deps): automated dependency updates'
-          branch: deps/automated-updates
-          labels: dependencies, automated
-```
+Do NOT add a scheduled workflow that runs `npm update` and opens PRs: it duplicates the bot you just configured and produces conflicting update PRs. A custom scheduled job is justified only for ecosystems your bot does not cover; if you write one, use current action majors pinned to full commit SHAs, a supported Node LTS, and `permissions: contents: read` plus the minimum needed to open a PR.
 
 ---
 
