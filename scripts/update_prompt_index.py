@@ -84,7 +84,11 @@ def parse_front_matter(text, source):
                 index += 1
             if not closed:
                 raise PromptError(f"{source}: unterminated quote in line: {raw!r}")
-            value = "".join(chars)  # anything after the close is comment
+            trailing = value[index + 1:].strip()
+            if trailing and not trailing.startswith("#"):
+                raise PromptError(
+                    f"{source}: content after the closing quote in line: {raw!r}")
+            value = "".join(chars)
         else:
             comment = value.find(" #")
             if comment != -1:
@@ -127,6 +131,10 @@ def collect(prompts_dir):
     for path in files:
         fields, body = parse_front_matter(path.read_text(encoding="utf-8-sig"), path.name)
         validate(fields, path.name)
+        if not re.fullmatch(r"[a-z0-9]+(-[a-z0-9]+)*", path.stem):
+            raise PromptError(
+                f"{path.name}: prompt filenames must be kebab-case "
+                "([a-z0-9-], no spaces or special characters)")
         if fields["name"] != path.stem:
             raise PromptError(f"{path.name}: front matter name {fields['name']!r} does not match filename")
         entries.append({

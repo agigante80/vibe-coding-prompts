@@ -656,6 +656,11 @@ python3 scripts/update_prompt_index.py
 CI runs the same script in `--check` mode and fails if the index is stale, if
 front matter is missing or malformed, or if a changed prompt was not bumped.
 
+**Reverting a prompt change**: versions only increase, so a plain `git revert`
+of a bump fails the gate. After reverting the content, set `version` to a
+fresh PATCH above the highest ever published (reverting 1.1.0 back to the
+1.0.0 content ships as 1.1.1).
+
 ---
 
 ## 💡 Tips for Great Prompts

@@ -23,7 +23,10 @@ mode.
 Rules:
 - Modified prompts and renamed-with-edits prompts need a strictly
   increasing version; `updated` must be a real date and never go backwards.
-- Pure renames between prompt paths (identical content) pass.
+- Pure renames between prompt paths (identical content) pass THIS gate,
+  but the index check still fails them until the front matter name is
+  updated to the new stem, which is a content change requiring a bump; in
+  practice every rename ships with a bump.
 - A path NEW to prompts/ (added, or renamed in from outside prompts/) must
   carry the seed version 1.0.0 UNLESS the path existed earlier in history
   (restoring a deleted prompt keeps its earned version).
@@ -100,7 +103,10 @@ def changed_prompts(base_commit, head, cwd=None):
     for line in out.splitlines():
         parts = line.split("\t")
         status = parts[0]
-        if status == "M":
+        if status in ("M", "T"):
+            # T (typechange, e.g. file replaced by a symlink) is judged as a
+            # modification: the new blob is the link target path, which has
+            # no front matter, so the gate fails it rather than skipping.
             old, new = parts[1], parts[1]
         elif status.startswith("R"):
             old, new = parts[1], parts[2]
@@ -121,13 +127,31 @@ def front_matter_of(text, source):
 
 
 def last_historical_blob(base_commit, path, cwd=None):
-    """Content the path last had at or before base, or None if it never
-    existed. --diff-filter=ACMR skips the deletion commit itself."""
-    out = git("log", "--format=%H", "--diff-filter=ACMR", "-1",
-              base_commit, "--", path, cwd=cwd).strip()
-    if not out:
-        return None
-    return git("show", f"{out}:{path}", cwd=cwd)
+    """The highest-versioned content the path ever had at or before base,
+    or None if it never existed.
+
+    Scans ALL history (--full-history defeats merge-side simplification;
+    picking by parsed version rather than commit date defeats timestamp
+    ties and delete-through-merge topologies), so a restore is always
+    judged against the version the prompt actually earned.
+    """
+    hashes = git("log", "--full-history", "--format=%H",
+                 "--diff-filter=ACMR", base_commit, "--", path,
+                 cwd=cwd).split()
+    best_blob, best_key = None, None
+    for commit in hashes:
+        try:
+            text = git("show", f"{commit}:{path}", cwd=cwd)
+        except subprocess.CalledProcessError:
+            continue
+        try:
+            version, _ = front_matter_of(text, path)
+        except PromptError:
+            version = ""
+        key = semver_tuple(version) if VERSION_RE.match(version) else (-1,)
+        if best_key is None or key > best_key:
+            best_blob, best_key = text, key
+    return best_blob
 
 
 def check(base_ref, head="HEAD", cwd=None):

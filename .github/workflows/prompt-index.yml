@@ -9,9 +9,11 @@ permissions:
   contents: read
 
 concurrency:
-  group: prompt-index-${{ github.ref }}
-  # Cancel superseded runs only for PRs: every push-to-main audit must
-  # complete, or a rapid second push could bury the first one's violations.
+  # PRs share a per-ref group and newer pushes supersede older runs. Pushes
+  # use per-SHA groups: GitHub cancels a PENDING run in a shared group by
+  # default (regardless of cancel-in-progress), which would silently drop
+  # the audit of an intermediate push range on main.
+  group: prompt-index-${{ github.event_name == 'pull_request' && github.ref || github.sha }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
