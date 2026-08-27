@@ -131,7 +131,7 @@ grep -rnE "^\s*(import|from .+ import|const .+ = require)" \
 5. If tests pass: commit; if fail: revert with `git reset --hard`
 6. Repeat for next file
 
-**For deleting obsolete files**: Search for references first (`grep -rn "filename" --include="*.{js,ts,py,json}" .`), delete only if unreferenced:
+**For deleting obsolete files**: Search for references first (`grep -rn "filename" --include="*.js" --include="*.ts" --include="*.py" .`), delete only if unreferenced:
 
 ```bash
 # Delete only confirmed obsolete files (git rm stages the deletion)

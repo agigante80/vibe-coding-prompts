@@ -47,7 +47,7 @@ Follow semantic versioning: `MAJOR.MINOR.PATCH[-PRERELEASE][+BUILD]`
 - **PRERELEASE**: Optional stage identifier appended with a hyphen (alpha, beta, rc); affects precedence
 - **BUILD**: Build metadata appended with a PLUS sign (commit hash, build number); ignored for precedence
 
-**Docker tag mapping**: Docker tags cannot contain `+`. When a version carries build metadata, encode the tag by replacing `+` with `-` (version `1.4.1+abcdef7` becomes tag `1.4.1-abcdef7`). Dev builds like `1.4.1-dev-abcdef7` are pre-release identifiers, not build metadata, and need no mapping.
+**Docker tag mapping**: git tags carry the `v` prefix (`v1.5.0`); Docker tags do not (`:1.5.0`, `:1.5`, `:1`). Docker tags also cannot contain `+`: encode build metadata by replacing `+` with `-` (version `1.4.1+abcdef7` becomes tag `1.4.1-abcdef7`). Dev builds like `1.4.1-dev-abcdef7` are pre-release identifiers, not build metadata, and need no mapping.
 
 ### Version Examples by Stage
 

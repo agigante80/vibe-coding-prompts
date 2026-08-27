@@ -196,8 +196,9 @@ updates:
           - "minor"
           - "patch"
     
-    # Which dependencies receive update PRs (grouping above handles batching;
-    # security updates are always raised individually by Dependabot itself)
+    # Which dependencies receive update PRs. The groups above batch version
+    # updates; security updates arrive individually unless you opt in to
+    # grouped security updates (applies-to: security-updates in a group).
     allow:
       - dependency-type: "direct"
       - dependency-type: "indirect"
