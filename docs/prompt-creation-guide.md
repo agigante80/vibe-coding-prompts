@@ -615,19 +615,40 @@ Examples:
 - ❌ `TestSuiteGenerator.md`
 - ❌ `test_suite.md`
 
-### **README Updates**
+### **Front Matter, Versioning and the README Index**
 
-When adding a prompt, update:
+Every prompt file starts with YAML front matter:
 
-1. **Category README** (`[category]/README.md`)
-   - Add prompt to "Available Prompts"
-   - Include description and usage tips
+```yaml
+---
+name: my-prompt-name          # matches the filename, kebab-case
+category: development-workflow
+version: 1.0.0                # bump on EVERY content change
+updated: 2026-08-27           # date of the last content change
+description: One sentence shown in the README index table.
+platforms: [chatgpt, claude, gemini, copilot-chat]
+---
+```
 
-2. **Main README** (`README.md`)
-   - Add to "Available Prompts" section
-   - Add to "Quick Selection Guide"
-   - Update TODO list (mark as complete)
-   - Update word count if showing stats
+**Version bump rules (SemVer-lite):**
+
+| Bump | When |
+|------|------|
+| **MAJOR** | The prompt's output contract or required sections change; users should re-read it |
+| **MINOR** | A new capability, section, or check is added |
+| **PATCH** | Wording fixes, typos, corrections that do not change what the prompt produces |
+
+Any change to a prompt file requires a version bump and an `updated` refresh in the same commit. This is enforced by CI, not memory.
+
+**The README index is generated.** Never hand-edit the table between the
+`prompts-index` markers in `README.md`. After adding or editing a prompt, run:
+
+```bash
+python3 scripts/update_prompt_index.py
+```
+
+CI runs the same script in `--check` mode and fails if the index is stale, if
+front matter is missing or malformed, or if a changed prompt was not bumped.
 
 ---
 
