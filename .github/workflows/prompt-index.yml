@@ -10,7 +10,9 @@ permissions:
 
 concurrency:
   group: prompt-index-${{ github.ref }}
-  cancel-in-progress: true
+  # Cancel superseded runs only for PRs: every push-to-main audit must
+  # complete, or a rapid second push could bury the first one's violations.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   verify:
@@ -34,15 +36,11 @@ jobs:
         run: python3 scripts/check_version_bump.py "origin/$BASE_REF"
 
       - name: Verify changed prompts were version bumped (push)
-        # Direct pushes to main are gated against the previous tip.
-        # Branch creation delivers the all-zero SHA; a force push delivers a
-        # real but now-unreachable SHA. Both have no usable base, so skip.
-        if: github.event_name == 'push' && github.event.before != '0000000000000000000000000000000000000000'
+        # Direct pushes to main are gated against the previous tip. The
+        # script itself skips (exit 0, with a ::warning:: annotation) when
+        # the base is unusable: branch creation's all-zero SHA, a force
+        # push's unreachable SHA, or unrelated histories.
+        if: github.event_name == 'push'
         env:
           BEFORE: ${{ github.event.before }}
-        run: |
-          if ! git cat-file -e "$BEFORE^{commit}" 2>/dev/null; then
-            echo "skipped: base $BEFORE is unreachable (force push)"
-            exit 0
-          fi
-          python3 scripts/check_version_bump.py "$BEFORE"
+        run: python3 scripts/check_version_bump.py "$BEFORE"
