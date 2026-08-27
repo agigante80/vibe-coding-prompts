@@ -270,6 +270,72 @@ class CheckVersionBumpTests(unittest.TestCase):
         with self.assertRaises(cvb.SkipCheck):
             cvb.check("0" * 40, cwd=repo)
 
+    def test_invalid_head_is_hard_error_not_skip(self):
+        """rc 128 from merge-base must propagate, never read as a skip."""
+        repo = self.make_repo()
+        with self.assertRaises(subprocess.CalledProcessError):
+            cvb.check("main", "refs/heads/does-not-exist", cwd=repo)
+
+    def test_restore_with_changed_content_same_version_fails(self):
+        """Delete then re-add with edits must still require a bump."""
+        repo = self.make_repo()
+        old = (PROMPT_V1.replace("sample-prompt", "veteran")
+               .replace("version: 1.0.0", "version: 3.2.0"))
+        run_git(repo, "checkout", "-q", "main")
+        (repo / "prompts" / "veteran.md").write_text(old, encoding="utf-8")
+        run_git(repo, "add", "-A")
+        run_git(repo, "commit", "-qm", "add veteran")
+        run_git(repo, "rm", "-q", "prompts/veteran.md")
+        run_git(repo, "commit", "-qm", "delete veteran")
+        run_git(repo, "checkout", "-q", "feature")
+        run_git(repo, "merge", "-q", "main")
+        (repo / "prompts" / "veteran.md").write_text(
+            old.replace("Original body", "Rewritten body"), encoding="utf-8")
+        self.commit_all(repo, "re-add veteran, edited, no bump")
+        failures = cvb.check("main", cwd=repo)
+        self.assertEqual(len(failures), 1)
+        self.assertIn("did not increase", failures[0])
+
+    def test_restore_with_changed_content_and_bump_passes(self):
+        repo = self.make_repo()
+        old = (PROMPT_V1.replace("sample-prompt", "veteran")
+               .replace("version: 1.0.0", "version: 3.2.0"))
+        run_git(repo, "checkout", "-q", "main")
+        (repo / "prompts" / "veteran.md").write_text(old, encoding="utf-8")
+        run_git(repo, "add", "-A")
+        run_git(repo, "commit", "-qm", "add veteran")
+        run_git(repo, "rm", "-q", "prompts/veteran.md")
+        run_git(repo, "commit", "-qm", "delete veteran")
+        run_git(repo, "checkout", "-q", "feature")
+        run_git(repo, "merge", "-q", "main")
+        (repo / "prompts" / "veteran.md").write_text(
+            old.replace("Original body", "Rewritten body")
+            .replace("version: 3.2.0", "version: 3.2.1"), encoding="utf-8")
+        self.commit_all(repo, "re-add veteran, edited and bumped")
+        self.assertEqual(cvb.check("main", cwd=repo), [])
+
+    def test_require_base_turns_skip_into_error(self):
+        repo = self.make_repo()
+        import contextlib, io, os
+        cwd = os.getcwd()
+        os.chdir(repo)
+        try:
+            err = io.StringIO()
+            with contextlib.redirect_stderr(err):
+                code = cvb.main(["--require-base", "refs/heads/nope"])
+        finally:
+            os.chdir(cwd)
+        self.assertEqual(code, 2)
+        self.assertIn("base is required but unusable", err.getvalue())
+
+    def test_empty_base_arg_is_usage_error(self):
+        import contextlib, io
+        err = io.StringIO()
+        with contextlib.redirect_stderr(err):
+            code = cvb.main([""])
+        self.assertEqual(code, 2)
+        self.assertIn("usage:", err.getvalue())
+
     def test_unrelated_histories_skip(self):
         repo = self.make_repo()
         run_git(repo, "checkout", "-q", "--orphan", "island")
