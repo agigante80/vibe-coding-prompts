@@ -1,7 +1,7 @@
 ---
 name: readme-generator
 category: documentation
-version: 1.0.0
+version: 1.1.0
 updated: 2026-08-27
 description: Generate or update a professional README, preserving images and validating Docker Hub descriptions.
 platforms: [chatgpt, claude, gemini, copilot-chat]
@@ -94,10 +94,12 @@ find . -name "short.md" -o -name "description.md" -o -name "docker-description.m
 15. **Roadmap**: Planned features, limitations, improvements
 16. **Acknowledgments**: Contributors, inspirations, resources
 17. **AI Integration** (AI/MCP): Agent roles, MCP server info, requirements
+18. **Support**: Where to ask questions (issues, discussions, chat)
+19. **Project Status**: Active/maintenance/archived, so users can calibrate expectations
 
 ### 🎨 **Best Practices**
 
-**Formatting**: Emojis for headers (sparingly), short paragraphs (2-3 sentences), code blocks with syntax highlighting, tables for data, blockquotes for notes
+**Formatting**: Optional emojis for headers (sparingly; screen readers announce emoji names, so never let one carry meaning), short paragraphs (2-3 sentences), code blocks with syntax highlighting, tables for data, blockquotes for notes
 
 **Badges**: Build status, Docker pulls, license, version, stars (shields.io)
 
@@ -108,6 +110,8 @@ find . -name "short.md" -o -name "description.md" -o -name "docker-description.m
 ---
 
 ## **Docker Descriptions**
+
+The `./docker/description/` file layout is a convention of this workflow, not a Docker standard. The text reaches Docker Hub via the repository settings UI, the Docker Hub API, or a CI step that syncs the files on release; wire one of these or the files change nothing.
 
 ### **Short Description** (`./docker/description/short.md`)
 
@@ -120,10 +124,11 @@ find . -name "short.md" -o -name "description.md" -o -name "docker-description.m
 
 **Character Count Validation**:
 ```bash
-# Check character count
-wc -m ./docker/description/short.md
+# Check character count (strip the trailing newline first: wc -m counts it,
+# so a description of exactly 100 characters would falsely fail)
+tr -d '\n' < ./docker/description/short.md | wc -m
 
-# Should output: ≤100
+# Should output: <=100
 ```
 
 **Examples**:
@@ -231,7 +236,7 @@ All README updates must be documented in `/docs/`:
 
 ## **Success Criteria**
 
-- [ ] README follows all 16 section guidelines (required + conditional)
+- [ ] README follows the 19 section guidelines (7 required + 12 conditional)
 - [ ] Project identity clear (title, tagline, badges)
 - [ ] Table of contents present for READMEs >200 lines
 - [ ] Installation and usage sections complete and accurate
@@ -269,17 +274,10 @@ All README updates must be documented in `/docs/`:
 - Use semantic heading hierarchy
 
 ### **SEO and Discoverability**
-- Use clear, searchable keywords in title and description
-- Include relevant technology names
-- Add topics/tags (GitHub repository settings)
-- Use descriptive commit messages when updating
+- Searchable keywords and technology names in title/description; topics set in repository settings
 
 ### **Visual Appeal**
-- Break up long text with lists and code blocks
-- Use horizontal rules (`---`) to separate major sections
-- Add emojis strategically (not excessively)
-- Include screenshots/GIFs for visual features
-- Use syntax highlighting for all code blocks
+- Break up long text with lists, code blocks and horizontal rules; screenshots/GIFs for visual features; syntax highlighting everywhere
 
 ### **Docker-Specific Best Practices**
 - Short description should work standalone (appears in search)
@@ -339,7 +337,7 @@ if [ ! -f "$SHORT_DESC_FILE" ]; then
   exit 1
 fi
 
-CHAR_COUNT=$(wc -m < "$SHORT_DESC_FILE" | tr -d ' ')
+CHAR_COUNT=$(tr -d '\n' < "$SHORT_DESC_FILE" | wc -m | tr -d ' ')
 MAX_CHARS=100
 
 echo "Docker Short Description: $(cat $SHORT_DESC_FILE)"

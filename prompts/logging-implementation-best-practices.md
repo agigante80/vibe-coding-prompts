@@ -1,7 +1,7 @@
 ---
 name: logging-implementation-best-practices
 category: operations
-version: 1.0.0
+version: 1.1.0
 updated: 2026-08-27
 description: Production logging with structured JSON, PII redaction, rotation, retention and observability.
 platforms: [chatgpt, claude, gemini, copilot-chat]
@@ -44,9 +44,9 @@ Auto-detect and analyze:
 
 Analyze requirements based on:
 
-* **Industry/Domain**:
-  - Healthcare (HIPAA) → 7+ year retention, audit trails
-  - Finance (PCI-DSS, SOX) → 7-10 year retention, immutable logs
+* **Industry/Domain** (typical starting points; ALWAYS verify exact retention against your regulation and record type):
+  - Healthcare (HIPAA) → multi-year retention, audit trails
+  - Finance (PCI-DSS, SOX) → long-term retention, immutable logs
   - E-commerce → 1-3 years, PCI compliance for payment logs
   - SaaS/General → 30-90 days hot, 1-3 years archive
 
@@ -119,14 +119,15 @@ Analyze requirements based on:
 **Code example patterns**:
 
 ```javascript
-// Node.js with Pino - sampling
+// Node.js with Pino - sample DEBUG calls at 5% (errors always pass).
+// The logMethod hook fires for EVERY call; its third argument is the
+// numeric level of THAT call (debug = 20). Comparing this.level (the
+// logger's configured minimum) would randomly drop ALL levels.
 const logger = pino({
   level: process.env.LOG_LEVEL || 'info',
-  formatters: { level: (label) => ({ level: label }) },
-  // Sample debug logs at 5%
   hooks: {
-    logMethod(args, method) {
-      if (this.level === 'debug' && Math.random() > 0.05) return;
+    logMethod(args, method, level) {
+      if (level === 20 && Math.random() > 0.05) return;
       method.apply(this, args);
     }
   }
@@ -188,9 +189,9 @@ structlog.configure(processors=[sample_debug, structlog.processors.JSONRenderer(
 - **Prod**: 100-500MB files, 7-30 days local, gzip/zstd, 1-7 years archive
 - **Audit**: 100-200MB files, 30-90 days local, 7-10 years archive
 
-**Strategy**: Size-based (100-500MB) + daily rotation, compress after rotation, keep 24-48h uncompressed
-
-**Tools**: logrotate (Linux), Docker logging driver (`max-size: 100m`, `max-file: 7`), app-level libraries (winston-daily-rotate-file, python-logrotate)
+**Branch by environment first** (twelve-factor: an app "never concerns itself with routing or storage of its output stream"):
+- **Containers/Kubernetes**: the app writes unbuffered JSON to stdout; rotation belongs to the runtime (Docker logging driver `max-size: 100m`, `max-file: 7`) or the node agent. Do NOT add app-level file rotation here.
+- **Bare metal/VMs where the app owns files**: size-based (100-500MB) plus daily rotation via logrotate or app-level libraries (winston-daily-rotate-file, python-logrotate); compress after rotation, keep 24-48h uncompressed
 
 ### 📦 **Long-Term Archive & Lifecycle**
 
@@ -257,7 +258,7 @@ Application → Local Buffer → Agent (Fluent Bit/Vector)
 5. **Monitoring**: Prometheus metrics, alert rules, Grafana dashboard, SLO definitions
 6. **Documentation**: Policy doc (retention, PII, compliance), developer guide, runbook, schema docs
 
-**Update `/docs/`**: OPERATIONS.md (architecture, levels, schema, retention), ARCHITECTURE.md (observability, pipeline), SECURITY_AND_PRIVACY.md (PII handling, access control, audit)
+**Update `/docs/`** (standard set only; do not create files outside it): ARCHITECTURE.md (logging architecture, levels, schema, pipeline, observability), SECURITY_AND_PRIVACY.md (PII handling, retention policy, access control, audit), TESTING_AND_RELIABILITY.md (redaction tests, rotation tests, restore drills)
 
 ---
 
@@ -306,7 +307,7 @@ Application → Local Buffer → Agent (Fluent Bit/Vector)
 * Keep hot retention minimal (7-30 days)
 * Use sampling for debug/trace logs
 * Compress logs immediately after rotation
-- Archive to object storage early (90 days)
+* Archive to object storage early (90 days)
 * Query cold archives directly (Athena/BigQuery) instead of rehydrating
 
 ---
@@ -321,7 +322,7 @@ Application → Local Buffer → Agent (Fluent Bit/Vector)
 
 **Phase 4 (Week 3-4)**: Set up object storage (S3/GCS), create export automation, schedule daily archive jobs, apply lifecycle policies, test restore, document retention policy
 
-**Phase 5 (Week 4)**: Configure pipeline health metrics, set up alerting, test failure scenarios, document runbooks, train team
+**Phase 5 (Week 4)**: Pipeline health metrics, alerting, failure testing, runbooks, team training
 
 ---
 
@@ -329,15 +330,6 @@ Application → Local Buffer → Agent (Fluent Bit/Vector)
 
 Run this prompt when:
 
-* Starting a new project and establishing logging standards
-* Migrating from unstructured to structured logging
-* Implementing compliance requirements (HIPAA, PCI-DSS, GDPR)
-* Setting up centralized logging infrastructure
-* Preparing for production deployment
-* Addressing log management technical debt
-* Establishing observability practices
-* Quarterly review of logging practices
-
----
-
-## **Multi-Language Quick Reference**
+* New project logging standards, or migrating from unstructured to structured logging
+* Compliance requirements (HIPAA, PCI-DSS, GDPR) or centralized logging infrastructure
+* Production deployment preparation, observability practices, quarterly reviews
