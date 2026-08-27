@@ -56,8 +56,8 @@ Apply appropriate security standards based on project type:
 **Scan**:
 ```bash
 # Prefer a real scanner: gitleaks (git = commit history, dir = working tree)
-gitleaks git .
-gitleaks dir .
+gitleaks git . -v
+gitleaks dir . -v
 
 # Keyword fallback (grep --include takes ONE glob; repeat the flag)
 grep -rn "password\|secret\|api_key\|token" \

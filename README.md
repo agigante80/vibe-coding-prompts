@@ -28,10 +28,10 @@ This table is generated from each prompt's front matter by `scripts/update_promp
 | [documentation-standardization](./prompts/documentation-standardization.md) | documentation | 1.0.0 | 2026-08-27 | 1724 | Standardize project documentation into the 9-file /docs/ structure with auditing and cleanup. |
 | [readme-generator](./prompts/readme-generator.md) | documentation | 1.1.0 | 2026-08-27 | 1587 | Generate or update a professional README, preserving images and validating Docker Hub descriptions. |
 | [logging-implementation-best-practices](./prompts/logging-implementation-best-practices.md) | operations | 1.1.0 | 2026-08-27 | 1595 | Production logging with structured JSON, PII redaction, rotation, retention and observability. |
-| [github-ready-preparation](./prompts/github-ready-preparation.md) | project-management | 1.1.0 | 2026-08-27 | 1594 | Prepare a repository for professional public release on GitHub. |
+| [github-ready-preparation](./prompts/github-ready-preparation.md) | project-management | 1.1.0 | 2026-08-27 | 1592 | Prepare a repository for professional public release on GitHub. |
 | [project-reassessment](./prompts/project-reassessment.md) | project-management | 1.1.0 | 2026-08-27 | 1534 | Full repository health check aligning code, documentation and policies. |
 | [dependency-update-manager](./prompts/dependency-update-manager.md) | security | 1.1.0 | 2026-08-27 | 1582 | Automate dependency updates with risk classification, testing and rollback. |
-| [security-audit-generator](./prompts/security-audit-generator.md) | security | 1.1.0 | 2026-08-27 | 1598 | Comprehensive security audit with OWASP-based checks and prioritized remediation. |
+| [security-audit-generator](./prompts/security-audit-generator.md) | security | 1.1.0 | 2026-08-27 | 1600 | Comprehensive security audit with OWASP-based checks and prioritized remediation. |
 <!-- prompts-index:end -->
 
 ## When to run what

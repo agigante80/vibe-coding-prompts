@@ -644,7 +644,7 @@ Field rules:
 | **MINOR** | A new capability, section, or check is added |
 | **PATCH** | Wording fixes, typos, corrections that do not change what the prompt produces |
 
-Any change to a prompt file requires a version bump and an `updated` refresh in the same pull request (the gate compares the PR base to its head, so one bump covers all of a PR's commits to the same prompt). This is enforced by CI, not memory.
+Any change to a prompt file requires a version bump and an `updated` refresh in the same pull request (the gate compares the PR base to its head, so one bump covers all of a PR's commits to the same prompt). CI enforces the bump strictly; for `updated` it enforces the format and that the date never goes backwards, so the refresh itself stays a review responsibility.
 
 **The README index is generated.** Never hand-edit the table between the
 `prompts-index` markers in `README.md`. After adding or editing a prompt, run:

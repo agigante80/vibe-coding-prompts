@@ -72,9 +72,9 @@ go list -m all 2>/dev/null
 gitleaks git .
 gitleaks dir .
 
-# List every .env ever committed, including later-deleted ones
-# (a git pathspec asterisk matches across directories)
-git log --all --oneline -- '*.env'
+# List every .env-style file ever committed, incl. later-deleted ones and
+# variants like .env.production (prints file paths, not commit subjects)
+git log --all --diff-filter=A --name-only --format= -- '*.env' '*.env.*' | sort -u
 ```
 Enable GitHub secret scanning with push protection in repository settings. No-install fallback: keyword grep for `api_key|secret|password|token`.
 
@@ -336,9 +336,8 @@ Update `/docs/` files per [Documentation Standardization](./documentation-standa
 
 ### **When to Run This Preparation**
 
-* Before a first public push, converting a private repo to public, or an open source release
-* Before showcases, job applications, or major version releases (v1.0, v2.0)
-* During project audits or quality reviews
+* Before a first public push, going public, or an open source release
+* Before showcases, job applications, major releases, or quality audits
 
 ### **Initial Setup**
 1. Ensure a clean working directory (commit or stash changes) and a backup before structural changes
