@@ -10,7 +10,7 @@ Thanks for wanting to improve this prompt collection.
 4. Regenerate the README index: `python3 scripts/update_prompt_index.py`
 5. Open a pull request. CI verifies the front matter, the version bump, and that the README index is fresh; a stale index or missing bump fails the build.
 
-Optional but recommended: `pip install pre-commit && pre-commit install` runs the same checks before every commit, so CI never surprises you.
+Optional but recommended: `pip install pre-commit && pre-commit install` runs the index regeneration, the version bump check (against your local `origin/main`) and the tooling tests before each commit, so CI rarely surprises you.
 
 ## Filing issues
 

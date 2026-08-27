@@ -1,5 +1,8 @@
 # Optional convenience layer; CI is the enforcement layer (see #20).
 # Install once per clone:  pip install pre-commit && pre-commit install
+#
+# Known limit: a commit that ONLY deletes a prompt does not trigger the
+# index hook (pre-commit skips deleted paths); CI's --check catches it.
 repos:
   - repo: local
     hooks:
@@ -7,7 +10,13 @@ repos:
         name: regenerate README prompt index
         entry: python3 scripts/update_prompt_index.py
         language: system
-        always_run: true
+        files: ^(prompts/.*\.md|README\.md|scripts/update_prompt_index\.py)$
+        pass_filenames: false
+      - id: prompt-version-bump
+        name: check prompt version bumps (vs origin/main)
+        entry: python3 scripts/check_version_bump.py origin/main
+        language: system
+        files: ^prompts/.*\.md$
         pass_filenames: false
       - id: prompt-index-tests
         name: prompt index generator tests

@@ -52,8 +52,12 @@ def parse_front_matter(text, source):
             raise PromptError(f"{source}: malformed front matter line: {raw!r}")
         key, _, value = raw.partition(":")
         value = value.strip()
-        if len(value) > 1 and value[0] == value[-1] and value[0] in "'\"":
-            value = value[1:-1]
+        if value[:1] in ("'", '"'):
+            quote = value[0]
+            closing = value.find(quote, 1)
+            if closing == -1:
+                raise PromptError(f"{source}: unterminated quote in line: {raw!r}")
+            value = value[1:closing]  # anything after the close quote is comment
         else:
             comment = value.find(" #")
             if comment != -1:

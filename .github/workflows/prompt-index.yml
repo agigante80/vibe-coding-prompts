@@ -25,4 +25,4 @@ jobs:
 
       - name: Verify changed prompts were version bumped
         if: github.event_name == 'pull_request'
-        run: python3 scripts/check_version_bump.py "${{ github.event.pull_request.base.sha }}"
+        run: python3 scripts/check_version_bump.py "origin/${{ github.base_ref }}"
