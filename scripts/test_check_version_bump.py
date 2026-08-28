@@ -361,8 +361,8 @@ class CheckVersionBumpTests(unittest.TestCase):
         p.write_text(second, encoding="utf-8")
         run_git(repo, "add", "-A")
         run_git(repo, "commit", "-qm", "second emoji version")
-        blobs, lossy = cvb.historical_blobs("main", "prompts/sample-prompt.md", cwd=repo)
-        self.assertFalse(lossy)
+        blobs, clean = cvb.historical_blobs("main", "prompts/sample-prompt.md", cwd=repo)
+        self.assertEqual(set(blobs), clean)  # emoji blobs decode strictly
         self.assertEqual(len(blobs), 2)
         self.assertIn(emoji, blobs)
         self.assertIn(second, blobs)
@@ -513,6 +513,42 @@ class CheckVersionBumpTests(unittest.TestCase):
         failures = cvb.check("main", cwd=repo)
         self.assertEqual(len(failures), 1)
         self.assertIn("did not increase", failures[0])
+
+    def test_corrupt_blob_does_not_poison_identical_clean_blob(self):
+        """A legacy corrupt blob that replace-decodes to the same text must
+        not veto a byte-exact restore of the clean version."""
+        base = PROMPT_V1.replace("Original body text.", "Byte: X.")
+        repo = self.make_repo(initial_text=base)
+        run_git(repo, "checkout", "-q", "main")
+        p = repo / "prompts" / "sample-prompt.md"
+        clean_text = base.replace("Byte: X.", "Byte: \ufffd.")
+        # commit 1: the CLEAN file containing a literal U+FFFD
+        p.write_bytes(clean_text.encode("utf-8"))
+        run_git(repo, "add", "-A")
+        run_git(repo, "commit", "-qm", "clean file with literal U+FFFD")
+        # commit 2: a CORRUPT blob that replace-decodes to the same text
+        p.write_bytes(base.replace("Byte: X.", "Byte: ").encode("utf-8") + b"\xe9.\n")
+        run_git(repo, "add", "-A")
+        run_git(repo, "commit", "-qm", "corrupt sibling")
+        run_git(repo, "rm", "-q", "prompts/sample-prompt.md")
+        run_git(repo, "commit", "-qm", "delete")
+        run_git(repo, "checkout", "-qB", "feature", "main")
+        p.parent.mkdir(exist_ok=True)
+        p.write_bytes(clean_text.encode("utf-8"))  # byte-exact clean restore
+        self.commit_all(repo, "restore the clean state")
+        self.assertEqual(cvb.check("main", cwd=repo), [])
+
+    def test_undecodable_filename_in_prompts_subdir_is_ignored(self):
+        """Only direct children of prompts/ are the gate's business."""
+        repo = self.make_repo()
+        sub = repo / "prompts" / "archive"
+        sub.mkdir()
+        bad = sub.as_posix().encode() + b"/caf\xe9.md"
+        with open(bad, "wb") as f:
+            f.write(b"archived\n")
+        run_git(repo, "add", "-A")
+        run_git(repo, "commit", "-qm", "archived file with undecodable name")
+        self.assertEqual(cvb.check("main", cwd=repo), [])
 
     def test_undecodable_filename_outside_prompts_is_ignored(self):
         """A non-UTF-8 filename elsewhere in the diff is none of the
