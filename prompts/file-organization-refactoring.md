@@ -216,7 +216,7 @@ Add file organization section with:
 3. **Migration Scripts** - Safe file operation automation
 4. **Test Results Log** - Post-change verification
 5. **Updated Documentation** - `/docs/REFACTORING_PLAN.md`, `/docs/ARCHITECTURE.md`, `/docs/README.md`, root `README.md`
-6. **Documentation Cleanup** - Run **[Documentation Standardization](./documentation-standardization.md)** for 9-file `/docs/` structure
+6. **Documentation Cleanup** - Run **[Documentation Standardization](./documentation-standardization.md)** for the `/docs/` contract
 7. **Verification Reports** - Import validation, test suite, build, application health
 
 ---

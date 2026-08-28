@@ -10,7 +10,7 @@ A comprehensive guide for creating effective, reusable prompts that follow this 
 
 ### **Step 1: Know what the `/docs/` standard is FOR**
 
-The standardized 9-file `/docs/` structure (defined by
+The standardized `/docs/` structure of 9 required files plus declared extensions (defined by
 [Documentation Standardization](../prompts/documentation-standardization.md))
 applies to the TARGET projects your prompt runs against, not to this
 repository. This repo is a content library: its own `/docs/` holds concept
@@ -53,7 +53,8 @@ Every prompt in this repository follows these fundamental principles:
 ## 📚 Understanding the `/docs/` Structure (in target projects)
 
 Prompts in this collection instruct AI agents to maintain a **standardized
-9-file documentation system** in the projects they run against (defined by
+documentation system** (9 required files plus declared extensions) in the
+projects they run against (defined by
 [Documentation Standardization](../prompts/documentation-standardization.md)).
 Your prompt's outputs must fit this structure:
 
