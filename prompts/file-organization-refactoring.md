@@ -2,7 +2,7 @@
 name: file-organization-refactoring
 category: development-workflow
 version: 1.1.1
-updated: 2026-08-27
+updated: 2026-08-28
 description: Reorganize project files and folders safely with tested, incremental migrations.
 platforms: [chatgpt, claude, gemini, copilot-chat]
 ---
@@ -27,9 +27,8 @@ Systematically reorganize project files and folders to establish clear structure
 ### 2. **Problem Identification**
 
 **Issues to Check**:
-- [ ] Flat structure, mixed concerns, unclear hierarchy, inconsistent depth
-- [ ] Orphaned/duplicate/obsolete files
-- [ ] Misplaced files (tests in src, configs in root)
+- [ ] Flat structure, mixed concerns, unclear hierarchy
+- [ ] Orphaned/duplicate/obsolete or misplaced files (tests in src, configs in root)
 - [ ] Naming inconsistencies (camelCase/snake_case/kebab-case mix)
 
 ### 3. **Documentation File Cleanup**
@@ -99,8 +98,10 @@ EOF
 **2. Analyze Dependencies**:
 ```bash
 # Find all import/require statements
-grep -rnE "^\s*(import|from .+ import|const .+ = require)" \
-  --include="*.js" --include="*.ts" --include="*.py" . > imports.txt
+# Adapt the pattern to the detected language(s); exclude noise dirs
+# rather than whitelisting extensions (bash brace expansion)
+grep -rnE "import|require|include|use " \
+  --exclude-dir={node_modules,.git,dist,build,vendor} . > imports.txt
 
 # Identify what needs updating when files move
 ```

@@ -2,7 +2,7 @@
 name: test-suite-generator
 category: development-workflow
 version: 1.1.0
-updated: 2026-08-27
+updated: 2026-08-28
 description: Generate a comprehensive test suite with unit, integration and e2e coverage, plus skipped-test cleanup.
 platforms: [chatgpt, claude, gemini, copilot-chat]
 ---
@@ -19,9 +19,7 @@ Generate a comprehensive, production-ready test suite for the current project th
 
 ### 1. **Project Analysis**
 
-* Detect project type and language (Python, JavaScript/TypeScript, Java, Go, Rust, etc.)
-* Identify existing testing framework or recommend appropriate ones
-* Analyze project structure and critical components
+* Detect language and framework; identify or recommend the testing stack; map critical components
 * **Review existing tests comprehensively:**
   * Identify skipped/disabled tests (pytest.skip, @Ignore, test.skip, etc.)
   * Analyze why tests were skipped (comments, commit history, issue references)
@@ -52,7 +50,7 @@ Choose appropriate frameworks based on project type:
 
 **Categorize**: fixable (update assertions/mocks/data), environment-dependent (conditional skip, document setup), flaky (fix timing/races), obsolete (document and remove), blocked (link issues, document clearly), unclear (investigate git history, then fix or document)
 
-**Skip Documentation**: Always include specific reason, issue reference, re-enabling conditions
+**Skip Documentation**: specific reason, issue reference, re-enabling conditions
 ```python
 @pytest.mark.skip(reason="Requires PostgreSQL 14+. See issue #123")
 ```
@@ -175,15 +173,12 @@ def test_invalid_timeout():
         Configuration(timeout=-1)
 ```
 
-**Key Principles**: Test every variable, defaults first, valid boundaries, invalid with clear errors, test behavior not just assignment
+**Key Principles**: every variable tested, defaults first, boundaries, clear errors, behavior over assignment
 
 ### **Mocking and Fixtures**
 
-* Create reusable fixtures for common test data
-* Mock external APIs, databases, and file systems
-* Use test databases or in-memory alternatives
-* Implement test data factories for complex objects
-* Clean up resources after each test
+* Reusable fixtures and factories for test data; mock external APIs, databases and file systems
+* Test databases or in-memory alternatives; clean up resources after each test
 
 ---
 
@@ -226,14 +221,14 @@ repos:
     hooks:
       - id: unit-tests
         name: unit tests
-        entry: pytest tests/unit --cov --cov-fail-under=80
+        entry: pytest tests/unit --cov=src --cov-fail-under=80
         language: system
         pass_filenames: false
 ```
 
 ### **CI/CD Integration**
 
-A complete minimal workflow (pin third-party actions to a full commit SHA in real projects; add a coverage-upload step only if you use such a service):
+A complete minimal workflow, Python example; generate the equivalent for the detected stack (setup-node + npm test, setup-go + go test, etc.). Pin third-party actions to a full commit SHA in real projects. Scope coverage to the source tree: bare `--cov` measures test files and site-packages instead of your code.
 
 ```yaml
 # .github/workflows/test.yml
@@ -246,8 +241,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r requirements.txt pytest pytest-cov
       - name: Run unit tests
-        run: pytest tests/unit --cov --cov-report=xml --cov-fail-under=80
+        run: pytest tests/unit --cov=src --cov-fail-under=80
       - name: Run integration tests
         run: pytest tests/integration
 ```
@@ -294,7 +293,7 @@ Update the following files in `/docs/`:
 - **`/docs/TESTING_AND_RELIABILITY.md`**:
   - Add test framework configuration details (pytest, Jest, JUnit, etc.)
   - Document test execution commands for each test type
-  - Include coverage requirements and thresholds (80%+ target)
+  - Include the coverage floor (80%) and its diagnostic-not-target framing
   - Add CI/CD integration details and workflows
   - Document skipped test handling procedures
   - Add test organization structure (unit, integration, e2e)

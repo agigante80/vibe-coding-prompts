@@ -36,7 +36,7 @@ Model context windows change every generation, so treat these as ORDERS OF MAGNI
 | Platform | Typical context scale | Notes |
 | -------- | --------------------- | ----- |
 | **ChatGPT (frontier models)** | Very large (100k+ tokens) | Multi-thousand-word meta-prompts are safe. |
-| **GitHub Copilot (inline)** | Small (single-digit k tokens) | Long prompts get truncated; keep under ~1,500 words, prefer Copilot Chat. |
+| **GitHub Copilot (inline)** | Small (single-digit k tokens) | Truncates long prompts; inline sweet spot is 300 to 700 words, hard ceiling ~1,500, prefer Copilot Chat. |
 | **Claude (frontier models)** | Very large (hundreds of k tokens) | Can process long prompts or entire repos. |
 | **Gemini (frontier models)** | Very large to huge (up to millions) | Entire codebases plus documentation. |
 
@@ -94,7 +94,7 @@ If your goal is to feed a **meta-prompt** like your universal CI/CD builder:
 
 * There's **no fixed word limit**, but clarity always matters more than size:
 
-  * **Copilot inline:** keep within 700 to 800 words; use Copilot Chat for longer prompts
+  * **Copilot inline:** 300 to 700 words is the sweet spot; use Copilot Chat beyond that
   * **ChatGPT, Claude, Gemini:** handle full prompts of any length in this collection easily
 
 * **This repository's prompts** target under 1600 words each; the current per-prompt word counts live in the [generated index in the root README](../README.md), the single source of truth
@@ -104,7 +104,7 @@ If your goal is to feed a **meta-prompt** like your universal CI/CD builder:
 
 ## 📦 How This Repository's Prompts Are Structured
 
-### Prompt Length Distribution
+### Prompt Lengths
 
 Per-prompt word counts are generated into the [root README's prompt index](../README.md) and verified by CI; that table is the single source of truth (hard-coded copies here rotted repeatedly, which is why none remain).
 
