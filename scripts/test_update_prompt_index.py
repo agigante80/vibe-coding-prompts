@@ -173,6 +173,17 @@ class CollectTests(unittest.TestCase):
             with self.assertRaises(upi.PromptError):
                 upi.collect(Path(tmp))
 
+    def test_symlinked_prompt_raises(self):
+        """A symlink reads fine but its content changes via the target,
+        invisible to the version gate; the linter must reject it."""
+        with tempfile.TemporaryDirectory() as tmp:
+            target = Path(tmp) / "elsewhere.md"
+            target.write_text(VALID, encoding="utf-8")
+            link = Path(tmp) / "sample-prompt.md"
+            link.symlink_to("elsewhere.md")
+            with self.assertRaises(upi.PromptError):
+                upi.collect(Path(tmp))
+
     def test_empty_directory_raises(self):
         with tempfile.TemporaryDirectory() as tmp:
             with self.assertRaises(upi.PromptError):

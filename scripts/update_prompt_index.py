@@ -129,6 +129,11 @@ def collect(prompts_dir):
     if not files:
         raise PromptError(f"no prompt files found in {prompts_dir}")
     for path in files:
+        if path.is_symlink():
+            # A symlinked prompt reads fine here but its content then changes
+            # via the TARGET file, which the version gate never sees; reject
+            # at the linter so one can never enter with green CI.
+            raise PromptError(f"{path.name}: prompt files must be regular files, not symlinks")
         fields, body = parse_front_matter(path.read_text(encoding="utf-8-sig"), path.name)
         validate(fields, path.name)
         if not re.fullmatch(r"[a-z0-9]+(-[a-z0-9]+)*", path.stem):
