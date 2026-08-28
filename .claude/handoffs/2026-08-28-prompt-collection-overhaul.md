@@ -14,7 +14,7 @@ A multi-day session that took the repository from a hand-maintained prompt colle
 - Final state: 14 prompts, all under the 1600-word cap, 81 tests passing, CI green on main, all merged branches deleted. Backlog: 16 open issues (14 `prompt-proposal`, 2 `prompt-review`).
 
 ## In progress (where we left off)
-Nothing in flight. No open PRs, no branches other than `main`, working tree clean at commit 07d7297.
+Nothing in flight. No open PRs, no branches other than `main`, working tree clean. The last commit of implementation work was 07d7297; the checkpoint commits that follow it carry only these `.claude/memory/` and `.claude/handoffs/` files.
 
 ## Next steps
 1. Enable **branch protection on `main`** requiring the `verify` check (human-only; until then the push-side gate is advisory).
