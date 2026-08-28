@@ -1,8 +1,8 @@
 ---
 name: version-management
 category: development-workflow
-version: 1.1.0
-updated: 2026-08-27
+version: 1.1.1
+updated: 2026-08-28
 description: Semantic versioning strategy with a VERSION file, conventional commits and automated releases.
 platforms: [chatgpt, claude, gemini, copilot-chat]
 ---
@@ -196,7 +196,7 @@ Create `VERSIONING.md` documenting version format, release process, and automate
 7. Git tags for all releases (pushed to GitHub)
 8. GitHub Releases created and marked as latest
 9. **Multi-platform builds** (linux/amd64, linux/arm64)
-10. **Multiple Docker tags** per release (`:1.5.0`, `:1.5`, `:1`, `:latest`)
+10. **Multiple Docker tags** per release (`:1.5.0`, `:1.5`, `:1`; `:latest` only when this is the newest stable release, with `main` builds publishing `:edge` instead, per the [CI/CD Generator](./github-actions-cicd-generator.md) tag policy)
 
 ---
 
