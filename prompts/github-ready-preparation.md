@@ -151,7 +151,7 @@ Enable GitHub secret scanning with push protection in repository settings. No-in
 | **Critical** | `/docs/` per [Documentation Standardization](./documentation-standardization.md) | ⬜ |
 
 **For README generation**, run **[README Generator](./readme-generator.md)**
-**For documentation standardization**, already covered in Step 4 above
+**For documentation standardization**, already covered in Step 3.1 above
 
 ### 👥 **7. Community & Contribution**
 
