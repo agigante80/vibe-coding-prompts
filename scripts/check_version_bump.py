@@ -49,17 +49,20 @@ class SkipCheck(Exception):
     """No usable base to diff against; the check is vacuous, not failed."""
 
 
-def git(*args, cwd=None):
+def git(*args, cwd=None, errors="strict"):
     # Bytes capture, explicit UTF-8 decode: text mode would both use the
     # locale encoding (cp1252 on Windows crashes on emoji) AND apply
     # universal-newline translation, which strips CR from git-show output
     # and breaks byte-exact comparison against cat-file blobs.
+    # errors="replace" is passed for BASE blob reads only: a legacy
+    # non-UTF-8 base must not wedge the gate shut for the very PR that
+    # fixes it. Head content stays strict.
     proc = subprocess.run(["git", *args], capture_output=True, cwd=cwd)
     if proc.returncode != 0:
         raise subprocess.CalledProcessError(
             proc.returncode, proc.args, proc.stdout,
             proc.stderr.decode("utf-8", errors="replace"))
-    return proc.stdout.decode("utf-8")
+    return proc.stdout.decode("utf-8", errors=errors)
 
 
 def semver_tuple(version):
@@ -102,7 +105,15 @@ def changed_prompts(base_commit, head, cwd=None):
     escapes, which would silently fail the prompts/ path match.
     """
     out = git("-c", "core.quotepath=off", "diff", "--name-status",
-              "--find-renames=25%", f"{base_commit}..{head}", cwd=cwd)
+              "--find-renames=25%", f"{base_commit}..{head}", cwd=cwd,
+              errors="replace")
+    if "\ufffd" in out:
+        # Fail closed: a filename we cannot decode is a path we cannot
+        # reliably gate. Distinct message so it is not misread as a blob
+        # content problem.
+        raise PromptError(
+            "a changed filename is not valid UTF-8; rename the file before "
+            "the gate can evaluate this range")
     pairs = []
     for line in out.splitlines():
         parts = line.split("\t")
@@ -153,7 +164,8 @@ def historical_blobs(base_commit, path, cwd=None):
         capture_output=True, cwd=cwd)
     if proc.returncode != 0:
         raise subprocess.CalledProcessError(
-            proc.returncode, proc.args, proc.stdout, proc.stderr)
+            proc.returncode, proc.args, proc.stdout,
+            proc.stderr.decode("utf-8", errors="replace"))
     blobs, out, pos = [], proc.stdout, 0
     while pos < len(out):
         newline = out.index(b"\n", pos)
@@ -196,6 +208,19 @@ def warn_if_shallow(cwd=None):
               "incomplete here (CI, with full history, is authoritative)")
 
 
+def is_exact_restore(new_text, version, blobs, hist_ver):
+    """The single exact-restore hatch shared by both branches.
+
+    Passes only at the HIGHEST earned version (an older exact state is a
+    net downgrade and must bump past the max). new_text containing U+FFFD
+    is excluded: historical blobs are replace-decoded, so a head file with
+    literal replacement characters could impersonate an invalid-UTF-8
+    historical blob and inherit its version.
+    """
+    return (new_text in blobs and version == hist_ver
+            and "\ufffd" not in new_text)
+
+
 def check(base_ref, head="HEAD", cwd=None):
     """Return a list of failure messages (empty means the check passes)."""
     warn_if_shallow(cwd=cwd)
@@ -212,10 +237,7 @@ def check(base_ref, head="HEAD", cwd=None):
                 continue
             blobs = historical_blobs(base_commit, new, cwd=cwd)
             hist_blob, hist_ver = best_historical(blobs, new)
-            if new_text in blobs and version == hist_ver:
-                # Exact restore of the HIGHEST earned state keeps its version.
-                # Restoring an OLDER exact state is a net downgrade across
-                # pushes and must bump past the max like any other change.
+            if is_exact_restore(new_text, version, blobs, hist_ver):
                 print(f"ok: {new} (restored prompt, unchanged at {version})")
                 continue
             if hist_blob is not None:
@@ -232,7 +254,8 @@ def check(base_ref, head="HEAD", cwd=None):
                     f"similarity or split the rewrite into a separate commit")
                 continue
         else:
-            old_text = git("show", f"{base_commit}:{old}", cwd=cwd)
+            old_text = git("show", f"{base_commit}:{old}", cwd=cwd,
+                           errors="replace")
             old_label = old
             if old_text == new_text:
                 continue  # pure rename, no content change
@@ -262,9 +285,9 @@ def check(base_ref, head="HEAD", cwd=None):
             if new != old:
                 blobs += historical_blobs(base_commit, new, cwd=cwd)
             hist_blob, hist_ver = best_historical(blobs, new)
-            if new_text in blobs and (hist_ver is None or new_version == hist_ver):
-                # Byte-exact restore of the pre-clobber state at its own
-                # (highest) version: no bump needed to undo a symlink swap.
+            if is_exact_restore(new_text, new_version, blobs, hist_ver):
+                # Undoing a symlink swap or corruption byte-exactly at the
+                # highest earned version needs no bump.
                 print(f"ok: {new} (restored prompt, unchanged at {new_version})")
                 continue
             if hist_blob is not None:
@@ -304,6 +327,9 @@ def main(argv):
         return 2
     try:
         failures = check(*positional)
+    except PromptError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 2
     except SkipCheck as reason:
         if require_base:
             print(f"error: base is required but unusable: {reason}",

@@ -63,7 +63,9 @@ class CheckVersionBumpTests(unittest.TestCase):
         run_git(repo, "config", "user.email", "t@example.com")
         run_git(repo, "config", "user.name", "t")
         (repo / "prompts").mkdir()
-        (repo / "prompts" / "sample-prompt.md").write_text(initial_text, encoding="utf-8")
+        # write_bytes: write_text would translate newlines on Windows and
+        # corrupt CRLF fixtures before they ever reach git
+        (repo / "prompts" / "sample-prompt.md").write_bytes(initial_text.encode("utf-8"))
         run_git(repo, "add", "-A")
         run_git(repo, "commit", "-qm", "base")
         run_git(repo, "checkout", "-qb", "feature")
@@ -442,6 +444,55 @@ class CheckVersionBumpTests(unittest.TestCase):
         p.write_bytes(crlf.encode("utf-8"))
         self.commit_all(repo, "restore crlf state")
         self.assertEqual(cvb.check("main", cwd=repo), [])
+
+    def test_legacy_encoding_base_does_not_wedge_the_gate(self):
+        """A non-UTF-8 byte in the BASE blob must not abort the gate; the
+        PR fixing the encoding (with a bump) must pass."""
+        legacy = PROMPT_V1.replace("Original body text.", "Body with a stray byte: X.")
+        repo = self.make_repo(initial_text=legacy)
+        raw = (repo / "prompts" / "sample-prompt.md").read_bytes().replace(b"X", b"\xe9")
+        run_git(repo, "checkout", "-q", "main")
+        (repo / "prompts" / "sample-prompt.md").write_bytes(raw)
+        run_git(repo, "add", "-A")
+        run_git(repo, "commit", "-qm", "legacy byte on main")
+        run_git(repo, "checkout", "-qB", "feature", "main")
+        fixed = (legacy.replace("stray byte: X", "stray byte: e")
+                 .replace("version: 1.0.0", "version: 1.0.1"))
+        (repo / "prompts" / "sample-prompt.md").write_bytes(fixed.encode("utf-8"))
+        self.commit_all(repo, "fix encoding with a bump")
+        self.assertEqual(cvb.check("main", cwd=repo), [])
+
+    def test_replacement_char_cannot_impersonate_legacy_blob(self):
+        """Head content with literal U+FFFD must not inherit an invalid
+        blob's earned version through the exact-restore hatch."""
+        legacy = (PROMPT_V1.replace("version: 1.0.0", "version: 2.0.0")
+                  .replace("Original body text.", "Legacy byte: X."))
+        repo = self.make_repo(initial_text=legacy)
+        raw = (repo / "prompts" / "sample-prompt.md").read_bytes().replace(b"X", b"\xe9")
+        run_git(repo, "checkout", "-q", "main")
+        (repo / "prompts" / "sample-prompt.md").write_bytes(raw)
+        run_git(repo, "add", "-A")
+        run_git(repo, "commit", "-qm", "invalid blob at 2.0.0")
+        run_git(repo, "rm", "-q", "prompts/sample-prompt.md")
+        run_git(repo, "commit", "-qm", "delete")
+        run_git(repo, "checkout", "-qB", "feature", "main")
+        p = repo / "prompts" / "sample-prompt.md"
+        p.parent.mkdir(exist_ok=True)
+        impersonator = legacy.replace("Legacy byte: X.", "Legacy byte: \ufffd.")
+        p.write_bytes(impersonator.encode("utf-8"))
+        self.commit_all(repo, "re-add with literal replacement char")
+        failures = cvb.check("main", cwd=repo)
+        self.assertEqual(len(failures), 1)
+
+    def test_undecodable_filename_fails_closed(self):
+        repo = self.make_repo()
+        bad = (repo / "prompts").as_posix().encode() + b"/caf\xe9.md"
+        with open(bad, "wb") as f:
+            f.write(PROMPT_V1.encode("utf-8"))
+        run_git(repo, "add", "-A")
+        run_git(repo, "commit", "-qm", "undecodable filename")
+        with self.assertRaises(cvb.PromptError):
+            cvb.check("main", cwd=repo)
 
     def test_shallow_clone_warns(self):
         import contextlib, io
