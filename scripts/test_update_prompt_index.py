@@ -186,6 +186,21 @@ class CollectTests(unittest.TestCase):
             with self.assertRaises(upi.PromptError):
                 upi.collect(Path(tmp))
 
+    def test_uppercase_extension_rejected(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            write_prompt(tmp, "sample-prompt.md", VALID)
+            write_prompt(tmp, "LEGACY-NOTES.MD", "# stray\n")
+            with self.assertRaises(upi.PromptError) as ctx:
+                upi.collect(Path(tmp))
+            self.assertIn("lowercase .md", str(ctx.exception))
+
+    def test_markdown_extension_rejected(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            write_prompt(tmp, "sample-prompt.md", VALID)
+            write_prompt(tmp, "notes.markdown", "# stray\n")
+            with self.assertRaises(upi.PromptError):
+                upi.collect(Path(tmp))
+
     def test_empty_directory_raises(self):
         with tempfile.TemporaryDirectory() as tmp:
             with self.assertRaises(upi.PromptError):
