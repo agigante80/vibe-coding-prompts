@@ -4,14 +4,16 @@ category: project-management
 version: 1.0.0
 updated: 2026-08-28
 description: Select, validate, implement, review and close a coherent batch of backlog tickets autonomously, with bounded quality loops.
-platforms: [chatgpt, claude, gemini]
+platforms: [chatgpt, claude, gemini, copilot-chat]
 ---
 
 # Autonomous Backlog Workflow
 
 ## **Objective**
 
-Work a ticket backlog autonomously: pick a coherent, high-value batch, validate every ticket against current reality, implement what can be finished without human decisions, test and review it under BOUNDED loops, and leave both the codebase and the backlog better than found. Complements [Project Reassessment](./project-reassessment.md): that prompt aligns docs to code; this one works the queue.
+Work a ticket backlog autonomously: pick a coherent, high-value batch, validate every ticket against current reality, implement what can be finished without human decisions, test and review it under BOUNDED loops, and leave both the codebase and the backlog better than found.
+
+**Division of authority with [Project Reassessment](./project-reassessment.md)**: that prompt surveys the repository and PRODUCES the prioritized action plan (and the `/docs/` work records); this one CONSUMES a queue and executes it. Run reassessment to decide what should be done; run this to do it, feeding results back into the same `/docs/` records.
 
 **What this costs**: this is a long-session prompt. It assumes a ticket system, an automated test gate, and a code-review capability. It is not a quick-task prompt.
 
@@ -21,6 +23,7 @@ Work a ticket backlog autonomously: pick a coherent, high-value batch, validate 
 
 ### 1. **Repository and Backlog Analysis**
 
+* Locate the backlog: the stated ticket system, else `gh issue list`, a tracker config, or a TODO/ROADMAP file in the repo; if none exists, say so and stop rather than inventing work
 * Inspect git status, current branch, recent commits, and any uncommitted work; never clobber pre-existing changes, and establish the baseline the final diff will be attributed to
 * Read the ENTIRE open backlog: titles, bodies, comments, links
 * Detect the project's conventions: test commands, commit style, review tooling, CI gates
@@ -60,8 +63,8 @@ Follow the project's testing conventions, and hold every new or changed test to 
 Run the project's code-review capability against the change, then:
 
 * **Round 1**: fix findings at high or medium severity. Everything below becomes a ticket immediately, not a negotiation
-* **Round 2**: review ONLY the fix commits; the target must not grow each round
-* **Round 3+**: only if round 2 found a high. **Hard cap: 4 rounds total**
+* **Round 2**: review ONLY the fix commits; fix highs and mediums as in round 1; the target must not grow each round
+* **Round 3+**: only if round 2 found a high; fix highs, ticket the rest. **Hard cap: 4 rounds total**
 * **Trip wire**: two consecutive rounds each finding a defect in the previous round's FIX means stop immediately; past that point iteration removes value
 * **A ticket is a finished outcome for a finding.** Filing is not failing to fix; without this exit the loop has no honorable end
 * Report the stopping reason and how many rounds found defects in prior fixes, so continuing is the operator's call, not a default
@@ -75,6 +78,7 @@ Run the project's code-review capability against the change, then:
 3. Updated tickets: each closed with what actually shipped, or re-scoped/split/labeled with evidence
 4. New tickets for every discovery and every unfixed review finding, linked to their origins
 5. A final report: per-ticket outcome, tests run, review rounds with the loop's stopping reason, and anything genuinely needing a human
+6. Documentation updates in the target project: `/docs/REFACTORING_PLAN.md` (completed tasks marked, new ones added), `/docs/IMPROVEMENT_AREAS.md` (debt cleared or newly found), and `/docs/ROADMAP.md` when a batch moves a milestone
 
 ---
 
@@ -83,8 +87,9 @@ Run the project's code-review capability against the change, then:
 - [ ] Every selected ticket validated against current reality before work
 - [ ] Every family sweep reported alongside its instance fix
 - [ ] New and changed tests seen red at least once
-- [ ] Review loop terminated by clean rounds, the cap, or the trip wire, with the reason reported
+- [ ] Review loop terminated by a round with no highs or mediums, the 4-round cap, or the trip wire, with the reason reported
 - [ ] Backlog reflects reality: no closed-but-undone or done-but-open tickets
+- [ ] `/docs/` work records updated so the tracker and the docs agree
 - [ ] All work committed and pushed; final diff attributable to the batch
 
 ---
