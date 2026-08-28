@@ -50,12 +50,16 @@ class SkipCheck(Exception):
 
 
 def git(*args, cwd=None):
-    # encoding pinned: prompts contain UTF-8 emoji, and text=True alone would
-    # use the locale encoding (cp1252 on Windows) and crash on git show output.
-    return subprocess.run(
-        ["git", *args], check=True, capture_output=True,
-        encoding="utf-8", cwd=cwd,
-    ).stdout
+    # Bytes capture, explicit UTF-8 decode: text mode would both use the
+    # locale encoding (cp1252 on Windows crashes on emoji) AND apply
+    # universal-newline translation, which strips CR from git-show output
+    # and breaks byte-exact comparison against cat-file blobs.
+    proc = subprocess.run(["git", *args], capture_output=True, cwd=cwd)
+    if proc.returncode != 0:
+        raise subprocess.CalledProcessError(
+            proc.returncode, proc.args, proc.stdout,
+            proc.stderr.decode("utf-8", errors="replace"))
+    return proc.stdout.decode("utf-8")
 
 
 def semver_tuple(version):
@@ -158,7 +162,9 @@ def historical_blobs(base_commit, path, cwd=None):
         if header.endswith(b" missing"):
             continue
         size = int(header.rsplit(b" ", 1)[1])
-        blobs.append(out[pos:pos + size].decode("utf-8"))
+        # errors="replace": historical blobs are only compared and parsed;
+        # a legacy non-UTF-8 blob garbles harmlessly instead of crashing.
+        blobs.append(out[pos:pos + size].decode("utf-8", errors="replace"))
         pos = pos + size + 1  # skip the trailing separator newline
     return blobs
 
@@ -181,10 +187,11 @@ def best_historical(blobs, path):
 
 
 def warn_if_shallow(cwd=None):
-    """A shallow clone truncates history walks silently; say so once."""
-    git_dir = git("rev-parse", "--git-dir", cwd=cwd).strip()
-    shallow = Path(cwd or ".") / git_dir / "shallow"
-    if shallow.exists():
+    """A shallow clone truncates history walks silently; say so once.
+
+    --is-shallow-repository answers correctly in every layout, including
+    linked worktrees whose git-dir does not hold the shallow file."""
+    if git("rev-parse", "--is-shallow-repository", cwd=cwd).strip() == "true":
         print("warning: shallow clone; historical version checks may be "
               "incomplete here (CI, with full history, is authoritative)")
 
@@ -204,11 +211,13 @@ def check(base_ref, head="HEAD", cwd=None):
                 failures.append(f"{new}: head front matter unreadable ({exc})")
                 continue
             blobs = historical_blobs(base_commit, new, cwd=cwd)
-            if new_text in blobs:
-                # Exact restore of ANY prior state keeps that state's version.
+            hist_blob, hist_ver = best_historical(blobs, new)
+            if new_text in blobs and version == hist_ver:
+                # Exact restore of the HIGHEST earned state keeps its version.
+                # Restoring an OLDER exact state is a net downgrade across
+                # pushes and must bump past the max like any other change.
                 print(f"ok: {new} (restored prompt, unchanged at {version})")
                 continue
-            hist_blob, hist_ver = best_historical(blobs, new)
             if hist_blob is not None:
                 # Changed content on a restored path is judged like a
                 # modification against the highest version it ever earned.
@@ -246,9 +255,18 @@ def check(base_ref, head="HEAD", cwd=None):
             # Base copy has no readable front matter (pre-migration legacy,
             # or a symlink blob). Do NOT blanket-accept: apply the same
             # rules as a new path, so a swapped-in file cannot carry an
-            # arbitrary version through this door.
-            blobs = historical_blobs(base_commit, new, cwd=cwd)
+            # arbitrary version through this door. Search the OLD path's
+            # history too, or a rename would shed the version floor earned
+            # under the previous name.
+            blobs = historical_blobs(base_commit, old, cwd=cwd)
+            if new != old:
+                blobs += historical_blobs(base_commit, new, cwd=cwd)
             hist_blob, hist_ver = best_historical(blobs, new)
+            if new_text in blobs and (hist_ver is None or new_version == hist_ver):
+                # Byte-exact restore of the pre-clobber state at its own
+                # (highest) version: no bump needed to undo a symlink swap.
+                print(f"ok: {new} (restored prompt, unchanged at {new_version})")
+                continue
             if hist_blob is not None:
                 old_text, old_label = hist_blob, f"{new} (historical {hist_ver})"
                 old_version, old_updated = front_matter_of(old_text, old_label)
@@ -298,6 +316,9 @@ def main(argv):
         return 0
     except subprocess.CalledProcessError as exc:
         print(f"error: git failed: {exc.stderr.strip()}", file=sys.stderr)
+        return 2
+    except UnicodeDecodeError as exc:
+        print(f"error: a prompt blob is not valid UTF-8 ({exc})", file=sys.stderr)
         return 2
     if failures:
         for f in failures:

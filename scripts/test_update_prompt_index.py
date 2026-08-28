@@ -160,12 +160,14 @@ class CollectTests(unittest.TestCase):
         # body: "# Sample Prompt" (3 words) + "One two three four five." (5 words)
         self.assertEqual(entries[1]["words"], 8)
 
-    def test_non_kebab_filename_raises(self):
+    def test_non_kebab_filename_raises_even_beside_valid_prompts(self):
         with tempfile.TemporaryDirectory() as tmp:
+            write_prompt(tmp, "sample-prompt.md", VALID)
             bad = VALID.replace("name: sample-prompt", "name: my prompt (v2)")
             write_prompt(tmp, "my prompt (v2).md", bad)
-            with self.assertRaises(upi.PromptError):
+            with self.assertRaises(upi.PromptError) as ctx:
                 upi.collect(Path(tmp))
+            self.assertIn("kebab-case", str(ctx.exception))
 
     def test_name_filename_mismatch_raises(self):
         with tempfile.TemporaryDirectory() as tmp:
