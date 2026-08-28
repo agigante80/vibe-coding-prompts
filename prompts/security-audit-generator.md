@@ -1,7 +1,7 @@
 ---
 name: security-audit-generator
 category: security
-version: 1.1.0
+version: 1.1.1
 updated: 2026-08-27
 description: Comprehensive security audit with OWASP-based checks and prioritized remediation.
 platforms: [chatgpt, claude, gemini, copilot-chat]
@@ -44,14 +44,7 @@ Apply appropriate security standards based on project type:
 
 ### 🔐 **Authentication & Authorization**
 
-**Check for**:
-- Weak password policies (length, complexity, rotation)
-- Missing multi-factor authentication (MFA)
-- Insecure session management and token handling
-- Improper access controls and privilege escalation risks
-- Hard-coded credentials in code or configuration
-- OAuth/SAML misconfigurations
-- JWT vulnerabilities (weak signing, no expiration)
+**Check for**: weak password policies, missing MFA, insecure session and token handling, improper access controls and privilege escalation risks, hard-coded credentials, OAuth/SAML misconfigurations, JWT weaknesses (weak signing, no expiration)
 
 **Scan**:
 ```bash
@@ -75,11 +68,7 @@ grep -rn "password\|secret\|api_key\|token" \
 - Server-Side Request Forgery (SSRF)
 - Deserialization vulnerabilities
 
-**Validate**:
-- All user inputs are sanitized and validated
-- Parameterized queries/prepared statements used
-- ORM properly configured
-- File upload restrictions (type, size, location)
+**Validate**: all inputs sanitized and validated, parameterized queries used, ORM properly configured, file uploads restricted (type, size, location)
 
 ### 🌐 **Web Security Headers**
 
@@ -217,10 +206,11 @@ snyk test --severity-threshold=high
 # SAST (Static Application Security Testing)
 semgrep --config=auto
 
-# Secret scanning: history, then working tree (run both even when the
-# first finds leaks; -v gives per-finding file/line detail)
-gitleaks git . -v
-gitleaks dir . -v
+# Secret scanning: history, then working tree (-v gives per-finding
+# detail). Scanners exit non-zero on findings, so under set -e capture
+# each status and fail at the end, or earlier findings mask later scans:
+gitleaks git . -v || status=1
+gitleaks dir . -v || status=1
 
 # Infrastructure as Code
 checkov -d .

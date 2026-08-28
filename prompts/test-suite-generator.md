@@ -1,7 +1,7 @@
 ---
 name: test-suite-generator
 category: development-workflow
-version: 1.0.0
+version: 1.1.0
 updated: 2026-08-27
 description: Generate a comprehensive test suite with unit, integration and e2e coverage, plus skipped-test cleanup.
 platforms: [chatgpt, claude, gemini, copilot-chat]
@@ -36,11 +36,11 @@ Choose appropriate frameworks based on project type:
 
 | Language | Unit Testing | Integration | E2E | Coverage |
 |----------|-------------|-------------|-----|----------|
-| **Python** | pytest, unittest | pytest | pytest, selenium | pytest-cov |
+| **Python** | pytest, unittest | pytest | Playwright | pytest-cov |
 | **JavaScript/TypeScript** | Jest, Vitest | Jest, Supertest | Playwright, Cypress | Jest, c8 |
 | **Java** | JUnit 5, TestNG | Spring Test | Selenium | JaCoCo |
 | **Go** | testing package | testing + testify | testing | go test -cover |
-| **Rust** | cargo test | cargo test | - | cargo-tarpaulin |
+| **Rust** | cargo test | tests/ dir | tests/ dir | cargo-tarpaulin |
 
 ---
 
@@ -50,13 +50,7 @@ Choose appropriate frameworks based on project type:
 
 **Catalog**: List test name, skip reason, date, issue references
 
-**Categorize**:
-- **Fixable**: Update assertions/mocks, fix test data
-- **Environment-Dependent**: Add conditional skipping, document setup
-- **Flaky**: Add retry, fix timing/race conditions
-- **Obsolete**: Document and remove
-- **Blocked**: Link issues, document skip reason clearly
-- **Unclear**: Investigate git history, fix or document
+**Categorize**: fixable (update assertions/mocks/data), environment-dependent (conditional skip, document setup), flaky (fix timing/races), obsolete (document and remove), blocked (link issues, document clearly), unclear (investigate git history, then fix or document)
 
 **Skip Documentation**: Always include specific reason, issue reference, re-enabling conditions
 ```python
@@ -69,11 +63,13 @@ Choose appropriate frameworks based on project type:
 
 ### **Test Types to Generate**
 
-#### 🧪 **Unit Tests** (Priority: HIGH)
+Shape the suite as a test pyramid: write LOTS of small fast unit tests, SOME coarser integration tests, and VERY FEW end-to-end tests; push every test as low in the pyramid as it can live.
+
+#### 🧪 **Unit Tests** (Priority: HIGH, the bulk of the suite)
 * Test individual functions, methods, and classes in isolation
 * Cover happy paths, edge cases, and error conditions
 * Mock external dependencies and I/O operations
-* Target: 80%+ code coverage
+* Coverage floor: 80% (a regression floor and a tool for FINDING untested code, never a goal; chasing a number produces assertion-free tests. Add mutation testing for critical logic to test the tests)
 
 #### 🔗 **Integration Tests** (Priority: MEDIUM)
 * Test component interactions and data flow
@@ -82,7 +78,7 @@ Choose appropriate frameworks based on project type:
 * Validate external service integrations
 * Target: Critical workflows covered
 
-#### 🌐 **End-to-End Tests** (Priority: MEDIUM)
+#### 🌐 **End-to-End Tests** (Priority: LOW, very few)
 * Test complete user workflows
 * Validate UI interactions (if applicable)
 * Test API flows from request to response
@@ -221,37 +217,39 @@ tests/
 
 ### **Pre-commit Hooks**
 
-Generate hooks to run tests automatically:
+Use the pre-commit framework (or husky for JS): raw `.git/hooks/` scripts are per-clone and invisible to the team, while a committed config is shared:
 
-```bash
-#!/bin/bash
-# .git/hooks/pre-commit
-
-echo "Running tests before commit..."
-pytest tests/unit --cov --cov-fail-under=80
-
-if [ $? -ne 0 ]; then
-    echo "Tests failed. Commit aborted."
-    exit 1
-fi
+```yaml
+# .pre-commit-config.yaml  (each developer runs: pre-commit install)
+repos:
+  - repo: local
+    hooks:
+      - id: unit-tests
+        name: unit tests
+        entry: pytest tests/unit --cov --cov-fail-under=80
+        language: system
+        pass_filenames: false
 ```
 
 ### **CI/CD Integration**
 
-Add test stages to existing workflows:
+A complete minimal workflow (pin third-party actions to a full commit SHA in real projects; add a coverage-upload step only if you use such a service):
 
 ```yaml
 # .github/workflows/test.yml
-test:
-  runs-on: ubuntu-latest
-  steps:
-    - uses: actions/checkout@v3
-    - name: Run Unit Tests
-      run: pytest tests/unit --cov --cov-report=xml
-    - name: Run Integration Tests
-      run: pytest tests/integration
-    - name: Upload Coverage
-      uses: codecov/codecov-action@v3
+name: Tests
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Run unit tests
+        run: pytest tests/unit --cov --cov-report=xml --cov-fail-under=80
+      - name: Run integration tests
+        run: pytest tests/integration
 ```
 
 ---
@@ -269,10 +267,7 @@ test:
 
 ### **Test Documentation**
 
-* Add docstrings explaining test purpose
-* Document complex test setups
-* Include examples of expected behavior
-* Note any special requirements or dependencies
+* Docstrings for purpose, documented complex setups, noted special requirements
 
 ---
 
@@ -325,7 +320,7 @@ Update the following files in `/docs/`:
 
 - [ ] **Skipped tests addressed**: Fixed, documented, or removed with justification
 - [ ] All active tests pass successfully (no skips without documented reason)
-- [ ] Code coverage meets minimum thresholds (80%+)
+- [ ] Coverage does not decrease (floor 80%); coverage used as a diagnostic, not a target
 - [ ] Tests run in CI/CD pipeline automatically
 - [ ] No flaky or intermittent test failures
 - [ ] Test execution time is reasonable (< 5 minutes for full suite)
@@ -339,44 +334,18 @@ Update the following files in `/docs/`:
 ## **Best Practices**
 
 ### **General Testing**
-* Write tests that describe behavior, not implementation
-* Keep tests simple and focused on one thing
-* Use meaningful assertion messages
-* Avoid test interdependencies
-* Mock external dependencies consistently
-* Run tests frequently during development
-* Update tests when code changes
-* Treat test code with same quality standards as production code
+* Test behavior, not implementation; one focused thing per test; meaningful assertion messages
+* No test interdependencies; mock external dependencies consistently
+* Run tests frequently, update them with code changes, and hold test code to production standards
 
 ### **Preventing Test Skipping**
 
-**Root Causes of Skipped Tests:**
-* **Flakiness** - Use proper waits, avoid sleep(), fix race conditions
-* **Environment Issues** - Use docker, test containers, or proper setup/teardown
-* **Slow Tests** - Optimize or move to separate suite (nightly/weekly runs)
-* **External Dependencies** - Mock APIs, use test doubles, avoid real network calls
-* **Missing Data** - Create reliable fixtures, use factories, seed test databases
-* **Unclear Failures** - Add detailed error messages, logs, and debugging info
+**Root Causes of Skipped Tests:** flakiness (fix waits and race conditions, avoid sleep()), environment issues (docker, test containers, proper setup/teardown), slow tests (optimize or move to a nightly suite), external dependencies (mock them), missing data (reliable fixtures and factories), unclear failures (detailed messages and logs)
 
-**Prevention Strategies:**
-* Make tests deterministic (no random data, fixed time/dates)
-* Isolate tests completely (no shared state)
-* Use proper test fixtures and cleanup
-* Document test requirements clearly
-* Add retry logic only for truly unavoidable flakiness
-* Fix failing tests immediately, don't skip them
-* Require documented reason + issue tracking for any skip
-* Regular test maintenance and cleanup sprints
+**Prevention:** deterministic tests (no random data, fixed time), complete isolation (no shared state), proper fixtures and cleanup, retries only for truly unavoidable flakiness, fix failures immediately instead of skipping, and require a documented reason plus issue link for any skip
 
 ---
 
 ## **Usage Instructions**
 
-Run this prompt when:
-
-* Starting a new project needing test infrastructure
-* Adding tests to legacy code without coverage
-* Improving existing test suites
-* Implementing test-driven development (TDD)
-* Preparing for production deployment
-* Meeting quality assurance requirements
+Run this prompt when: starting a project needing test infrastructure, adding tests to legacy code, improving existing suites, implementing TDD, or preparing for production deployment.

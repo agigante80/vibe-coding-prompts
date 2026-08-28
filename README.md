@@ -20,9 +20,9 @@ This table is generated from each prompt's front matter by `scripts/update_promp
 <!-- prompts-index:start -->
 | Prompt | Category | Version | Updated | Words | Description |
 |--------|----------|---------|---------|-------|-------------|
-| [code-refactoring-plan](./prompts/code-refactoring-plan.md) | development-workflow | 1.0.0 | 2026-08-27 | 1597 | Analyze code smells and technical debt, producing a prioritized refactoring roadmap. |
-| [file-organization-refactoring](./prompts/file-organization-refactoring.md) | development-workflow | 1.1.0 | 2026-08-27 | 1597 | Reorganize project files and folders safely with tested, incremental migrations. |
-| [test-suite-generator](./prompts/test-suite-generator.md) | development-workflow | 1.0.0 | 2026-08-27 | 1587 | Generate a comprehensive test suite with unit, integration and e2e coverage, plus skipped-test cleanup. |
+| [code-refactoring-plan](./prompts/code-refactoring-plan.md) | development-workflow | 1.1.0 | 2026-08-27 | 1595 | Analyze code smells and technical debt, producing a prioritized refactoring roadmap. |
+| [file-organization-refactoring](./prompts/file-organization-refactoring.md) | development-workflow | 1.1.1 | 2026-08-27 | 1591 | Reorganize project files and folders safely with tested, incremental migrations. |
+| [test-suite-generator](./prompts/test-suite-generator.md) | development-workflow | 1.1.0 | 2026-08-27 | 1592 | Generate a comprehensive test suite with unit, integration and e2e coverage, plus skipped-test cleanup. |
 | [version-management](./prompts/version-management.md) | development-workflow | 1.1.0 | 2026-08-27 | 1008 | Semantic versioning strategy with a VERSION file, conventional commits and automated releases. |
 | [github-actions-cicd-generator](./prompts/github-actions-cicd-generator.md) | devops-automation | 2.0.0 | 2026-08-27 | 219 | Versioning, branching and Docker tagging policy for GitHub Actions pipelines. |
 | [documentation-standardization](./prompts/documentation-standardization.md) | documentation | 1.0.0 | 2026-08-27 | 1724 | Standardize project documentation into the 9-file /docs/ structure with auditing and cleanup. |
@@ -31,7 +31,7 @@ This table is generated from each prompt's front matter by `scripts/update_promp
 | [github-ready-preparation](./prompts/github-ready-preparation.md) | project-management | 1.1.0 | 2026-08-27 | 1592 | Prepare a repository for professional public release on GitHub. |
 | [project-reassessment](./prompts/project-reassessment.md) | project-management | 1.1.0 | 2026-08-27 | 1534 | Full repository health check aligning code, documentation and policies. |
 | [dependency-update-manager](./prompts/dependency-update-manager.md) | security | 1.1.0 | 2026-08-27 | 1582 | Automate dependency updates with risk classification, testing and rollback. |
-| [security-audit-generator](./prompts/security-audit-generator.md) | security | 1.1.0 | 2026-08-27 | 1600 | Comprehensive security audit with OWASP-based checks and prioritized remediation. |
+| [security-audit-generator](./prompts/security-audit-generator.md) | security | 1.1.1 | 2026-08-27 | 1595 | Comprehensive security audit with OWASP-based checks and prioritized remediation. |
 <!-- prompts-index:end -->
 
 ## When to run what
