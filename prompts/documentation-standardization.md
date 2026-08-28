@@ -67,9 +67,9 @@ After initialization, `/docs/` contains **9 required markdown files**, optional 
 
 **Summary: `/docs/` holds the 9 required files, optional `VERSIONING.md`, plus DECLARED EXTENSIONS: any additional file is allowed if it is listed with one line of purpose in `docs/README.md`'s index.** An undeclared extra is the finding; the fix is declaring it or merging it, chosen at the approval gate.
 
-**Archive Location**: obsolete files go to `docs/archive/docs-backup-YYYY-MM-DD/`.
+**Archive**: `docs/archive/docs-backup-YYYY-MM-DD/`.
 
-**Scope note**: this standard covers MAINTAINER documentation (plans, architecture, policies). User-facing tutorials and how-to guides (Diataxis' learning and task quadrants) are out of scope; keep them wherever the project publishes docs and declare a pointer in `docs/README.md`.
+**Scope note**: this standard covers MAINTAINER documentation (plans, architecture, policies). User-facing content (Diataxis' tutorials, how-to guides and reference) is out of scope: keep it wherever the project publishes docs, and either declare it as an extension or point to it from `docs/README.md`.
 
 ---
 
@@ -79,13 +79,12 @@ After initialization, `/docs/` contains **9 required markdown files**, optional 
 
 **Root Directory**:
 - List all `.md` files, identify files NOT in allowed list
-- For each non-allowed file, PROPOSE at the approval gate: merge useful content into a standard file, archive to `docs/archive/docs-backup-YYYY-MM-DD/`, or delete only trivially empty files
+- For each non-allowed file, PROPOSE at the approval gate: merge useful content into a standard file, archive to `docs/archive/docs-backup-YYYY-MM-DD/`, or delete only per the Deletion Guidelines below
 
 **`/docs/` Directory**:
-- List all files; identify files neither in the 9-file set, nor VERSIONING.md, nor declared in the `docs/README.md` index
-- **VERSIONING.md**: if it exists, keep and review it; do not create it
-- For each undeclared file: propose (at the approval gate) declaring it as an extension, merging its content, or archiving it
-- Final `/docs/`: 9 required files, optional VERSIONING.md, declared extensions, optional `archive/`
+- Identify files that are neither required, VERSIONING.md, nor declared in the `docs/README.md` index
+- **VERSIONING.md**: keep and review if present; never create it
+- For each undeclared file, propose at the gate: declare as an extension, merge, or archive
 
 **Subdirectories (Outside Root and `/docs/`)**:
 - Scan for UPPERCASE `.md` files (e.g., `src/ARCHITECTURE.md`, `lib/CONTRIBUTING.md`, `scripts/DEPLOYMENT.md`)
@@ -186,7 +185,7 @@ find docs/ -path docs/archive -prune -o -type f \
 find . -mindepth 2 -type f -name "*.md" ! -name "README.md" \
   ! -path "./docs/*" ! -path "./.git/*" ! -path "./.github/*" \
   ! -path "*/node_modules/*" ! -path "*/vendor/*" \
-  | grep -E '/[A-Z0-9_-]+\.md$' || true
+  | grep -E '/[A-Z0-9_-]*[A-Z][A-Z0-9_-]*\.md$' || true
 ```
 
 ### **Execution**
@@ -199,12 +198,14 @@ Compliance needs: [GDPR/HIPAA/PCI-DSS/none]
 
 ### **Post-Execution Validation**
 ```bash
-# Every required file exists (assertable pass condition)
+# Every required file exists (fails with a non-zero exit code)
+missing=0
 for f in README PROJECT_OVERVIEW ARCHITECTURE AI_INTERACTION_GUIDE \
          REFACTORING_PLAN TESTING_AND_RELIABILITY IMPROVEMENT_AREAS \
          SECURITY_AND_PRIVACY ROADMAP; do
-  [ -f "docs/$f.md" ] || echo "MISSING docs/$f.md"
+  [ -f "docs/$f.md" ] || { echo "MISSING docs/$f.md"; missing=1; }
 done
+[ "$missing" -eq 0 ] || echo "FAIL: required docs missing"
 
 # Root and /docs/ inventories match the approved plan
 find . -maxdepth 1 -name "*.md"
