@@ -22,12 +22,14 @@ This table is generated from each prompt's front matter by `scripts/update_promp
 |--------|----------|---------|---------|-------|-------------|
 | [code-refactoring-plan](./prompts/code-refactoring-plan.md) | development-workflow | 1.1.0 | 2026-08-28 | 1594 | Analyze code smells and technical debt, producing a prioritized refactoring roadmap. |
 | [file-organization-refactoring](./prompts/file-organization-refactoring.md) | development-workflow | 1.1.2 | 2026-08-28 | 1591 | Reorganize project files and folders safely with tested, incremental migrations. |
-| [test-suite-generator](./prompts/test-suite-generator.md) | development-workflow | 1.1.0 | 2026-08-28 | 1592 | Generate a comprehensive test suite with unit, integration and e2e coverage, plus skipped-test cleanup. |
+| [prove-your-tests-can-fail](./prompts/prove-your-tests-can-fail.md) | development-workflow | 1.0.0 | 2026-08-28 | 808 | Verify that tests can actually fail, catching assertions that pass no matter what the code does. |
+| [test-suite-generator](./prompts/test-suite-generator.md) | development-workflow | 1.1.1 | 2026-08-28 | 1600 | Generate a comprehensive test suite with unit, integration and e2e coverage, plus skipped-test cleanup. |
 | [version-management](./prompts/version-management.md) | development-workflow | 1.1.1 | 2026-08-28 | 1028 | Semantic versioning strategy with a VERSION file, conventional commits and automated releases. |
 | [github-actions-cicd-generator](./prompts/github-actions-cicd-generator.md) | devops-automation | 3.0.0 | 2026-08-28 | 945 | Generate a complete, security-hardened GitHub Actions pipeline for any stack, with Docker publishing and release automation. |
 | [documentation-standardization](./prompts/documentation-standardization.md) | documentation | 2.0.0 | 2026-08-28 | 1594 | Standardize project documentation into the required /docs/ set plus declared extensions, with approval-gated cleanup. |
 | [readme-generator](./prompts/readme-generator.md) | documentation | 1.1.0 | 2026-08-27 | 1587 | Generate or update a professional README, preserving images and validating Docker Hub descriptions. |
 | [logging-implementation-best-practices](./prompts/logging-implementation-best-practices.md) | operations | 1.1.0 | 2026-08-27 | 1595 | Production logging with structured JSON, PII redaction, rotation, retention and observability. |
+| [autonomous-backlog-workflow](./prompts/autonomous-backlog-workflow.md) | project-management | 1.0.0 | 2026-08-28 | 873 | Select, validate, implement, review and close a coherent batch of backlog tickets autonomously, with bounded quality loops. |
 | [github-ready-preparation](./prompts/github-ready-preparation.md) | project-management | 1.1.2 | 2026-08-28 | 1597 | Prepare a repository for professional public release on GitHub. |
 | [project-reassessment](./prompts/project-reassessment.md) | project-management | 1.1.2 | 2026-08-28 | 1546 | Full repository health check aligning code, documentation and policies. |
 | [dependency-update-manager](./prompts/dependency-update-manager.md) | security | 1.1.0 | 2026-08-27 | 1582 | Automate dependency updates with risk classification, testing and rollback. |
@@ -45,6 +47,8 @@ This table is generated from each prompt's front matter by `scripts/update_promp
 | Monthly health check | project-reassessment, security-audit-generator |
 | Quarterly maintenance | project-reassessment, code-refactoring-plan, file-organization-refactoring, documentation-standardization |
 | Weekly upkeep | dependency-update-manager |
+| Working a ticket backlog autonomously | autonomous-backlog-workflow (long-session: needs a ticket system, test gate and review capability) |
+| After writing or inheriting tests | prove-your-tests-can-fail |
 
 When a scenario includes both, run file-organization-refactoring before test-suite-generator: moving files first avoids updating test imports twice.
 
