@@ -19,10 +19,9 @@ Systematically reorganize project files and folders to establish clear structure
 
 ### 1. **Current State Analysis**
 
-- Generate directory tree: `tree -L 4 -I 'node_modules|vendor|dist|build|__pycache__|.git'`
-- List all files: `find . -type f -not -path "*/node_modules/*" | sed 's|^\./||' | sort`
+- Directory tree: `tree -L 4 -I 'node_modules|vendor|dist|build|__pycache__|.git'`; file list via `find . -type f -not -path "*/node_modules/*" | sort`
 - Find issues: source files in root, `.bak`/`.old` files, tests outside test dirs
-- Detect programming language, framework, project pattern (MVC/layered/feature-based)
+- Detect language, framework, project pattern (MVC/layered/feature-based)
 
 ### 2. **Problem Identification**
 
@@ -98,10 +97,11 @@ EOF
 **2. Analyze Dependencies**:
 ```bash
 # Find all import/require statements
-# Adapt the pattern to the detected language(s); exclude noise dirs
-# rather than whitelisting extensions (bash brace expansion)
-grep -rnE "import|require|include|use " \
-  --exclude-dir={node_modules,.git,dist,build,vendor} . > imports.txt
+# Anchored import statements only (adapt per language); -I skips
+# binaries; exclude noise dirs and the output file itself (bash)
+grep -rnEI "^\s*(import |from .+ import|const .+ = require|require\()" \
+  --exclude-dir={node_modules,.git,dist,build,vendor} \
+  --exclude=imports.txt . > imports.txt
 
 # Identify what needs updating when files move
 ```
@@ -144,13 +144,8 @@ git commit -m "refactor: remove obsolete files"
 
 **1. Test Suite Validation**:
 ```bash
-# Run complete test suite
-npm test                    # or pytest, mvn test, etc.
-npm run test:integration
-npm run test:e2e
-
-# Verify coverage maintained
-npm run test:coverage
+npm test && npm run test:integration && npm run test:e2e   # or pytest etc.
+npm run test:coverage   # verify coverage maintained
 ```
 
 **2. Import Path Verification**:
@@ -237,11 +232,11 @@ Add file organization section with:
 
 ## **Best Practices**
 
-**Safety**: small move-only commits via `git mv`, commit frequently, keep a backup branch
+**Safety**: small move-only commits via `git mv`, commit frequently, keep a backup branch and snapshot non-git state (schemas, configs)
 
 **Incremental**: start with least-coupled leaf files, update imports progressively, validate with the test suite as you go
 
-**Communication**: notify the team first, use clear commit messages, document new conventions in the same commit
+**Communication**: notify the team first, clear commit messages, document new conventions, post-change team walkthrough
 
 ---
 

@@ -129,7 +129,7 @@ Enable GitHub secret scanning with push protection in repository settings. No-in
 | Priority | Item | Status |
 |----------|------|--------|
 | **Critical** | Automated tests (runnable with single command) | ⬜ |
-| **Recommended** | Coverage floor (80%, per the Test Suite prompt) & CI integration | ⬜ |
+| **Recommended** | Coverage floor per the [Test Suite Generator](./test-suite-generator.md) & CI integration | ⬜ |
 
 **For comprehensive test setup**, run **[Test Suite Generator](./test-suite-generator.md)**
 

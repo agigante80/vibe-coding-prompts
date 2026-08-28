@@ -95,7 +95,7 @@ Shape the suite as a test pyramid: write LOTS of small fast unit tests, SOME coa
 
 ### **Test Structure**
 
-Each test file must include:
+
 
 ```
 # Test file structure example (Python/pytest)
@@ -244,6 +244,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+          cache: 'pip'
       - run: pip install -r requirements.txt pytest pytest-cov
       - name: Run unit tests
         run: pytest tests/unit --cov=src --cov-fail-under=80
@@ -251,18 +252,16 @@ jobs:
         run: pytest tests/integration
 ```
 
+Using a coverage service (Codecov etc.)? Add `--cov-report=xml` and that service's upload step.
+
 ---
 
 ## **Quality Standards**
 
 ### **Each Test Must:**
 
-* Have a clear, descriptive name explaining what it tests
-* Follow Arrange-Act-Assert (AAA) pattern
-* Be independent and not rely on execution order
-* Run quickly (unit tests < 100ms each)
-* Clean up resources (files, connections, etc.)
-* Include assertions that verify expected behavior
+* Clear descriptive name; Arrange-Act-Assert pattern; independent of execution order
+* Fast (unit tests < 100ms each); cleans up resources; asserts expected behavior
 
 ### **Test Documentation**
 

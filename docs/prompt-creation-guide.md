@@ -354,7 +354,7 @@ Use checkboxes for measurable outcomes:
 ## **Success Criteria**
 
 - [ ] All generated tests pass successfully
-- [ ] Coverage floor holds (80%), used as a diagnostic rather than a target
+- [ ] Coverage floor holds (per the test-suite prompt), used as a diagnostic rather than a target
 - [ ] Tests run in CI/CD pipeline automatically
 - [ ] No flaky or intermittent test failures
 - [ ] Documentation explains test structure and maintenance
