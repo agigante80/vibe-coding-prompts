@@ -287,9 +287,11 @@ Technique names follow [Fowler's refactoring catalog](https://refactoring.com/ca
 
 ## **Best Practices**
 
-**Incremental**: small frequent refactorings, system always working  
+**Incremental**: small frequent refactorings, system always working, deploy gradually  
 **Test-Driven**: never refactor without tests; add them first if missing  
-**Boy Scout Rule**: leave code better than found; discuss major changes; measure before/after
+**Boy Scout Rule**: leave code better than found  
+**Communication**: discuss major changes and document why  
+**Measure**: track metrics before/after
 
 ---
 

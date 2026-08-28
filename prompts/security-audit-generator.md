@@ -19,12 +19,8 @@ Perform a comprehensive security audit of the current project, identifying vulne
 
 ### 1. **Project Discovery**
 
-* Detect project type, language, and framework
-* Identify web frameworks, APIs, and external integrations
-* Catalog dependencies and third-party libraries
-* Map authentication and authorization mechanisms
-* Identify data storage and sensitive information handling
-* Review deployment architecture and infrastructure
+* Detect language, framework, APIs and external integrations; catalog dependencies
+* Map authentication/authorization, data storage, sensitive data handling, and deployment architecture
 
 ### 2. **Security Standards**
 
@@ -54,8 +50,8 @@ gitleaks dir . -v
 
 # Keyword fallback: search ALL files (an extension whitelist misses
 # Dockerfiles, Makefiles and CI YAML); bash brace expansion
-grep -rn "password\|secret\|api_key\|token" \
-  --exclude-dir={node_modules,.git,vendor,dist} .
+grep -rnI "password\|secret\|api_key\|token" \
+  --exclude-dir={node_modules,.git,dist,build,vendor} .
 ```
 
 ### 🛡️ **Input Validation & Injection**
@@ -187,7 +183,7 @@ SQL string concatenation
 
 ### **Automated Scans**
 
-Run comprehensive security scans:
+Save as `scan.sh` and run it; do NOT paste into an interactive shell (the final `exit` would close it):
 
 ```bash
 #!/usr/bin/env bash

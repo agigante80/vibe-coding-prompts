@@ -1,8 +1,8 @@
 ---
 name: project-reassessment
 category: project-management
-version: 1.1.0
-updated: 2026-08-27
+version: 1.1.1
+updated: 2026-08-28
 description: Full repository health check aligning code, documentation and policies.
 platforms: [chatgpt, claude, gemini, copilot-chat]
 ---
@@ -194,7 +194,7 @@ All reassessment findings and updates must be documented in `/docs/`:
 ## **Success Criteria**
 
 - [ ] Complete alignment between code and documentation
-- [ ] All tests passing with adequate coverage (80%+)
+- [ ] All tests passing; coverage floor holds (per the [Test Suite Generator](./test-suite-generator.md), a diagnostic rather than a target)
 - [ ] No outstanding critical or high-severity security vulnerabilities
 - [ ] Clear development roadmap established with priorities
 - [ ] Automated workflows (CI/CD, testing) functioning properly
