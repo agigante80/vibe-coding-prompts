@@ -53,7 +53,7 @@ project/
 └── [package manager files]
 ```
 
-Adjust for project type (library, CLI, microservices) by adding/removing directories as needed.
+Adjust for project type (library, CLI, microservices) by adding or removing directories.
 
 ---
 
