@@ -13,7 +13,7 @@ platforms: [chatgpt, claude, gemini, copilot-chat]
 
 Work a ticket backlog autonomously: pick a coherent, high-value batch, validate every ticket against current reality, implement what can be finished without human decisions, test and review it under BOUNDED loops, and leave both the codebase and the backlog better than found.
 
-**Division of authority with [Project Reassessment](./project-reassessment.md)**: that prompt surveys the repository and PRODUCES the prioritized action plan (and the `/docs/` work records); this one CONSUMES a queue and executes it. Run reassessment to decide what should be done; run this to do it, feeding results back into the same `/docs/` records.
+**Division of authority with [Project Reassessment](./project-reassessment.md)**: that prompt surveys the repository and produces a prioritized action plan in its report and `/docs/` records; it does not file tickets. This one works an EXISTING ticket queue. Use reassessment's plan as input when filing the tickets this prompt then executes.
 
 **What this costs**: this is a long-session prompt. It assumes a ticket system, an automated test gate, and a code-review capability. It is not a quick-task prompt.
 
@@ -64,7 +64,7 @@ Run the project's code-review capability against the change, then:
 
 * **Round 1**: fix findings at high or medium severity. Everything below becomes a ticket immediately, not a negotiation
 * **Round 2**: review ONLY the fix commits; fix highs and mediums as in round 1; the target must not grow each round
-* **Round 3+**: only if round 2 found a high; fix highs, ticket the rest. **Hard cap: 4 rounds total**
+* **Round 3+**: only if round 2 found a high; fix highs, ticket the rest. Mediums alone end the loop: fix them and stop. **Hard cap: 4 rounds total**
 * **Trip wire**: two consecutive rounds each finding a defect in the previous round's FIX means stop immediately; past that point iteration removes value
 * **A ticket is a finished outcome for a finding.** Filing is not failing to fix; without this exit the loop has no honorable end
 * Report the stopping reason and how many rounds found defects in prior fixes, so continuing is the operator's call, not a default
@@ -78,7 +78,7 @@ Run the project's code-review capability against the change, then:
 3. Updated tickets: each closed with what actually shipped, or re-scoped/split/labeled with evidence
 4. New tickets for every discovery and every unfixed review finding, linked to their origins
 5. A final report: per-ticket outcome, tests run, review rounds with the loop's stopping reason, and anything genuinely needing a human
-6. Documentation updates in the target project: `/docs/REFACTORING_PLAN.md` (completed tasks marked, new ones added), `/docs/IMPROVEMENT_AREAS.md` (debt cleared or newly found), and `/docs/ROADMAP.md` when a batch moves a milestone
+6. Documentation updates WHERE the target project keeps such records: `/docs/REFACTORING_PLAN.md` (completed tasks marked, new ones added), `/docs/IMPROVEMENT_AREAS.md` (debt cleared or newly found), `/docs/ROADMAP.md` when a batch moves a milestone. Projects without them need no new files: the tracker is then the sole record
 
 ---
 
@@ -87,9 +87,9 @@ Run the project's code-review capability against the change, then:
 - [ ] Every selected ticket validated against current reality before work
 - [ ] Every family sweep reported alongside its instance fix
 - [ ] New and changed tests seen red at least once
-- [ ] Review loop terminated by a round with no highs or mediums, the 4-round cap, or the trip wire, with the reason reported
+- [ ] Review loop terminated by one of: a round finding no highs, the 4-round cap, or the trip wire, with the reason and the fate of every finding reported
 - [ ] Backlog reflects reality: no closed-but-undone or done-but-open tickets
-- [ ] `/docs/` work records updated so the tracker and the docs agree
+- [ ] Existing `/docs/` work records updated so the tracker and the docs agree
 - [ ] All work committed and pushed; final diff attributable to the batch
 
 ---
