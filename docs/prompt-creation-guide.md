@@ -354,7 +354,7 @@ Use checkboxes for measurable outcomes:
 ## **Success Criteria**
 
 - [ ] All generated tests pass successfully
-- [ ] Code coverage meets minimum thresholds (80%+)
+- [ ] Coverage floor holds (80%), used as a diagnostic rather than a target
 - [ ] Tests run in CI/CD pipeline automatically
 - [ ] No flaky or intermittent test failures
 - [ ] Documentation explains test structure and maintenance
