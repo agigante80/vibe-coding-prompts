@@ -175,6 +175,25 @@ class CollectTests(unittest.TestCase):
             with self.assertRaises(upi.PromptError):
                 upi.collect(Path(tmp))
 
+    def test_dangling_symlink_still_rejected(self):
+        """A symlink whose target is missing (fresh CI checkout) must
+        still hit the symlink guard, not be silently skipped."""
+        with tempfile.TemporaryDirectory() as tmp:
+            write_prompt(tmp, "sample-prompt.md", VALID)
+            link = Path(tmp) / "other-prompt.md"
+            link.symlink_to("nowhere-at-all.md")
+            with self.assertRaises(upi.PromptError) as ctx:
+                upi.collect(Path(tmp))
+            self.assertIn("symlink", str(ctx.exception))
+
+    def test_dotfile_sidecar_ignored(self):
+        """AppleDouble/editor sidecars must not block the index."""
+        with tempfile.TemporaryDirectory() as tmp:
+            write_prompt(tmp, "sample-prompt.md", VALID)
+            write_prompt(tmp, "._sample-prompt.md", "junk")
+            entries = upi.collect(Path(tmp))
+            self.assertEqual([e["name"] for e in entries], ["sample-prompt"])
+
     def test_symlinked_prompt_raises(self):
         """A symlink reads fine but its content changes via the target,
         invisible to the version gate; the linter must reject it."""
@@ -192,7 +211,7 @@ class CollectTests(unittest.TestCase):
             write_prompt(tmp, "LEGACY-NOTES.MD", "# stray\n")
             with self.assertRaises(upi.PromptError) as ctx:
                 upi.collect(Path(tmp))
-            self.assertIn("lowercase .md", str(ctx.exception))
+            self.assertIn(".md extension", str(ctx.exception))
 
     def test_markdown_extension_rejected(self):
         with tempfile.TemporaryDirectory() as tmp:
