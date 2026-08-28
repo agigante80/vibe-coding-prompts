@@ -1,7 +1,7 @@
 ---
 name: test-suite-generator
 category: development-workflow
-version: 1.1.1
+version: 1.2.0
 updated: 2026-08-28
 description: Generate a comprehensive test suite with unit, integration and e2e coverage, plus skipped-test cleanup.
 platforms: [chatgpt, claude, gemini, copilot-chat]
@@ -20,6 +20,7 @@ Generate a comprehensive, production-ready test suite for the current project th
 ### 1. **Project Analysis**
 
 * Detect language and framework; identify or recommend the testing stack; map critical components
+
 * **Review existing tests comprehensively:**
   * Identify skipped/disabled tests (pytest.skip, @Ignore, test.skip, etc.)
   * Analyze why tests were skipped (comments, commit history, issue references)
@@ -46,7 +47,7 @@ Choose appropriate frameworks based on project type:
 
 ### **Skipped/Disabled Test Analysis**
 
-**Catalog**: List test name, skip reason, date, issue references
+**Catalog**: test name, skip reason, date, issue references
 
 **Categorize**: fixable (update assertions/mocks/data), environment-dependent (conditional skip, document setup), flaky (fix timing/races), obsolete (document and remove), blocked (link issues, document clearly), unclear (investigate git history, then fix or document)
 
@@ -132,7 +133,7 @@ class TestComponentName:
         # Test implementation
 ```
 
-### **Test Coverage Goals**
+### **Coverage Goals**
 
 - [ ] **Critical paths**: 100% coverage
 - [ ] **Business logic**: 90%+ coverage
@@ -140,7 +141,7 @@ class TestComponentName:
 - [ ] **Error handling**: All error paths tested
 - [ ] **Edge cases**: Null, empty, boundary values
 - [ ] **Security**: Authentication, authorization, input validation
-- [ ] **Variable validation**: All configuration and input variables tested
+- [ ] **Variables**: all configuration and input variables tested
 
 ### **Variable Validation Testing**
 
@@ -332,7 +333,7 @@ Update the following files in `/docs/`:
 ## **Best Practices**
 
 ### **General Testing**
-* Test behavior, not implementation; one focused thing per test. Verify new tests can actually fail: [Prove Your Tests Can Fail](./prove-your-tests-can-fail.md)
+* Test behavior, not implementation; one thing per test; meaningful assertion messages. Verify tests can actually fail: [Prove Your Tests Can Fail](./prove-your-tests-can-fail.md)
 * No test interdependencies; mock external dependencies consistently
 * Run tests frequently, update them with code changes, and hold test code to production standards
 

@@ -46,9 +46,9 @@ Sweep for these mechanical patterns; each is a real failure class:
 For each assertion you doubt:
 
 1. Name the code change that OUGHT to break it (flip the operator, hardcode the return, swap the message's value)
-2. Make that change in a scratch copy
+2. Make that change in the code the test suite ACTUALLY EXECUTES (working tree, not a copy the runner never imports: see shape 5)
 3. Run the test; record red or green beside the test
-4. Restore the code
+4. Restore the code (`git checkout -- <file>`), and re-run to confirm green again
 
 If it stays green, the test is not testing what its name says: rewrite the assertion, add the missing fixture, or delete the test with a note.
 

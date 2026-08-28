@@ -1,7 +1,7 @@
 ---
 name: project-reassessment
 category: project-management
-version: 1.1.2
+version: 1.1.3
 updated: 2026-08-28
 description: Full repository health check aligning code, documentation and policies.
 platforms: [chatgpt, claude, gemini, copilot-chat]
@@ -126,7 +126,7 @@ Delegate the detailed audits to their owning prompts and fold their findings int
 
 * Write the full report to `docs/archive/reassessment-YYYY-MM-DD.md` (dated, outside the standard file set) and append a dated summary section to `/docs/IMPROVEMENT_AREAS.md`
 * Update relevant `/docs` files as needed
-* Propose the **next logical step** for continued development
+* Propose the **next logical step** for continued development; to execute the resulting queue, run [Autonomous Backlog Workflow](./autonomous-backlog-workflow.md)
 * Identify priority items for immediate attention
 
 ---
