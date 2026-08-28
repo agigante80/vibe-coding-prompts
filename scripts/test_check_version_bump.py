@@ -344,6 +344,24 @@ class CheckVersionBumpTests(unittest.TestCase):
         self.assertEqual(len(failures), 1)
         self.assertIn("introduce front matter at", failures[0])
 
+    def test_emoji_blobs_parse_exactly(self):
+        """cat-file sizes are BYTES; multi-byte content must not corrupt
+        record boundaries or exact-restore matching."""
+        emoji = PROMPT_V1.replace("Original body text.",
+                                  "Body with emoji \U0001f9ea\U0001f512\U0001f680.")
+        repo = self.make_repo(initial_text=emoji)
+        run_git(repo, "checkout", "-q", "main")
+        p = repo / "prompts" / "sample-prompt.md"
+        second = emoji.replace("version: 1.0.0", "version: 1.1.0").replace(
+            "emoji", "more emoji \U0001f3af")
+        p.write_text(second, encoding="utf-8")
+        run_git(repo, "add", "-A")
+        run_git(repo, "commit", "-qm", "second emoji version")
+        blobs = cvb.historical_blobs("main", "prompts/sample-prompt.md", cwd=repo)
+        self.assertEqual(len(blobs), 2)
+        self.assertIn(emoji, blobs)
+        self.assertIn(second, blobs)
+
     def test_restore_of_any_exact_historical_state_passes(self):
         """Restoring an OLDER exact blob (not just the newest) is legal."""
         repo = self.make_repo()
