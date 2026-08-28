@@ -134,11 +134,14 @@ def collect(prompts_dir):
     # them enter with green CI.
     files = sorted(
         p for p in prompts_dir.iterdir()
-        if p.is_file() and p.suffix.lower() in (".md", ".markdown"))
+        if not p.name.startswith(".")            # editor/OS sidecars
+        and (p.is_symlink() or p.is_file())      # keep symlinks visible so
+        and p.suffix.lower() in (".md", ".markdown"))  # the guard below fires
     for stray in files:
         if stray.suffix != ".md":
             raise PromptError(
-                f"{stray.name}: prompt files use the lowercase .md extension")
+                f"{stray.name}: prompt files use the .md extension "
+                "(lowercase, not .MD or .markdown)")
     if not files:
         raise PromptError(f"no prompt files found in {prompts_dir}")
     for path in files:

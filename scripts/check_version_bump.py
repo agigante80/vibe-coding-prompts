@@ -49,6 +49,16 @@ class SkipCheck(Exception):
     """No usable base to diff against; the check is vacuous, not failed."""
 
 
+def git_bytes(*args, cwd=None):
+    """Raw stdout, for byte-exact comparisons that must not be lossy."""
+    proc = subprocess.run(["git", *args], capture_output=True, cwd=cwd)
+    if proc.returncode != 0:
+        raise subprocess.CalledProcessError(
+            proc.returncode, proc.args, proc.stdout,
+            proc.stderr.decode("utf-8", errors="replace"))
+    return proc.stdout
+
+
 def git(*args, cwd=None, errors="strict"):
     # Bytes capture, explicit UTF-8 decode: text mode would both use the
     # locale encoding (cp1252 on Windows crashes on emoji) AND apply
@@ -107,13 +117,13 @@ def changed_prompts(base_commit, head, cwd=None):
     out = git("-c", "core.quotepath=off", "diff", "--name-status",
               "--find-renames=25%", f"{base_commit}..{head}", cwd=cwd,
               errors="replace")
-    if "\ufffd" in out:
-        # Fail closed: a filename we cannot decode is a path we cannot
-        # reliably gate. Distinct message so it is not misread as a blob
-        # content problem.
-        raise PromptError(
-            "a changed filename is not valid UTF-8; rename the file before "
-            "the gate can evaluate this range")
+    # Fail closed only for paths that could be prompts: an undecodable name
+    # elsewhere in the diff is none of this gate's business.
+    for line in out.splitlines():
+        if "\ufffd" in line and "prompts/" in line:
+            raise PromptError(
+                "a changed filename under prompts/ is not valid UTF-8; "
+                "rename it before the gate can evaluate this range")
     pairs = []
     for line in out.splitlines():
         parts = line.split("\t")
@@ -142,7 +152,10 @@ def front_matter_of(text, source):
 
 
 def historical_blobs(base_commit, path, cwd=None):
-    """Every content the path had at or before base, newest first.
+    """(blobs, lossy) for every content the path had at or before base.
+
+    lossy holds the subset that required replacement decoding, so callers
+    can refuse to treat those as byte-exact evidence.
 
     One rev-list plus ONE `git cat-file --batch` subprocess regardless of
     how many commits touched the path. cat-file's explicit "missing"
@@ -154,7 +167,7 @@ def historical_blobs(base_commit, path, cwd=None):
                  "--diff-filter=ACMR", base_commit, "--", path,
                  cwd=cwd).split()
     if not hashes:
-        return []
+        return [], set()
     batch_input = "".join(f"{h}:{path}\n" for h in hashes).encode()
     # Parse in BYTES: cat-file sizes are byte counts, and prompts contain
     # multi-byte UTF-8 (emoji), so slicing a decoded str by the byte size
@@ -166,7 +179,7 @@ def historical_blobs(base_commit, path, cwd=None):
         raise subprocess.CalledProcessError(
             proc.returncode, proc.args, proc.stdout,
             proc.stderr.decode("utf-8", errors="replace"))
-    blobs, out, pos = [], proc.stdout, 0
+    blobs, lossy, out, pos = [], set(), proc.stdout, 0
     while pos < len(out):
         newline = out.index(b"\n", pos)
         header = out[pos:newline]
@@ -176,9 +189,15 @@ def historical_blobs(base_commit, path, cwd=None):
         size = int(header.rsplit(b" ", 1)[1])
         # errors="replace": historical blobs are only compared and parsed;
         # a legacy non-UTF-8 blob garbles harmlessly instead of crashing.
-        blobs.append(out[pos:pos + size].decode("utf-8", errors="replace"))
+        raw = out[pos:pos + size]
+        try:
+            blobs.append(raw.decode("utf-8"))
+        except UnicodeDecodeError:
+            text = raw.decode("utf-8", errors="replace")
+            blobs.append(text)
+            lossy.add(text)
         pos = pos + size + 1  # skip the trailing separator newline
-    return blobs
+    return blobs, lossy
 
 
 def best_historical(blobs, path):
@@ -208,17 +227,19 @@ def warn_if_shallow(cwd=None):
               "incomplete here (CI, with full history, is authoritative)")
 
 
-def is_exact_restore(new_text, version, blobs, hist_ver):
+def is_exact_restore(new_text, version, blobs, hist_ver, lossy_blobs=()):
     """The single exact-restore hatch shared by both branches.
 
     Passes only at the HIGHEST earned version (an older exact state is a
-    net downgrade and must bump past the max). new_text containing U+FFFD
-    is excluded: historical blobs are replace-decoded, so a head file with
-    literal replacement characters could impersonate an invalid-UTF-8
-    historical blob and inherit its version.
+    net downgrade and must bump past the max). A match against a blob that
+    was LOSSILY decoded does not count: replacement characters in such a
+    blob stand for bytes we never saw, so equality proves nothing. Keying
+    on the blob's provenance (not on the character) lets a prompt that
+    legitimately contains U+FFFD still be restored.
     """
-    return (new_text in blobs and version == hist_ver
-            and "\ufffd" not in new_text)
+    if new_text not in blobs or version != hist_ver:
+        return False
+    return new_text not in lossy_blobs
 
 
 def check(base_ref, head="HEAD", cwd=None):
@@ -235,9 +256,9 @@ def check(base_ref, head="HEAD", cwd=None):
             except PromptError as exc:
                 failures.append(f"{new}: head front matter unreadable ({exc})")
                 continue
-            blobs = historical_blobs(base_commit, new, cwd=cwd)
+            blobs, lossy = historical_blobs(base_commit, new, cwd=cwd)
             hist_blob, hist_ver = best_historical(blobs, new)
-            if is_exact_restore(new_text, version, blobs, hist_ver):
+            if is_exact_restore(new_text, version, blobs, hist_ver, lossy):
                 print(f"ok: {new} (restored prompt, unchanged at {version})")
                 continue
             if hist_blob is not None:
@@ -254,11 +275,14 @@ def check(base_ref, head="HEAD", cwd=None):
                     f"similarity or split the rewrite into a separate commit")
                 continue
         else:
+            # Byte comparison first: a replace-decoded base could otherwise
+            # equal a head containing literal U+FFFD, masking a real change.
+            if (git_bytes("show", f"{base_commit}:{old}", cwd=cwd)
+                    == git_bytes("show", f"{head}:{new}", cwd=cwd)):
+                continue  # identical bytes: pure rename, no content change
             old_text = git("show", f"{base_commit}:{old}", cwd=cwd,
                            errors="replace")
             old_label = old
-            if old_text == new_text:
-                continue  # pure rename, no content change
         try:
             new_version, new_updated = front_matter_of(new_text, new)
         except PromptError as exc:
@@ -281,11 +305,13 @@ def check(base_ref, head="HEAD", cwd=None):
             # arbitrary version through this door. Search the OLD path's
             # history too, or a rename would shed the version floor earned
             # under the previous name.
-            blobs = historical_blobs(base_commit, old, cwd=cwd)
+            blobs, lossy = historical_blobs(base_commit, old, cwd=cwd)
             if new != old:
-                blobs += historical_blobs(base_commit, new, cwd=cwd)
+                more, more_lossy = historical_blobs(base_commit, new, cwd=cwd)
+                blobs += more
+                lossy |= more_lossy
             hist_blob, hist_ver = best_historical(blobs, new)
-            if is_exact_restore(new_text, new_version, blobs, hist_ver):
+            if is_exact_restore(new_text, new_version, blobs, hist_ver, lossy):
                 # Undoing a symlink swap or corruption byte-exactly at the
                 # highest earned version needs no bump.
                 print(f"ok: {new} (restored prompt, unchanged at {new_version})")
