@@ -1,7 +1,7 @@
 ---
 name: code-refactoring-plan
 category: development-workflow
-version: 1.0.0
+version: 1.1.0
 updated: 2026-08-27
 description: Analyze code smells and technical debt, producing a prioritized refactoring roadmap.
 platforms: [chatgpt, claude, gemini, copilot-chat]
@@ -49,7 +49,7 @@ cloc . --exclude-dir=node_modules,vendor,dist,build
 - **Feature Envy** - Methods using other classes' data more than their own
 - **Data Clumps** - Same group of variables passed around together
 - **Primitive Obsession** - Overuse of primitives instead of domain objects
-- **Switch/Case Statements** - Complex conditionals that should be polymorphic
+- **Switch/Case Statements** - Complex conditionals that MAY warrant polymorphism (situational: an exhaustive switch over a closed enum is often clearer)
 
 **Duplication Issues**:
 - **Duplicate Code** - Identical or similar code blocks (>5 lines)
@@ -100,7 +100,7 @@ Use language-appropriate tools:
 | **Parameters per Function** | 0-3 | 4-5 | 6-8 | >8 |
 | **Nesting Depth** | 1-2 | 3-4 | 5-6 | >6 |
 | **Code Duplication %** | 0-3% | 3-5% | 5-10% | >10% |
-| **Test Coverage** | 80-100% | 60-79% | 40-59% | <40% |
+| **Test Coverage** (risk signal, not a quality score) | 80-100% | 60-79% | 40-59% | <40% |
 
 ---
 
@@ -133,7 +133,7 @@ Use language-appropriate tools:
 ### 🏗️ **Major Refactorings (1-4 weeks)**
 
 **High Impact, High Effort**:
-- Architectural restructuring (monolith → microservices)
+- Architectural restructuring: default to Strangler Fig and a modular monolith; split into microservices only with team experience running them AND a concrete scaling driver (per Fowler's MonolithFirst)
 - Replace legacy frameworks with modern alternatives
 - Migrate from inheritance to composition
 - Implement proper separation of concerns (MVC, Clean Architecture)
@@ -188,11 +188,13 @@ Rate each refactoring on three dimensions:
 Priority = (Technical Debt × 2 + Business Impact × 3) / Effort
 ```
 
-Higher scores = Higher priority refactoring
+Higher scores = higher priority. The weights favor business impact over internal debt; dividing by effort deliberately biases toward quick wins, so ALSO review the top items with effort ignored or strategic work never surfaces.
 
 ---
 
 ## **Refactoring Techniques**
+
+Technique names follow [Fowler's refactoring catalog](https://refactoring.com/catalog/).
 
 ### **Method-Level Refactorings**
 
@@ -233,14 +235,7 @@ Higher scores = Higher priority refactoring
 
 ### **Refactoring Risk Levels**
 
-**Low Risk** (Green Light):
-- Renaming variables/functions (with IDE support)
-- Extracting methods/functions
-- Adding type annotations
-- Removing dead code
-- Formatting and style fixes
-- Adding tests without changing code
-- Improving documentation
+**Low Risk** (Green Light): renames with IDE support, method extraction, type annotations, dead-code removal, formatting, adding tests, documentation
 
 **Medium Risk** (Proceed with Caution):
 - Moving methods between classes
@@ -266,25 +261,12 @@ Higher scores = Higher priority refactoring
 - [ ] All tests passing (100% green)
 - [ ] Test coverage adequate (>70% for changed areas)
 - [ ] Feature branch created
-- [ ] Backup of current state
 - [ ] Team notified of refactoring scope
 - [ ] Risk assessment documented
 
-**During Refactoring**:
-- [ ] Work in small, incremental steps
-- [ ] Run tests after each change
-- [ ] Commit frequently with clear messages
-- [ ] Keep CI/CD pipeline green
-- [ ] Use automated refactoring tools when possible
-- [ ] Pair programming for high-risk changes
+**During**: small incremental steps, tests after each change, frequent clear commits, CI kept green, automated refactoring tools where possible, pairing on high-risk changes
 
-**After Refactoring**:
-- [ ] Full test suite passing
-- [ ] Code review completed
-- [ ] Performance benchmarks maintained or improved
-- [ ] Documentation updated
-- [ ] Team walkthrough conducted
-- [ ] Monitoring alerts configured
+**After**: full suite passing, code review done, benchmarks maintained or improved, documentation updated, monitoring configured
 
 ---
 

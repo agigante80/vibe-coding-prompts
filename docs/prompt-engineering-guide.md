@@ -31,12 +31,14 @@ As a rule of thumb:
 
 ## ⚙️ Hard Technical Limits (Approximate)
 
-| Platform / Model                | Max Prompt Size                | Notes                                                                                   |
-| ------------------------------- | ------------------------------ | --------------------------------------------------------------------------------------- |
-| **OpenAI GPT-5 (ChatGPT)**      | ~128k tokens (~80k to 100k words) | Huge; you can safely use multi-thousand-word system or meta-prompts.                   |
-| **GitHub Copilot**              | ~4k to 8k tokens               | Much smaller; long prompts get truncated. You should keep prompts <1,500 words ideally. |
-| **Anthropic Claude 3.5 / Opus** | 200k tokens                    | Extremely large context; can process long prompts or even entire repos.                 |
-| **Gemini 1.5 Pro**              | 1M tokens                      | Can handle entire codebases and documentation together.                                 |
+Model context windows change every generation, so treat these as ORDERS OF MAGNITUDE and check your platform's current documentation for exact limits:
+
+| Platform | Typical context scale | Notes |
+| -------- | --------------------- | ----- |
+| **ChatGPT (frontier models)** | Very large (100k+ tokens) | Multi-thousand-word meta-prompts are safe. |
+| **GitHub Copilot (inline)** | Small (single-digit k tokens) | Long prompts get truncated; keep under ~1,500 words, prefer Copilot Chat. |
+| **Claude (frontier models)** | Very large (hundreds of k tokens) | Can process long prompts or entire repos. |
+| **Gemini (frontier models)** | Very large to huge (up to millions) | Entire codebases plus documentation. |
 
 > 🔹 *1 token ≈ 4 characters (average), or roughly ¾ of a word.*
 
@@ -67,7 +69,7 @@ If your prompt (like your CI/CD meta-prompt) is longer than ~1,000 words:
 | Simple Code Generation                       | 1 to 2 paragraphs   | “Generate a Python script to convert JSON to CSV.”                       |
 | Multi-step workflow                          | 300 to 600 words    | “Generate a CI/CD pipeline for Node.js with Docker build and release.”   |
 | Meta-Prompt (Reusable Template)              | 800 to 1500 words   | Your universal CI/CD generator prompt.                                   |
-| Entire Specification (Copilot Chat or GPT-5) | 2k to 5k words      | Can include detailed rules, multiple registry configs, validations, etc. |
+| Entire Specification (Copilot Chat or frontier chat models) | 2k to 5k words      | Can include detailed rules, multiple registry configs, validations, etc. |
 
 ---
 
@@ -90,15 +92,13 @@ If your goal is to feed a **meta-prompt** like your universal CI/CD builder:
 
 ## ✅ Quick Reference Summary
 
-* There's **no fixed word limit**, but:
+* There's **no fixed word limit**, but clarity always matters more than size:
 
-  * **Copilot:** keep within 700 to 800 words (~5k characters) - ✅ All prompts in this repo comply!
-  * **ChatGPT (GPT-4/5):** can handle 50k+ words, but clarity matters more than size
-  * **Claude 3.5:** excellent for 1k-5k word prompts with full context
-  * **Gemini 1.5 Pro:** handles extremely long contexts (entire codebases)
+  * **Copilot inline:** keep within 700 to 800 words; use Copilot Chat for longer prompts
+  * **ChatGPT, Claude, Gemini:** handle full prompts of any length in this collection easily
 
-* **This repository's prompts (390-940 words)** work perfectly across all platforms
-* For very long CI/CD meta-prompts (2,000+ words), consider modular sections for Copilot
+* **This repository's prompts** target under 1600 words each; the current per-prompt word counts live in the [generated index in the root README](../README.md), the single source of truth
+* For prompts near the cap, feed Copilot the relevant sections rather than the whole file
 
 ---
 
@@ -106,22 +106,13 @@ If your goal is to feed a **meta-prompt** like your universal CI/CD builder:
 
 ### Prompt Length Distribution
 
-Most prompts in this repository fall into these categories:
-
-| Category | Typical Length | Best Platform | Notes |
-|----------|---------------|---------------|-------|
-| **Documentation** | ~940 words | All platforms | Comprehensive yet concise documentation systems |
-| **DevOps Automation** | ~640 words | All platforms | Focused CI/CD pipelines with clear structure |
-| **Project Management** | ~390 words | All platforms | Concise assessments and planning prompts |
-| **Development Workflow** | ~460 words | All platforms | Efficient process automation with clear boundaries |
+Per-prompt word counts are generated into the [root README's prompt index](../README.md) and verified by CI; that table is the single source of truth (hard-coded copies here rotted repeatedly, which is why none remain).
 
 ### Recommendations by Platform
 
 #### For GitHub Copilot Users
-- ✅ **All prompts in this repository are Copilot-friendly!** (all under 1000 words)
-- Can use **inline completions** or **Copilot Chat** - both work well
-- **Development Workflow** (~460 words) and **Project Management** (~390 words) are especially efficient
-- **Documentation** (~940 words) works best in Copilot Chat
+- Use **Copilot Chat** for these prompts; most exceed comfortable inline-completion length
+- Check a prompt's current word count in the [README index](../README.md) before feeding it inline
 
 #### For ChatGPT / Claude / Gemini Users
 - ✅ All prompts in this repository work excellently
