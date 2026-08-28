@@ -17,7 +17,7 @@ Audit a test suite for assertions that cannot fail, then fix or remove them. Lin
 
 ## **The Rule**
 
-A test is worth having only once it has been SEEN TO FAIL. Break the behavior it claims to pin, run the test against the broken copy, watch it go red, then restore. A test never seen red proves nothing about the code.
+A test is worth having only once it has been SEEN TO FAIL. Break the behavior it claims to pin IN THE CODE THE SUITE EXECUTES, run the test, watch it go red, then restore. A test never seen red proves nothing about the code.
 
 ---
 
@@ -43,12 +43,12 @@ Sweep for these mechanical patterns; each is a real failure class:
 
 ## **The Manual Method** (no tooling required)
 
-For each assertion you doubt:
+Start from a clean working tree (`git status` empty, or your edits stashed), so restoring cannot lose unrelated work. For each assertion you doubt:
 
 1. Name the code change that OUGHT to break it (flip the operator, hardcode the return, swap the message's value)
 2. Make that change in the code the test suite ACTUALLY EXECUTES (working tree, not a copy the runner never imports: see shape 5)
 3. Run the test; record red or green beside the test
-4. Restore the code (`git checkout -- <file>`), and re-run to confirm green again
+4. Restore exactly the edit you made (undo it, or `git checkout -- <file>` on a clean tree), then re-run to confirm green again
 
 If it stays green, the test is not testing what its name says: rewrite the assertion, add the missing fixture, or delete the test with a note.
 
