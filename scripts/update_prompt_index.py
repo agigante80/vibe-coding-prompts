@@ -28,6 +28,7 @@ END = "<!-- prompts-index:end -->"
 REQUIRED_FIELDS = ("name", "category", "version", "updated", "description", "platforms")
 VERSION_RE = re.compile(r"^\d+\.\d+\.\d+$")
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+KEBAB_RE = re.compile(r"[a-z0-9]+(-[a-z0-9]+)*")
 
 
 class PromptError(Exception):
@@ -37,11 +38,14 @@ class PromptError(Exception):
 def is_prompt_path(path_str):
     """The single definition of 'a prompt file' shared by all tooling layers.
 
-    Only files directly inside prompts/ count; subdirectories (drafts,
-    archives) are ignored by the index, the version gate, and the hooks
-    alike, so no layer sees a file another layer misses.
+    Only kebab-named .md files directly inside prompts/ count;
+    subdirectories and non-kebab names are ignored by the gate but
+    REJECTED by collect(), so a stray file fails CI loudly rather than
+    being half-tracked. The pre-commit files: patterns are deliberately
+    broader (any prompts/*.md) so the failing checks still trigger.
     """
-    return bool(re.fullmatch(r"prompts/[^/]+\.md", path_str))
+    m = re.fullmatch(r"prompts/([^/]+)\.md", path_str)
+    return bool(m and KEBAB_RE.fullmatch(m.group(1)))
 
 
 def parse_front_matter(text, source):
@@ -129,6 +133,12 @@ def collect(prompts_dir):
     if not files:
         raise PromptError(f"no prompt files found in {prompts_dir}")
     for path in files:
+        # Content-independent checks first, so a badly named or symlinked
+        # file gets ITS error, not a confusing parse error.
+        if not KEBAB_RE.fullmatch(path.stem):
+            raise PromptError(
+                f"{path.name}: prompt filenames must be kebab-case "
+                "([a-z0-9-], no spaces or special characters)")
         if path.is_symlink():
             # A symlinked prompt reads fine here but its content then changes
             # via the TARGET file, which the version gate never sees; reject
@@ -136,10 +146,6 @@ def collect(prompts_dir):
             raise PromptError(f"{path.name}: prompt files must be regular files, not symlinks")
         fields, body = parse_front_matter(path.read_text(encoding="utf-8-sig"), path.name)
         validate(fields, path.name)
-        if not re.fullmatch(r"[a-z0-9]+(-[a-z0-9]+)*", path.stem):
-            raise PromptError(
-                f"{path.name}: prompt filenames must be kebab-case "
-                "([a-z0-9-], no spaces or special characters)")
         if fields["name"] != path.stem:
             raise PromptError(f"{path.name}: front matter name {fields['name']!r} does not match filename")
         entries.append({
@@ -195,6 +201,9 @@ def main(argv):
         updated = inject(current, render_table(entries))
     except (PromptError, FileNotFoundError) as exc:
         print(f"error: {exc}", file=sys.stderr)
+        return 1
+    except UnicodeDecodeError as exc:
+        print(f"error: a prompt file is not valid UTF-8 ({exc})", file=sys.stderr)
         return 1
     if updated == current:
         print(f"prompt index: up to date ({len(entries)} prompts)")

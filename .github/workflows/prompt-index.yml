@@ -10,10 +10,11 @@ permissions:
 
 concurrency:
   # PRs share a per-ref group and newer pushes supersede older runs. Pushes
-  # use per-SHA groups: GitHub cancels a PENDING run in a shared group by
-  # default (regardless of cancel-in-progress), which would silently drop
-  # the audit of an intermediate push range on main.
-  group: prompt-index-${{ github.event_name == 'pull_request' && github.ref || github.sha }}
+  # use per-RUN groups (run_id is unique): GitHub cancels a PENDING run in a
+  # shared group regardless of cancel-in-progress, which would silently drop
+  # the audit of an intermediate push range on main; per-SHA grouping still
+  # collided when a force-push restored an exact prior tip.
+  group: prompt-index-${{ github.event_name == 'pull_request' && github.ref || github.run_id }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:

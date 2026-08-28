@@ -172,26 +172,22 @@ class CheckVersionBumpTests(unittest.TestCase):
         self.commit_all(repo)
         self.assertEqual(cvb.check("main", cwd=repo), [])
 
-    def test_non_ascii_filename_not_skipped(self):
-        """core.quotepath must not hide non-ASCII prompt paths from the gate."""
-        repo = self.make_repo()
-        src = repo / "prompts" / "sample-prompt.md"
-        dst = repo / "prompts" / "caf\u00e9-prompt.md"
-        dst.write_text(
-            src.read_text(encoding="utf-8")
-            .replace("sample-prompt", "caf\u00e9-prompt")
-            .replace("Original body", "Edited body"),
-            encoding="utf-8")
-        run_git(repo, "checkout", "-q", "main")
-        run_git(repo, "add", "-A")
-        run_git(repo, "commit", "-qm", "add unicode prompt")
-        run_git(repo, "checkout", "-q", "feature")
-        run_git(repo, "merge", "-q", "main")
-        edited = dst.read_text(encoding="utf-8").replace("Edited body", "Edited again")
-        dst.write_text(edited, encoding="utf-8")
-        self.commit_all(repo)
-        failures = cvb.check("main", cwd=repo)
-        self.assertEqual(len(failures), 1)
+    def test_non_kebab_filenames_rejected_by_linter_not_gated(self):
+        """Layered defense: is_prompt_path ignores non-kebab names so the
+        gate never half-tracks them, and the index linter hard-rejects
+        them, so such a file cannot exist with green CI."""
+        import update_prompt_index as upi
+        self.assertFalse(upi.is_prompt_path("prompts/caf\u00e9-prompt.md"))
+        self.assertFalse(upi.is_prompt_path('prompts/a"b.md'))
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            d = Path(tmp) / "prompts"
+            d.mkdir()
+            (d / "caf\u00e9-prompt.md").write_text(
+                PROMPT_V1.replace("sample-prompt", "caf\u00e9-prompt"),
+                encoding="utf-8")
+            with self.assertRaises(upi.PromptError):
+                upi.collect(d)
 
     def test_impossible_calendar_date_fails(self):
         repo = self.make_repo()
@@ -296,12 +292,12 @@ class CheckVersionBumpTests(unittest.TestCase):
         run_git(repo, "rm", "-q", "prompts/sample-prompt.md")
         self.commit_all(repo, "delete prompt")
         run_git(repo, "checkout", "-q", "main")
-        # modify/delete conflict resolved as delete
+        # modify/delete conflict is deterministic: the merge MUST stop
         merge = subprocess.run(["git", "merge", "--no-ff", "deleter"],
                                cwd=repo, capture_output=True, env=GIT_ENV)
-        if merge.returncode != 0:
-            run_git(repo, "rm", "-q", "prompts/sample-prompt.md")
-            run_git(repo, "commit", "-qm", "merge deleter, resolve as delete")
+        self.assertNotEqual(merge.returncode, 0, "expected modify/delete conflict")
+        run_git(repo, "rm", "-q", "prompts/sample-prompt.md")
+        run_git(repo, "commit", "-qm", "merge deleter, resolve as delete")
         # feature: re-add with new content at a version below the earned 2.0.0
         run_git(repo, "checkout", "-qB", "feature", "main")
         p.parent.mkdir(exist_ok=True)  # dir vanished with its last file
@@ -311,6 +307,76 @@ class CheckVersionBumpTests(unittest.TestCase):
         failures = cvb.check("main", cwd=repo)
         self.assertEqual(len(failures), 1)
         self.assertIn("did not increase", failures[0])
+
+    def _symlink_base(self, initial_text):
+        repo = self.make_repo(initial_text=initial_text)
+        run_git(repo, "checkout", "-q", "main")
+        p = repo / "prompts" / "sample-prompt.md"
+        (repo / "prompts" / "target.txt").write_text("payload", encoding="utf-8")
+        p.unlink()
+        p.symlink_to("target.txt")
+        run_git(repo, "add", "-A")
+        run_git(repo, "commit", "-qm", "symlink base")
+        run_git(repo, "checkout", "-qB", "feature", "main")
+        return repo, p
+
+    def test_symlink_swap_judged_against_history(self):
+        """Base is a symlink blob: the swapped-in file is judged against
+        the path's real versioned history, so a downgrade fails."""
+        repo, p = self._symlink_base(PROMPT_V1)  # history holds 1.0.0
+        p.unlink()
+        p.write_text(PROMPT_V1.replace("version: 1.0.0", "version: 0.5.0"),
+                     encoding="utf-8")
+        self.commit_all(repo, "swap in downgraded file")
+        failures = cvb.check("main", cwd=repo)
+        self.assertEqual(len(failures), 1)
+        self.assertIn("did not increase", failures[0])
+
+    def test_symlink_swap_without_history_requires_seed(self):
+        """No versioned history behind the symlink: the seed rule applies,
+        so an arbitrary high version cannot enter."""
+        repo, p = self._symlink_base("# bare file, no front matter\n")
+        p.unlink()
+        p.write_text(PROMPT_V1.replace("version: 1.0.0", "version: 7.7.7"),
+                     encoding="utf-8")
+        self.commit_all(repo, "swap at arbitrary version")
+        failures = cvb.check("main", cwd=repo)
+        self.assertEqual(len(failures), 1)
+        self.assertIn("introduce front matter at", failures[0])
+
+    def test_restore_of_any_exact_historical_state_passes(self):
+        """Restoring an OLDER exact blob (not just the newest) is legal."""
+        repo = self.make_repo()
+        run_git(repo, "checkout", "-q", "main")
+        p = repo / "prompts" / "sample-prompt.md"
+        v1 = p.read_text(encoding="utf-8")
+        p.write_text(v1.replace("version: 1.0.0", "version: 2.0.0")
+                     .replace("Original body", "Newer body"), encoding="utf-8")
+        run_git(repo, "add", "-A")
+        run_git(repo, "commit", "-qm", "bump to 2.0.0")
+        run_git(repo, "rm", "-q", "prompts/sample-prompt.md")
+        run_git(repo, "commit", "-qm", "delete")
+        run_git(repo, "checkout", "-qB", "feature", "main")
+        p.parent.mkdir(exist_ok=True)
+        p.write_text(v1, encoding="utf-8")  # exact ORIGINAL 1.0.0 state
+        self.commit_all(repo, "restore original state")
+        self.assertEqual(cvb.check("main", cwd=repo), [])
+
+    def test_shallow_clone_warns(self):
+        import contextlib, io
+        repo = self.make_repo()
+        clone = Path(str(repo) + "-shallow")
+        subprocess.run(["git", "clone", "-q", "--depth", "1",
+                        f"file://{repo}", str(clone)], check=True,
+                       capture_output=True, env=GIT_ENV)
+        self.addCleanup(lambda: subprocess.run(["rm", "-rf", str(clone)]))
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            try:
+                cvb.check("HEAD", cwd=clone)
+            except cvb.SkipCheck:
+                pass
+        self.assertIn("shallow clone", out.getvalue())
 
     def test_unusable_base_skips(self):
         repo = self.make_repo()
