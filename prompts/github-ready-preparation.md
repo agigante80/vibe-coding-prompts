@@ -1,8 +1,8 @@
 ---
 name: github-ready-preparation
 category: project-management
-version: 1.1.0
-updated: 2026-08-27
+version: 1.1.1
+updated: 2026-08-28
 description: Prepare a repository for professional public release on GitHub.
 platforms: [chatgpt, claude, gemini, copilot-chat]
 ---
@@ -129,7 +129,7 @@ Enable GitHub secret scanning with push protection in repository settings. No-in
 | Priority | Item | Status |
 |----------|------|--------|
 | **Critical** | Automated tests (runnable with single command) | ⬜ |
-| **Recommended** | 70%+ coverage & CI integration | ⬜ |
+| **Recommended** | Coverage floor (80%, per the Test Suite prompt) & CI integration | ⬜ |
 
 **For comprehensive test setup**, run **[Test Suite Generator](./test-suite-generator.md)**
 

@@ -2,7 +2,7 @@
 name: code-refactoring-plan
 category: development-workflow
 version: 1.1.0
-updated: 2026-08-27
+updated: 2026-08-28
 description: Analyze code smells and technical debt, producing a prioritized refactoring roadmap.
 platforms: [chatgpt, claude, gemini, copilot-chat]
 ---
@@ -19,13 +19,7 @@ Analyze codebase to identify code smells, technical debt, and architectural issu
 
 ### 1. **Codebase Analysis**
 
-**Project Discovery**:
-- Detect project type, language, and framework
-- Identify code organization patterns (monolith, microservices, modular)
-- Catalog dependencies and third-party integrations
-- Map file structure and module boundaries
-- Analyze code metrics (LOC, complexity, duplication)
-- Review existing tests and coverage
+**Project Discovery**: detect language/framework and organization pattern (monolith, modular, services), catalog dependencies, map module boundaries, analyze metrics (LOC, complexity, duplication), review tests and coverage
 
 **Technology Stack Detection**:
 ```bash
@@ -235,7 +229,7 @@ Technique names follow [Fowler's refactoring catalog](https://refactoring.com/ca
 
 ### **Refactoring Risk Levels**
 
-**Low Risk** (Green Light): renames with IDE support, method extraction, type annotations, dead-code removal, formatting, adding tests, documentation
+**Low Risk** (Green Light): renames with IDE support, method extraction, type annotations, dead-code removal, formatting, adding tests WITHOUT changing production code, documentation
 
 **Medium Risk** (Proceed with Caution):
 - Moving methods between classes
@@ -260,13 +254,13 @@ Technique names follow [Fowler's refactoring catalog](https://refactoring.com/ca
 **Before Refactoring**:
 - [ ] All tests passing (100% green)
 - [ ] Test coverage adequate (>70% for changed areas)
-- [ ] Feature branch created
+- [ ] Feature branch created; backup branch/tag for non-git state (schemas, configs)
 - [ ] Team notified of refactoring scope
 - [ ] Risk assessment documented
 
 **During**: small incremental steps, tests after each change, frequent clear commits, CI kept green, automated refactoring tools where possible, pairing on high-risk changes
 
-**After**: full suite passing, code review done, benchmarks maintained or improved, documentation updated, monitoring configured
+**After**: full suite passing, code review done, benchmarks maintained or improved, documentation updated, monitoring alerts configured, team walkthrough for major changes
 
 ---
 
@@ -293,11 +287,9 @@ Technique names follow [Fowler's refactoring catalog](https://refactoring.com/ca
 
 ## **Best Practices**
 
-**Incremental**: Small frequent refactorings, keep system working, deploy gradually  
-**Test-Driven**: Never refactor without tests, add tests first if missing  
-**Boy Scout Rule**: Leave code better than found  
-**Communication**: Discuss major changes, document why  
-**Measure**: Track metrics before/after
+**Incremental**: small frequent refactorings, system always working  
+**Test-Driven**: never refactor without tests; add them first if missing  
+**Boy Scout Rule**: leave code better than found; discuss major changes; measure before/after
 
 ---
 

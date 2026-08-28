@@ -2,7 +2,7 @@
 name: security-audit-generator
 category: security
 version: 1.1.1
-updated: 2026-08-27
+updated: 2026-08-28
 description: Comprehensive security audit with OWASP-based checks and prioritized remediation.
 platforms: [chatgpt, claude, gemini, copilot-chat]
 ---
@@ -52,9 +52,10 @@ Apply appropriate security standards based on project type:
 gitleaks git . -v
 gitleaks dir . -v
 
-# Keyword fallback (grep --include takes ONE glob; repeat the flag)
+# Keyword fallback: search ALL files (an extension whitelist misses
+# Dockerfiles, Makefiles and CI YAML); bash brace expansion
 grep -rn "password\|secret\|api_key\|token" \
-  --include="*.js" --include="*.py" --include="*.java" --include="*.env"
+  --exclude-dir={node_modules,.git,vendor,dist} .
 ```
 
 ### 🛡️ **Input Validation & Injection**
@@ -131,15 +132,7 @@ cargo audit
 
 ### ⚙️ **Configuration & Secrets**
 
-**Check for**:
-- Debug mode enabled in production
-- Verbose error messages exposing internal details
-- Default credentials not changed
-- Secrets in version control (.env files, config files)
-- Insecure CORS policies (wildcard origins)
-- Missing rate limiting and throttling
-- Exposed admin panels or debug endpoints
-- Unnecessary services or ports exposed
+**Check for**: debug mode in production, verbose errors exposing internals, unchanged default credentials, secrets in version control, wildcard CORS origins, missing rate limiting, exposed admin/debug endpoints, unnecessary services or ports
 
 **Best practices**: environment variables or secret managers (Vault, AWS Secrets Manager); .gitignore for sensitive files; regular rotation; least privilege
 
@@ -197,24 +190,18 @@ SQL string concatenation
 Run comprehensive security scans:
 
 ```bash
-# Container scanning
-trivy image your-image:tag --severity HIGH,CRITICAL
-
-# Dependency scanning
-snyk test --severity-threshold=high
-
-# SAST (Static Application Security Testing)
-semgrep --config=auto
-
-# Secret scanning: history, then working tree (-v gives per-finding
-# detail). Scanners exit non-zero on findings, so under set -e capture
-# each status and fail at the end, or earlier findings mask later scans:
-gitleaks git . -v || status=1
-gitleaks dir . -v || status=1
-
-# Infrastructure as Code
-checkov -d .
-tfsec .
+#!/usr/bin/env bash
+# EVERY scanner exits non-zero on findings; capture each status and fail
+# at the end, or the first finding masks all later scans (fatal under set -e).
+status=0
+trivy image your-image:tag --severity HIGH,CRITICAL || status=1  # containers
+snyk test --severity-threshold=high || status=1                  # dependencies
+semgrep --config=auto || status=1                                # SAST
+gitleaks git . -v || status=1   # secrets: full commit history
+gitleaks dir . -v || status=1   # secrets: working tree
+checkov -d . || status=1        # infrastructure as code
+tfsec . || status=1
+exit "$status"
 ```
 
 ### **Manual Testing Checklist**
