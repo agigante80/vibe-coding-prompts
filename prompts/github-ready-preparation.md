@@ -1,7 +1,7 @@
 ---
 name: github-ready-preparation
 category: project-management
-version: 1.1.1
+version: 1.1.2
 updated: 2026-08-28
 description: Prepare a repository for professional public release on GitHub.
 platforms: [chatgpt, claude, gemini, copilot-chat]
@@ -26,10 +26,7 @@ Prepare a project for professional GitHub publication by establishing proper str
 
 ### 2. **.gitignore Review & Validation**
 
-**Critical Checks**:
-- Verify needed files aren't excluded
-- Ensure build artifacts, secrets (`.env`, `*.key`), and OS files are ignored
-- Organize by category (Dependencies, Build, Secrets, IDE, OS, Logs)
+**Critical Checks**: needed files not excluded; build artifacts, secrets (`.env`, `*.key`) and OS files ignored; entries organized by category
 
 **Validation**: Run `git check-ignore README.md package.json src/` (should return nothing)
 
@@ -151,7 +148,7 @@ Enable GitHub secret scanning with push protection in repository settings. No-in
 | Priority | Item | Status |
 |----------|------|--------|
 | **Critical** | Professional `README.md` | ⬜ |
-| **Critical** | `/docs/` standardization (9 files) | ⬜ |
+| **Critical** | `/docs/` standardization (9 files + declared extensions) | ⬜ |
 
 **For README generation**, run **[README Generator](./readme-generator.md)**
 **For documentation standardization**, already covered in Step 4 above
@@ -317,7 +314,7 @@ Update `/docs/` files per [Documentation Standardization](./documentation-standa
 - [ ] All critical files present (`.gitignore`, `LICENSE`, `README.md`)
 - [ ] No secrets in repository history
 - [ ] Tests pass, CI/CD configured and passing
-- [ ] `/docs/` standardized (9 files)
+- [ ] `/docs/` standardized (9 files + declared extensions)
 - [ ] Security scanning enabled (Dependabot, secret scanning)
 - [ ] Repository metadata configured (description, topics)
 - [ ] Project can be cloned and run without additional guidance

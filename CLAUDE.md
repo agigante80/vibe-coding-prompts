@@ -39,6 +39,6 @@ A library of reusable AI "meta-prompts" for software development workflows. The 
 
 ## The `/docs/` standardization system (in target projects)
 
-Prompts instruct AI agents to maintain a standardized 9-file `/docs/` structure in *target* projects (defined by `prompts/documentation-standardization.md`). This repository itself is exempt: it is a content library, and its own `/docs/` holds concept guides (the README states this explicitly). When writing a prompt, its Deliverables should specify which target-project `/docs/` files the output updates.
+Prompts instruct AI agents to maintain a standardized `/docs/` structure in *target* projects: 9 required files plus declared extensions (defined by `prompts/documentation-standardization.md`). This repository itself is exempt: it is a content library, and its own `/docs/` holds concept guides (the README states this explicitly). When writing a prompt, its Deliverables should specify which target-project `/docs/` files the output updates.
 
 Cross-file consistency matters: when changing a convention (the `/docs/` file list, word limits, front matter fields), sweep every prompt and doc that states it.
