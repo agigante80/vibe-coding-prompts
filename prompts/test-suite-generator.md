@@ -1,7 +1,7 @@
 ---
 name: test-suite-generator
 category: development-workflow
-version: 1.1.0
+version: 1.1.1
 updated: 2026-08-28
 description: Generate a comprehensive test suite with unit, integration and e2e coverage, plus skipped-test cleanup.
 platforms: [chatgpt, claude, gemini, copilot-chat]
@@ -332,7 +332,7 @@ Update the following files in `/docs/`:
 ## **Best Practices**
 
 ### **General Testing**
-* Test behavior, not implementation; one focused thing per test; meaningful assertion messages
+* Test behavior, not implementation; one focused thing per test. Verify new tests can actually fail: [Prove Your Tests Can Fail](./prove-your-tests-can-fail.md)
 * No test interdependencies; mock external dependencies consistently
 * Run tests frequently, update them with code changes, and hold test code to production standards
 
