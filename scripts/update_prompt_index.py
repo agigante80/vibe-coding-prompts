@@ -127,9 +127,10 @@ def validate(fields, source):
 def collect(prompts_dir):
     """Read every prompt file and return sorted table entries."""
     entries = []
-    files = sorted(
-        p for p in prompts_dir.glob("*.md")
-        if is_prompt_path(f"prompts/{p.name}"))
+    # Deliberately UNFILTERED: every *.md is examined so a mis-named file
+    # is rejected loudly here (the gate's is_prompt_path ignores it, and
+    # silent ignoring in both layers would let it enter with green CI).
+    files = sorted(prompts_dir.glob("*.md"))
     if not files:
         raise PromptError(f"no prompt files found in {prompts_dir}")
     for path in files:

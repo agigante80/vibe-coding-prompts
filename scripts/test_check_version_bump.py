@@ -183,11 +183,13 @@ class CheckVersionBumpTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             d = Path(tmp) / "prompts"
             d.mkdir()
+            (d / "sample-prompt.md").write_text(PROMPT_V1, encoding="utf-8")
             (d / "caf\u00e9-prompt.md").write_text(
                 PROMPT_V1.replace("sample-prompt", "caf\u00e9-prompt"),
                 encoding="utf-8")
-            with self.assertRaises(upi.PromptError):
+            with self.assertRaises(upi.PromptError) as ctx:
                 upi.collect(d)
+            self.assertIn("kebab-case", str(ctx.exception))
 
     def test_impossible_calendar_date_fails(self):
         repo = self.make_repo()
@@ -362,22 +364,83 @@ class CheckVersionBumpTests(unittest.TestCase):
         self.assertIn(emoji, blobs)
         self.assertIn(second, blobs)
 
-    def test_restore_of_any_exact_historical_state_passes(self):
-        """Restoring an OLDER exact blob (not just the newest) is legal."""
+    def _deleted_two_version_repo(self):
         repo = self.make_repo()
         run_git(repo, "checkout", "-q", "main")
         p = repo / "prompts" / "sample-prompt.md"
         v1 = p.read_text(encoding="utf-8")
-        p.write_text(v1.replace("version: 1.0.0", "version: 2.0.0")
-                     .replace("Original body", "Newer body"), encoding="utf-8")
+        v2 = (v1.replace("version: 1.0.0", "version: 2.0.0")
+              .replace("Original body", "Newer body"))
+        p.write_text(v2, encoding="utf-8")
         run_git(repo, "add", "-A")
         run_git(repo, "commit", "-qm", "bump to 2.0.0")
         run_git(repo, "rm", "-q", "prompts/sample-prompt.md")
         run_git(repo, "commit", "-qm", "delete")
         run_git(repo, "checkout", "-qB", "feature", "main")
         p.parent.mkdir(exist_ok=True)
+        return repo, p, v1, v2
+
+    def test_restore_of_highest_state_passes(self):
+        repo, p, v1, v2 = self._deleted_two_version_repo()
+        p.write_text(v2, encoding="utf-8")  # exact HIGHEST state
+        self.commit_all(repo, "restore highest state")
+        self.assertEqual(cvb.check("main", cwd=repo), [])
+
+    def test_restore_of_older_state_is_a_downgrade_and_fails(self):
+        """An exact OLDER state is a net downgrade across pushes; it must
+        bump past the earned maximum like any other change."""
+        repo, p, v1, v2 = self._deleted_two_version_repo()
         p.write_text(v1, encoding="utf-8")  # exact ORIGINAL 1.0.0 state
         self.commit_all(repo, "restore original state")
+        failures = cvb.check("main", cwd=repo)
+        self.assertEqual(len(failures), 1)
+        self.assertIn("did not increase", failures[0])
+
+    def test_rename_after_corruption_keeps_old_path_floor(self):
+        """Corrupt front matter then rename: the version floor earned under
+        the old name must survive to the new name."""
+        repo = self.make_repo()
+        run_git(repo, "checkout", "-q", "main")
+        p = repo / "prompts" / "sample-prompt.md"
+        earned = (PROMPT_V1.replace("version: 1.0.0", "version: 3.0.0")
+                  .replace("Original body", "Earned body"))
+        p.write_text(earned, encoding="utf-8")
+        run_git(repo, "add", "-A")
+        run_git(repo, "commit", "-qm", "earn 3.0.0")
+        p.write_text("corrupted, no front matter\n" + earned, encoding="utf-8")
+        run_git(repo, "add", "-A")
+        run_git(repo, "commit", "-qm", "corrupt front matter")
+        run_git(repo, "checkout", "-qB", "feature", "main")
+        run_git(repo, "mv", "prompts/sample-prompt.md", "prompts/renamed-prompt.md")
+        (repo / "prompts" / "renamed-prompt.md").write_text(
+            PROMPT_V1.replace("sample-prompt", "renamed-prompt"),
+            encoding="utf-8")  # restored front matter at 1.0.0
+        self.commit_all(repo, "rename with fresh 1.0.0")
+        failures = cvb.check("main", cwd=repo)
+        self.assertEqual(len(failures), 1)
+        self.assertIn("did not increase", failures[0])
+
+    def test_symlink_clobber_undo_needs_no_bump(self):
+        """Restoring the byte-exact pre-symlink file must pass as-is."""
+        repo, p = self._symlink_base(PROMPT_V1)
+        p.unlink()
+        p.write_text(PROMPT_V1, encoding="utf-8")  # exact original
+        self.commit_all(repo, "undo symlink clobber")
+        self.assertEqual(cvb.check("main", cwd=repo), [])
+
+    def test_crlf_restore_round_trips(self):
+        """CR-bearing content must compare byte-exactly through both the
+        git() wrapper and the cat-file blob path."""
+        crlf = PROMPT_V1.replace("\n", "\r\n")
+        repo = self.make_repo(initial_text=crlf)
+        run_git(repo, "checkout", "-q", "main")
+        run_git(repo, "rm", "-q", "prompts/sample-prompt.md")
+        run_git(repo, "commit", "-qm", "delete")
+        run_git(repo, "checkout", "-qB", "feature", "main")
+        p = repo / "prompts" / "sample-prompt.md"
+        p.parent.mkdir(exist_ok=True)
+        p.write_bytes(crlf.encode("utf-8"))
+        self.commit_all(repo, "restore crlf state")
         self.assertEqual(cvb.check("main", cwd=repo), [])
 
     def test_shallow_clone_warns(self):
