@@ -361,7 +361,8 @@ class CheckVersionBumpTests(unittest.TestCase):
         p.write_text(second, encoding="utf-8")
         run_git(repo, "add", "-A")
         run_git(repo, "commit", "-qm", "second emoji version")
-        blobs = cvb.historical_blobs("main", "prompts/sample-prompt.md", cwd=repo)
+        blobs, lossy = cvb.historical_blobs("main", "prompts/sample-prompt.md", cwd=repo)
+        self.assertFalse(lossy)
         self.assertEqual(len(blobs), 2)
         self.assertIn(emoji, blobs)
         self.assertIn(second, blobs)
@@ -493,6 +494,37 @@ class CheckVersionBumpTests(unittest.TestCase):
         run_git(repo, "commit", "-qm", "undecodable filename")
         with self.assertRaises(cvb.PromptError):
             cvb.check("main", cwd=repo)
+
+    def test_replacement_char_edit_over_legacy_base_is_caught(self):
+        """A base with a raw non-UTF-8 byte and a head with the literal
+        U+FFFD an editor writes is a REAL change: replace-decoding must
+        not make them compare equal and skip the bump requirement."""
+        legacy = PROMPT_V1.replace("Original body text.", "Byte: X.")
+        repo = self.make_repo(initial_text=legacy)
+        raw = (repo / "prompts" / "sample-prompt.md").read_bytes().replace(b"X", b"\xe9")
+        run_git(repo, "checkout", "-q", "main")
+        (repo / "prompts" / "sample-prompt.md").write_bytes(raw)
+        run_git(repo, "add", "-A")
+        run_git(repo, "commit", "-qm", "legacy byte base")
+        run_git(repo, "checkout", "-qB", "feature", "main")
+        resaved = legacy.replace("Byte: X.", "Byte: \ufffd.")
+        (repo / "prompts" / "sample-prompt.md").write_bytes(resaved.encode("utf-8"))
+        self.commit_all(repo, "editor re-save, no bump")
+        failures = cvb.check("main", cwd=repo)
+        self.assertEqual(len(failures), 1)
+        self.assertIn("did not increase", failures[0])
+
+    def test_undecodable_filename_outside_prompts_is_ignored(self):
+        """A non-UTF-8 filename elsewhere in the diff is none of the
+        gate's business and must not fail the run."""
+        repo = self.make_repo()
+        bad = repo.as_posix().encode() + b"/testdata-caf\xe9.txt"
+        (repo / "testdata").mkdir(exist_ok=True)
+        with open(bad, "wb") as f:
+            f.write(b"payload")
+        run_git(repo, "add", "-A")
+        run_git(repo, "commit", "-qm", "unrelated undecodable filename")
+        self.assertEqual(cvb.check("main", cwd=repo), [])
 
     def test_shallow_clone_warns(self):
         import contextlib, io
