@@ -140,22 +140,25 @@ def historical_blobs(base_commit, path, cwd=None):
                  cwd=cwd).split()
     if not hashes:
         return []
-    batch_input = "".join(f"{h}:{path}\n" for h in hashes)
+    batch_input = "".join(f"{h}:{path}\n" for h in hashes).encode()
+    # Parse in BYTES: cat-file sizes are byte counts, and prompts contain
+    # multi-byte UTF-8 (emoji), so slicing a decoded str by the byte size
+    # would swallow separators and corrupt subsequent records.
     proc = subprocess.run(
         ["git", "cat-file", "--batch"], input=batch_input,
-        capture_output=True, encoding="utf-8", cwd=cwd)
+        capture_output=True, cwd=cwd)
     if proc.returncode != 0:
         raise subprocess.CalledProcessError(
             proc.returncode, proc.args, proc.stdout, proc.stderr)
     blobs, out, pos = [], proc.stdout, 0
     while pos < len(out):
-        newline = out.index("\n", pos)
+        newline = out.index(b"\n", pos)
         header = out[pos:newline]
         pos = newline + 1
-        if header.endswith(" missing"):
+        if header.endswith(b" missing"):
             continue
-        size = int(header.rsplit(" ", 1)[1])
-        blobs.append(out[pos:pos + size])
+        size = int(header.rsplit(b" ", 1)[1])
+        blobs.append(out[pos:pos + size].decode("utf-8"))
         pos = pos + size + 1  # skip the trailing separator newline
     return blobs
 
