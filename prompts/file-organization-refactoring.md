@@ -1,7 +1,7 @@
 ---
 name: file-organization-refactoring
 category: development-workflow
-version: 1.1.0
+version: 1.1.1
 updated: 2026-08-27
 description: Reorganize project files and folders safely with tested, incremental migrations.
 platforms: [chatgpt, claude, gemini, copilot-chat]
@@ -131,7 +131,7 @@ grep -rnE "^\s*(import|from .+ import|const .+ = require)" \
 5. If tests pass: commit; if fail: revert with `git reset --hard`
 6. Repeat for next file
 
-**For deleting obsolete files**: Search for references first (`grep -rn "filename" --include="*.js" --include="*.ts" --include="*.py" --include="*.json" .`), delete only if unreferenced:
+**For deleting obsolete files**: Search for references across ALL files first; an extension whitelist misses Dockerfiles, Makefiles, CI YAML and shell scripts, so exclude noise directories instead (`grep -rn "filename" --exclude-dir={node_modules,.git,dist,build,vendor} .`), and delete only if unreferenced:
 
 ```bash
 # Delete only confirmed obsolete files (git rm stages the deletion)
@@ -288,11 +288,8 @@ The AI analyzes the current structure, proposes a target layout for your project
 - Consider gradual migration with aliasing
 
 ### **Pitfall 2: Losing Git History**
-**Problem**: Using `rm` + `add` instead of `git mv` loses file history
-**Solution**:
-- Use `git mv` in move-only commits; git rename detection is a similarity heuristic, not recorded metadata
-- Use `git log --follow` to verify history is still traceable after each move
-- Avoid bulk operations without git awareness
+**Problem**: rename detection is a similarity heuristic, not recorded metadata
+**Solution**: `git mv` in move-only commits, verify with `git log --follow`, avoid bulk operations mixing moves and edits
 
 ### **Pitfall 3: Circular Dependencies**
 **Problem**: Moving files reveals or creates circular dependencies
