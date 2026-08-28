@@ -50,8 +50,8 @@ Model context windows change every generation, so treat these as ORDERS OF MAGNI
 
 Because you mentioned GitHub Actions and Copilot-like usage, **the sweet spot** for Copilot and similar code assistants is:
 
-> 🧩 **Between 300 and 700 words (2k to 5k characters)**
-> That’s long enough to provide detail and structure, but short enough to not get truncated or ignored.
+> 🧩 **The inline sweet-spot range in the limits table above**
+> Long enough for detail and structure, short enough not to get truncated or ignored.
 
 If your prompt (like your CI/CD meta-prompt) is longer than ~1,000 words:
 
@@ -94,7 +94,7 @@ If your goal is to feed a **meta-prompt** like your universal CI/CD builder:
 
 * There's **no fixed word limit**, but clarity always matters more than size:
 
-  * **Copilot inline:** 300 to 700 words is the sweet spot; use Copilot Chat beyond that
+  * **Copilot inline:** stay in the limits table's sweet spot; use Copilot Chat beyond it
   * **ChatGPT, Claude, Gemini:** handle full prompts of any length in this collection easily
 
 * **This repository's prompts** target under 1600 words each; the current per-prompt word counts live in the [generated index in the root README](../README.md), the single source of truth
