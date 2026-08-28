@@ -1,7 +1,7 @@
 ---
 name: file-organization-refactoring
 category: development-workflow
-version: 1.1.1
+version: 1.1.2
 updated: 2026-08-28
 description: Reorganize project files and folders safely with tested, incremental migrations.
 platforms: [chatgpt, claude, gemini, copilot-chat]
@@ -34,7 +34,7 @@ Systematically reorganize project files and folders to establish clear structure
 
 Run **[Documentation Standardization](./documentation-standardization.md)** to ensure:
 - Root has 2-6 `.md` files (README, LICENSE required)
-- `/docs/` has exactly 9 standard `.md` files
+- `/docs/` has the 9 standard `.md` files (plus optional VERSIONING.md and declared extensions)
 - Obsolete docs archived to `docs/archive/docs-backup-YYYY-MM-DD/`
 
 ---
@@ -244,10 +244,8 @@ Add file organization section with:
 
 ### **When to Run This Refactoring**
 
-* Project grew organically: unclear structure, cluttered root, tests mixed with source
-* Hard to find files; onboarding new developers is challenging
-* Preparing for major refactoring or feature development
-* Before transitioning to monorepo or microservices
+* Organic growth: unclear structure, cluttered root, tests mixed with source, hard onboarding
+* Before major refactoring, feature pushes, or a monorepo/microservices transition
 
 ### **Initial Setup**
 1. Review current structure; ensure a comprehensive test suite exists (add tests first if needed)

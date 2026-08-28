@@ -1,7 +1,7 @@
 ---
 name: project-reassessment
 category: project-management
-version: 1.1.1
+version: 1.1.2
 updated: 2026-08-28
 description: Full repository health check aligning code, documentation and policies.
 platforms: [chatgpt, claude, gemini, copilot-chat]
@@ -87,7 +87,7 @@ grep -rhoE "v?[0-9]+\.[0-9]+\.[0-9]+" docs/ README.md | sort | uniq -c
 - `SECURITY_AND_PRIVACY.md` - Security policies and data protection
 - `ROADMAP.md` - Priority-based future improvement plan
 
-**Note**: `/docs/` must contain these 9 files (plus optional `VERSIONING.md` if it already exists, per the Documentation Standardization prompt). Other documentation should be deleted, merged into these files, or archived to `docs/archive/docs-backup-YYYY-MM-DD/`.
+**Note**: `/docs/` contains these 9 files, optional `VERSIONING.md`, and extensions declared in the `docs/README.md` index (per the Documentation Standardization prompt). Undeclared extras get declared, merged, or archived to `docs/archive/docs-backup-YYYY-MM-DD/` at that prompt's approval gate.
 
 **Detect Contradictions**:
 - Compare version numbers across all docs
