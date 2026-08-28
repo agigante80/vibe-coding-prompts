@@ -126,36 +126,69 @@ def front_matter_of(text, source):
     return fields.get("version", ""), fields.get("updated", "")
 
 
-def last_historical_blob(base_commit, path, cwd=None):
-    """The highest-versioned content the path ever had at or before base,
-    or None if it never existed.
+def historical_blobs(base_commit, path, cwd=None):
+    """Every content the path had at or before base, newest first.
 
-    Scans ALL history (--full-history defeats merge-side simplification;
-    picking by parsed version rather than commit date defeats timestamp
-    ties and delete-through-merge topologies), so a restore is always
-    judged against the version the prompt actually earned.
+    One rev-list plus ONE `git cat-file --batch` subprocess regardless of
+    how many commits touched the path. cat-file's explicit "missing"
+    marker distinguishes absent blobs (skipped) from real git errors
+    (which raise), and --full-history plus version-aware consumers defeat
+    merge-side history simplification.
     """
     hashes = git("log", "--full-history", "--format=%H",
                  "--diff-filter=ACMR", base_commit, "--", path,
                  cwd=cwd).split()
-    best_blob, best_key = None, None
-    for commit in hashes:
-        try:
-            text = git("show", f"{commit}:{path}", cwd=cwd)
-        except subprocess.CalledProcessError:
+    if not hashes:
+        return []
+    batch_input = "".join(f"{h}:{path}\n" for h in hashes)
+    proc = subprocess.run(
+        ["git", "cat-file", "--batch"], input=batch_input,
+        capture_output=True, encoding="utf-8", cwd=cwd)
+    if proc.returncode != 0:
+        raise subprocess.CalledProcessError(
+            proc.returncode, proc.args, proc.stdout, proc.stderr)
+    blobs, out, pos = [], proc.stdout, 0
+    while pos < len(out):
+        newline = out.index("\n", pos)
+        header = out[pos:newline]
+        pos = newline + 1
+        if header.endswith(" missing"):
             continue
+        size = int(header.rsplit(" ", 1)[1])
+        blobs.append(out[pos:pos + size])
+        pos = pos + size + 1  # skip the trailing separator newline
+    return blobs
+
+
+def best_historical(blobs, path):
+    """(blob, version) of the highest-versioned historical copy, or
+    (None, None) when no blob carries a parseable version."""
+    best_blob, best_ver, best_key = None, None, None
+    for text in blobs:
         try:
             version, _ = front_matter_of(text, path)
         except PromptError:
-            version = ""
-        key = semver_tuple(version) if VERSION_RE.match(version) else (-1,)
+            continue
+        if not VERSION_RE.match(version):
+            continue
+        key = semver_tuple(version)
         if best_key is None or key > best_key:
-            best_blob, best_key = text, key
-    return best_blob
+            best_blob, best_ver, best_key = text, version, key
+    return best_blob, best_ver
+
+
+def warn_if_shallow(cwd=None):
+    """A shallow clone truncates history walks silently; say so once."""
+    git_dir = git("rev-parse", "--git-dir", cwd=cwd).strip()
+    shallow = Path(cwd or ".") / git_dir / "shallow"
+    if shallow.exists():
+        print("warning: shallow clone; historical version checks may be "
+              "incomplete here (CI, with full history, is authoritative)")
 
 
 def check(base_ref, head="HEAD", cwd=None):
     """Return a list of failure messages (empty means the check passes)."""
+    warn_if_shallow(cwd=cwd)
     base_commit = resolve_base(base_ref, head, cwd=cwd)
     failures = []
     for old, new in changed_prompts(base_commit, head, cwd=cwd):
@@ -167,15 +200,16 @@ def check(base_ref, head="HEAD", cwd=None):
             except PromptError as exc:
                 failures.append(f"{new}: head front matter unreadable ({exc})")
                 continue
-            historical = last_historical_blob(base_commit, new, cwd=cwd)
-            if historical is not None:
-                # A restored path is judged like a modification against the
-                # content it last had, so delete-then-re-add cannot smuggle
-                # content changes past the bump rules across two pushes.
-                if historical == new_text:
-                    print(f"ok: {new} (restored prompt, unchanged at {version})")
-                    continue
-                old_text, old_label = historical, f"{new} (historical)"
+            blobs = historical_blobs(base_commit, new, cwd=cwd)
+            if new_text in blobs:
+                # Exact restore of ANY prior state keeps that state's version.
+                print(f"ok: {new} (restored prompt, unchanged at {version})")
+                continue
+            hist_blob, hist_ver = best_historical(blobs, new)
+            if hist_blob is not None:
+                # Changed content on a restored path is judged like a
+                # modification against the highest version it ever earned.
+                old_text, old_label = hist_blob, f"{new} (historical {hist_ver})"
             elif version == SEED_VERSION:
                 print(f"ok: {new} (new prompt at {SEED_VERSION})")
                 continue
@@ -206,9 +240,24 @@ def check(base_ref, head="HEAD", cwd=None):
         try:
             old_version, old_updated = front_matter_of(old_text, old_label)
         except PromptError:
-            # Base copy predates front matter; the new version is the seed.
-            print(f"ok: {new} (front matter introduced at {new_version})")
-            continue
+            # Base copy has no readable front matter (pre-migration legacy,
+            # or a symlink blob). Do NOT blanket-accept: apply the same
+            # rules as a new path, so a swapped-in file cannot carry an
+            # arbitrary version through this door.
+            blobs = historical_blobs(base_commit, new, cwd=cwd)
+            hist_blob, hist_ver = best_historical(blobs, new)
+            if hist_blob is not None:
+                old_text, old_label = hist_blob, f"{new} (historical {hist_ver})"
+                old_version, old_updated = front_matter_of(old_text, old_label)
+            elif new_version == SEED_VERSION:
+                print(f"ok: {new} (front matter introduced at {SEED_VERSION})")
+                continue
+            else:
+                failures.append(
+                    f"{new}: base has no readable front matter and no "
+                    f"versioned history; introduce front matter at "
+                    f"{SEED_VERSION}, not {new_version}")
+                continue
         if not VERSION_RE.match(old_version):
             print(f"ok: {new} (base version unparseable; seeded {new_version})")
             continue
