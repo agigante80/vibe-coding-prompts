@@ -25,10 +25,10 @@ This table is generated from each prompt's front matter by `scripts/update_promp
 | [test-suite-generator](./prompts/test-suite-generator.md) | development-workflow | 1.1.0 | 2026-08-28 | 1592 | Generate a comprehensive test suite with unit, integration and e2e coverage, plus skipped-test cleanup. |
 | [version-management](./prompts/version-management.md) | development-workflow | 1.1.1 | 2026-08-28 | 1028 | Semantic versioning strategy with a VERSION file, conventional commits and automated releases. |
 | [github-actions-cicd-generator](./prompts/github-actions-cicd-generator.md) | devops-automation | 3.0.0 | 2026-08-28 | 945 | Generate a complete, security-hardened GitHub Actions pipeline for any stack, with Docker publishing and release automation. |
-| [documentation-standardization](./prompts/documentation-standardization.md) | documentation | 2.0.0 | 2026-08-28 | 1598 | Standardize project documentation into the 9-file /docs/ structure with auditing and cleanup. |
+| [documentation-standardization](./prompts/documentation-standardization.md) | documentation | 2.0.0 | 2026-08-28 | 1599 | Standardize project documentation into the required /docs/ set plus declared extensions, with approval-gated cleanup. |
 | [readme-generator](./prompts/readme-generator.md) | documentation | 1.1.0 | 2026-08-27 | 1587 | Generate or update a professional README, preserving images and validating Docker Hub descriptions. |
 | [logging-implementation-best-practices](./prompts/logging-implementation-best-practices.md) | operations | 1.1.0 | 2026-08-27 | 1595 | Production logging with structured JSON, PII redaction, rotation, retention and observability. |
-| [github-ready-preparation](./prompts/github-ready-preparation.md) | project-management | 1.1.2 | 2026-08-28 | 1592 | Prepare a repository for professional public release on GitHub. |
+| [github-ready-preparation](./prompts/github-ready-preparation.md) | project-management | 1.1.2 | 2026-08-28 | 1597 | Prepare a repository for professional public release on GitHub. |
 | [project-reassessment](./prompts/project-reassessment.md) | project-management | 1.1.2 | 2026-08-28 | 1546 | Full repository health check aligning code, documentation and policies. |
 | [dependency-update-manager](./prompts/dependency-update-manager.md) | security | 1.1.0 | 2026-08-27 | 1582 | Automate dependency updates with risk classification, testing and rollback. |
 | [security-audit-generator](./prompts/security-audit-generator.md) | security | 1.1.1 | 2026-08-28 | 1582 | Comprehensive security audit with OWASP-based checks and prioritized remediation. |
@@ -59,7 +59,7 @@ For prompt-length limits per platform, see the [Prompt Engineering Guide](./docs
 
 ## A note on this repository's own standards
 
-Several prompts here define standards for target software projects (a 9-file `/docs/` structure, test suites, CI/CD pipelines). This repository itself is a content library, not a software project: its `/docs/` holds concept guides, its tests cover the index tooling in `scripts/`, and the documentation standards its prompts enforce apply to the projects you run them on, not to this repo.
+Several prompts here define standards for target software projects (a standardized `/docs/` structure, test suites, CI/CD pipelines). This repository itself is a content library, not a software project: its `/docs/` holds concept guides, its tests cover the index tooling in `scripts/`, and the documentation standards its prompts enforce apply to the projects you run them on, not to this repo.
 
 ## Contributing
 

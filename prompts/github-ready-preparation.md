@@ -42,7 +42,7 @@ Prepare a project for professional GitHub publication by establishing proper str
 ### 3.1. **Documentation Sanitization & Standardization**
 
 **For comprehensive documentation cleanup**, run **[Documentation Standardization](./documentation-standardization.md)** which covers:
-- Standard 9-file `/docs/` structure enforcement
+- The `/docs/` contract (9 required files plus declared extensions), applied at its approval gate
 - Duplicate/outdated file identification and archiving
 - Contradiction detection and resolution
 - Naming convention fixes and cross-reference validation
@@ -148,7 +148,7 @@ Enable GitHub secret scanning with push protection in repository settings. No-in
 | Priority | Item | Status |
 |----------|------|--------|
 | **Critical** | Professional `README.md` | ⬜ |
-| **Critical** | `/docs/` standardization (9 files + declared extensions) | ⬜ |
+| **Critical** | `/docs/` per [Documentation Standardization](./documentation-standardization.md) | ⬜ |
 
 **For README generation**, run **[README Generator](./readme-generator.md)**
 **For documentation standardization**, already covered in Step 4 above
@@ -314,7 +314,7 @@ Update `/docs/` files per [Documentation Standardization](./documentation-standa
 - [ ] All critical files present (`.gitignore`, `LICENSE`, `README.md`)
 - [ ] No secrets in repository history
 - [ ] Tests pass, CI/CD configured and passing
-- [ ] `/docs/` standardized (9 files + declared extensions)
+- [ ] `/docs/` matches the [Documentation Standardization](./documentation-standardization.md) contract
 - [ ] Security scanning enabled (Dependabot, secret scanning)
 - [ ] Repository metadata configured (description, topics)
 - [ ] Project can be cloned and run without additional guidance
