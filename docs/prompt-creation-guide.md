@@ -411,7 +411,7 @@ Based on our platform compatibility guidelines:
 | **Complex** | 1500-2000 words | ChatGPT, Claude, Gemini (Copilot Chat) |
 | **Extensive** | 2000-5000 words | ChatGPT, Claude, Gemini |
 
-**Repository policy**: keep prompts under 1600 words (body text, measured with `wc -w` minus front matter). One legacy prompt is currently over the cap; see issue #5.
+**Repository policy**: keep prompts under 1600 words (body text, measured with `wc -w` minus front matter). All current prompts comply; the generated README index shows live counts.
 
 ### **How to Optimize Length**
 
