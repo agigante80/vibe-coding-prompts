@@ -11,7 +11,7 @@ A multi-day session that took the repository from a hand-maintained prompt colle
 - **Versioning system**: YAML front matter on every prompt, `scripts/update_prompt_index.py` generating the README table, `scripts/check_version_bump.py` gating bumps from git blobs, CI workflow, pre-commit config. Hardened across four follow-up tickets. (#18, #19, #20, #24, #25, #27, #31, #46)
 - **New prompts**: `autonomous-backlog-workflow` and `prove-your-tests-can-fail`, authored from the user field-tested specs. (#2, #3)
 - **Backlog hygiene**: triaged the old README TODO list into twelve `prompt-proposal` issues (#33 to #44) with discard rationale recorded on #23.
-- Final state: 14 prompts, all under the 1600-word cap, 81 tests passing, CI green on main, all merged branches deleted.
+- Final state: 14 prompts, all under the 1600-word cap, 81 tests passing, CI green on main, all merged branches deleted. Backlog: 16 open issues (14 `prompt-proposal`, 2 `prompt-review`).
 
 ## In progress (where we left off)
 Nothing in flight. No open PRs, no branches other than `main`, working tree clean at commit 07d7297.
@@ -20,6 +20,7 @@ Nothing in flight. No open PRs, no branches other than `main`, working tree clea
 1. Enable **branch protection on `main`** requiring the `verify` check (human-only; until then the push-side gate is advisory).
 2. Work the twelve prompt proposals, one per batch. Suggested priority: #34 (API documentation generator) and #35 (code review checklist) for reach, #44 (tutorial and guide creator) to give the collection its first user-facing-docs prompt, filling the gap the Diataxis scope note in documentation-standardization now makes explicit.
 3. Each proposal follows the same shape: author per `docs/prompt-creation-guide.md`, front matter at 1.0.0, regenerate the index, bounded review loop, merge.
+4. Triage four issues filed by another session while this one ran (not reviewed here): #51 and #52 (`prompt-review`: security-audit-generator names OWASP Top 10:2025 but does not cover it; no SBOM or build provenance anywhere) and #53, #54 (`prompt-proposal`: AI feature security audit for the OWASP LLM Top 10; agent instruction file generator for AGENTS.md). #51 and #52 look like genuine content gaps in a prompt this session already edited, so check them against the current file before assuming they still apply.
 
 ## Decisions and why
 - **Flat `prompts/` over category directories** (#17 Option A): twelve prompts across six directories meant two files each and six README indexes that all drifted; category now lives in front matter and renders as an index column.
