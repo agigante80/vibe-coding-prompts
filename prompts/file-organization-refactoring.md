@@ -99,7 +99,7 @@ EOF
 # Find all import/require statements
 # Anchored import statements only (adapt per language); -I skips
 # binaries; exclude noise dirs and the output file itself (bash)
-grep -rnEI "^\s*(import |from .+ import|const .+ = require|require\()" \
+grep -rnEI "^\s*(import |from .+ import|(const|let|var) .+ = require|require\()" \
   --exclude-dir={node_modules,.git,dist,build,vendor} \
   --exclude=imports.txt . > imports.txt
 

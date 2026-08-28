@@ -95,7 +95,7 @@ Shape the suite as a test pyramid: write LOTS of small fast unit tests, SOME coa
 
 ### **Test Structure**
 
-
+Each test file follows this shape:
 
 ```
 # Test file structure example (Python/pytest)
