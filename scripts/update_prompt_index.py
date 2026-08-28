@@ -127,10 +127,18 @@ def validate(fields, source):
 def collect(prompts_dir):
     """Read every prompt file and return sorted table entries."""
     entries = []
-    # Deliberately UNFILTERED: every *.md is examined so a mis-named file
-    # is rejected loudly here (the gate's is_prompt_path ignores it, and
-    # silent ignoring in both layers would let it enter with green CI).
-    files = sorted(prompts_dir.glob("*.md"))
+    # Deliberately UNFILTERED and case-insensitive: every markdown-like
+    # file is examined so a mis-named file (LEGACY-NOTES.MD,
+    # notes.markdown) is rejected loudly here; the gate's is_prompt_path
+    # ignores such names, and silent ignoring in both layers would let
+    # them enter with green CI.
+    files = sorted(
+        p for p in prompts_dir.iterdir()
+        if p.is_file() and p.suffix.lower() in (".md", ".markdown"))
+    for stray in files:
+        if stray.suffix != ".md":
+            raise PromptError(
+                f"{stray.name}: prompt files use the lowercase .md extension")
     if not files:
         raise PromptError(f"no prompt files found in {prompts_dir}")
     for path in files:
