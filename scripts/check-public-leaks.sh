@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# check-public-leaks-version: 12
+# check-public-leaks-version: 13
 #
 # The public half of the leak guard: home paths, unlisted "~/" roots and reachable addresses.
 #
@@ -206,6 +206,27 @@ while [ $# -gt 0 ]; do
   shift
 done
 
+# Trailing sentence punctuation belongs to the prose, not to the name. Only the tail is stripped,
+# so "~/.claude" keeps the dot that is part of the directory name. The angle bracket is deliberately
+# NOT in the set: stripping it would turn the "<user>" placeholder into "<user", which no longer
+# matches the placeholder list, and the guard would start rejecting the documentation forms it
+# exists to permit. Defined here, ahead of the allow-file parser below, because the prefix key
+# needs it to refuse a dead entry before judge() (which needs it too) is ever reached.
+TAIL_PUNCT='.,;:!?)]}"'"'"
+# Assigns to STRIPPED rather than printing, like set_lower: a command substitution forks, and
+# --history judges thousands of matches in one run.
+strip_tail() {
+  local s="$1" c
+  while [ -n "$s" ]; do
+    c="${s: -1}"
+    case "$TAIL_PUNCT" in
+      *"$c"*) s="${s%?}" ;;
+      *) break ;;
+    esac
+  done
+  STRIPPED="$s"
+}
+
 # --- the allowed sets ------------------------------------------------------
 # Roots a document may show. "<root>" is the generic placeholder for projects that have not agreed
 # a canonical example root yet; the others are either the canonical root or real, published
@@ -249,6 +270,11 @@ if [ -n "$ALLOW_FILE" ]; then
         case "$rest" in
           */*|'') die "$ALLOW_FILE:$lineno: prefix must name exactly one segment, because rule A matches one segment and nothing deeper: $pfx" ;;
         esac
+        # A segment that is entirely punctuation ("..", "...") is never a username: judge() will
+        # never see it as one either (it returns before ALLOW_PREFIXES is consulted), so an entry
+        # naming one could never match anything. Refuse it rather than accept a dead entry.
+        strip_tail "$rest"
+        [ -n "$STRIPPED" ] || die "$ALLOW_FILE:$lineno: prefix segment cannot be a username (entirely punctuation), so this entry could never match: $pfx"
         ALLOW_PREFIXES+=("$pfx") ;;
       email)  ALLOW_EMAILS+=("$val") ;;
       skip)   SKIP_PATHS+=("$val") ;;
@@ -348,26 +374,6 @@ RE_ROOT='~/[^/[:space:]"`]+/?'
 RE_MAIL='(^|[^A-Za-z0-9._%+-])[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}'
 RE_ANY="$RE_HOME|$RE_ROOT|$RE_MAIL"
 
-# Trailing sentence punctuation belongs to the prose, not to the name. Only the tail is stripped,
-# so "~/.claude" keeps the dot that is part of the directory name. The angle bracket is deliberately
-# NOT in the set: stripping it would turn the "<user>" placeholder into "<user", which no longer
-# matches the placeholder list, and the guard would start rejecting the documentation forms it
-# exists to permit.
-TAIL_PUNCT='.,;:!?)]}"'"'"
-# Assigns to STRIPPED rather than printing, like set_lower: a command substitution forks, and
-# --history judges thousands of matches in one run.
-strip_tail() {
-  local s="$1" c
-  while [ -n "$s" ]; do
-    c="${s: -1}"
-    case "$TAIL_PUNCT" in
-      *"$c"*) s="${s%?}" ;;
-      *) break ;;
-    esac
-  done
-  STRIPPED="$s"
-}
-
 violations=0
 report() { printf '%s:%s: %s: %s\n' "$1" "$2" "$3" "$4"; violations=$((violations + 1)); }
 
@@ -408,6 +414,10 @@ judge() {
       # would leave nothing to compare and the guard would reject its own documented placeholder.
       in_list "$seg" "${PLACEHOLDER_USERS[@]}" && return 0
       strip_tail "$seg"; in_list "$STRIPPED" "${PLACEHOLDER_USERS[@]}" && return 0
+      # A segment that strips to nothing is entirely punctuation ("..", "...", a lone "}"): a
+      # path idiom or a code fragment, not a person. No allow-file entry can name it (the prefix
+      # parser above refuses to accept one), so without this it could never be suppressed.
+      [ -n "$STRIPPED" ] || return 0
       # Punctuation is stripped here for the same reason as the placeholder check above, and
       # its absence was a real false positive: with `prefix /home/runner`, an allowed path at
       # the end of a sentence or inside brackets still reported a leak.
@@ -420,6 +430,9 @@ judge() {
       report "$f" "$n" home-path "$(show_evidence home-path "$m")" ;;
     '~'/*)
       strip_tail "${m%/}"; root="${STRIPPED#\~/}"
+      # A root that strips to nothing is entirely punctuation ("~/..", "~/}"): a path idiom or a
+      # code fragment, not a person's home. No allow-file `root` entry could name it either.
+      [ -n "$root" ] || return 0
       in_list "$root" "${ALLOW_ROOTS[@]}" && return 0
       report "$f" "$n" home-root "$(show_evidence home-root "$m")" ;;
     *)
