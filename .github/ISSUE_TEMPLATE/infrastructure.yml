@@ -1,0 +1,139 @@
+name: Infrastructure Task
+description: DevOps, CI/CD, deployment, hosting, configuration
+labels: ["infrastructure"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        <!-- template-version: 6 -->
+        ## Infrastructure Task
+        For CI/CD, Docker, deployment, hosting, monitoring, and configuration work.
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What infrastructure work is needed and why?
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options:
+        - P0 - Critical
+        - P1 - High
+        - P2 - Medium
+        - P3 - Low
+    validations:
+      required: true
+
+  - type: dropdown
+    id: areas
+    attributes:
+      label: Area(s) affected
+      multiple: true
+      options:
+        - CI/CD (GitHub Actions)
+        - Index and version-bump tooling (scripts/)
+        - Leak guard
+        - Secrets / credentials
+    validations:
+      required: true
+
+  - type: textarea
+    id: files
+    attributes:
+      label: Files to create/modify
+      placeholder: |
+        - `.github/workflows/ci.yml`
+        - `docker-compose.yml`
+        - `Dockerfile`
+    validations:
+      required: false
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      placeholder: |
+        - [ ] CI pipeline passes
+        - [ ] Docker images build successfully
+    validations:
+      required: true
+
+  - type: textarea
+    id: rollback
+    attributes:
+      label: Rollback plan
+      description: How to revert if this change causes problems.
+      placeholder: |
+        - Revert commit / re-deploy previous version
+        - No data migration needed
+    validations:
+      required: true
+
+  - type: textarea
+    id: security
+    attributes:
+      label: Security considerations
+      value: |
+        - **Credentials:** Are secrets stored securely (env vars, GitHub Secrets)?
+        - **Access control:** Who can access the changed infrastructure?
+        - **Network exposure:** Any new ports or endpoints exposed?
+    validations:
+      required: true
+
+  - type: textarea
+    id: scenarios
+    attributes:
+      label: Test scenarios (Given / When / Then)
+      description: |
+        One positive and one negative scenario per condition being changed.
+      placeholder: |
+        **Condition: [name the condition]**
+
+        Positive
+        - Given: [valid starting state]
+        - When: [action is performed]
+        - Then: [expected correct result]
+
+        Negative
+        - Given: [invalid or edge-case state]
+        - When: [action is performed]
+        - Then: [expected error / rejection message]
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: agent_reviews
+    attributes:
+      label: Required reviews (mandatory)
+      description: |
+        The gate runs its mechanical checks plus one critic, with the security lens joining by label.
+        The gate must return PASS before implementation begins.
+      options:
+        - label: "**ticket-gate** - mandatory before implementation. Mechanical checks + one critic (plus the security lens by label). Must return PASS."
+          required: true
+
+  - type: textarea
+    id: docs_impact
+    attributes:
+      label: Documentation impact
+      description: Which documentation does this change affect, in the docs tree and the root README? "None" needs a reason.
+      placeholder: |
+        - **Docs affected:**
+        - **README impact:**
+        - **Why not, if none:**
+    validations:
+      required: true
+
+  - type: textarea
+    id: codebase_context
+    attributes:
+      label: Codebase Context
+      description: "Auto-populated by ticket-gate. Do not edit manually."
+      placeholder: "Populated automatically when you run /gate-ticket"
+    validations:
+      required: false

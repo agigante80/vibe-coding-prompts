@@ -1,0 +1,183 @@
+name: Security Issue
+description: Report a security vulnerability or propose a security hardening
+labels: ["security"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        <!-- template-version: 6 -->
+        ## Security Issue
+        For responsible disclosure of active vulnerabilities, consider reporting privately first.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Vulnerability description
+      description: What is the vulnerability or security gap?
+    validations:
+      required: true
+
+  - type: dropdown
+    id: owasp
+    attributes:
+      label: OWASP category
+      description: Which OWASP Top 10 category applies?
+      options:
+        - A01 Broken Access Control
+        - A02 Cryptographic Failures
+        - A03 Injection
+        - A04 Insecure Design
+        - A05 Security Misconfiguration
+        - A06 Vulnerable Components
+        - A07 Authentication Failures
+        - A08 Data Integrity Failures
+        - A09 Logging/Monitoring Failures
+        - A10 SSRF
+        - Other / N/A
+    validations:
+      required: true
+
+  - type: textarea
+    id: affected
+    attributes:
+      label: Affected endpoints/files
+      description: Which routes, files, or components are vulnerable?
+      placeholder: |
+        - `src/routes/alerts.ts` - POST /api/resource
+        - `src/jobs/process.ts`
+    validations:
+      required: true
+
+  - type: textarea
+    id: personal_data
+    attributes:
+      label: Personal data handling
+      description: Does this vulnerability affect personal data? If so, state all seven facts; otherwise mark N/A with the reason.
+      value: |
+        - **Personal-data fields affected:**
+        - **Storage location and encryption at rest:**
+        - **Erasure, including cascading deletion:**
+        - **Portability (export on request):**
+        - **Minimisation and retention:**
+        - **Legal basis:**
+        - **Cross-border transfer:**
+    validations:
+      required: true
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      options:
+        - critical (actively exploitable, PII exposed)
+        - high (exploitable with effort, safety-impacting)
+        - medium (requires specific conditions)
+        - low (theoretical, defense-in-depth)
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: What must be true for this vulnerability to be considered resolved?
+      placeholder: |
+        - [ ] Vulnerability no longer exploitable
+        - [ ] Regression test added
+    validations:
+      required: true
+
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies
+      description: Other issues blocked by or related to this security fix.
+      placeholder: "Blocks: #55"
+    validations:
+      required: false
+
+  - type: textarea
+    id: scenarios
+    attributes:
+      label: Test scenarios (Given / When / Then)
+      description: |
+        One positive and one negative scenario per condition being fixed.
+      placeholder: |
+        **Condition: [name the condition]**
+
+        Positive
+        - Given: [valid starting state]
+        - When: [action is performed]
+        - Then: [expected correct result]
+
+        Negative
+        - Given: [invalid or edge-case state]
+        - When: [action is performed]
+        - Then: [expected error / rejection message]
+    validations:
+      required: true
+
+  - type: textarea
+    id: unit_tests
+    attributes:
+      label: Unit tests
+      description: |
+        Specific test cases. State file path, input, and expected output for each case.
+      placeholder: |
+        - [ ] Positive: `tests/unit/[file].test.ts` - call with [valid input] -> [expected output / field value]
+        - [ ] Negative: `tests/unit/[file].test.ts` - call with [bad input] -> error code "[CODE]" / message contains "[text]"
+        - [ ] Unit test suite passes
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: agent_reviews
+    attributes:
+      label: Required reviews (mandatory)
+      description: |
+        The gate runs its mechanical checks plus one critic, with the security lens joining by label.
+        The gate must return PASS before implementation begins.
+      options:
+        - label: "**ticket-gate** - mandatory before implementation. Mechanical checks + one critic (plus the security lens by label). Must return PASS."
+          required: true
+
+  - type: textarea
+    id: remediation
+    attributes:
+      label: Remediation approach
+      description: How should this be fixed?
+    validations:
+      required: true
+
+  - type: textarea
+    id: tests
+    attributes:
+      label: Test plan for the fix
+      description: How do we verify the fix works and doesn't regress?
+      placeholder: |
+        - [ ] Unit test: ...
+        - [ ] Integration test: ...
+        - [ ] Manual verification: ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: docs_impact
+    attributes:
+      label: Documentation impact
+      description: Which documentation does this change affect, in the docs tree and the root README? "None" needs a reason.
+      placeholder: |
+        - **Docs affected:**
+        - **README impact:**
+        - **Why not, if none:**
+    validations:
+      required: true
+
+  - type: textarea
+    id: codebase_context
+    attributes:
+      label: Codebase Context
+      description: "Auto-populated by ticket-gate. Do not edit manually."
+      placeholder: "Populated automatically when you run /gate-ticket"
+    validations:
+      required: false

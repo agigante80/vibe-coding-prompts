@@ -1,0 +1,68 @@
+- name: bug
+  color: "d73a4a"
+  description: Something isn't working
+
+- name: enhancement
+  color: "a2eeef"
+  description: New feature or request
+
+- name: feature
+  color: "0075ca"
+  description: New feature (alias for enhancement, more specific)
+
+- name: security
+  color: "e4e669"
+  description: Security vulnerability or hardening
+
+- name: infrastructure
+  color: "c5def5"
+  description: DevOps, CI/CD, deployment, hosting
+
+- name: design
+  color: "f9d0c4"
+  description: Wireframes, UX, accessibility
+
+- name: documentation
+  color: "0e8a16"
+  description: Documentation updates or additions
+
+- name: testing
+  color: "fbca04"
+  description: Tests, QA, coverage
+
+- name: P0
+  color: "b60205"
+  description: Critical - blocks release or safety-impacting
+
+- name: P1
+  color: "d93f0b"
+  description: High priority - important for current milestone
+
+- name: P2
+  color: "e4e669"
+  description: Medium priority - should do, not blocking
+
+- name: P3
+  color: "0e8a16"
+  description: Low priority - nice to have
+
+- name: critical
+  color: "b60205"
+  description: Highest urgency - adds the security lens and maximum scrutiny in ticket-gate
+
+- name: prompts
+  color: "ededed"
+  description: Prompt files in prompts/, new or changed meta-prompts
+
+- name: docs
+  color: "ededed"
+  description: Concept guides in docs/ and the root README
+
+- name: tooling
+  color: "bfdadc"
+  description: The guards, scripts and CI that enforce the rules
+
+- name: governance
+  color: "d0c6e0"
+  description: Templates, labels, ticket standards, the roadmap and the docs that carry them
+

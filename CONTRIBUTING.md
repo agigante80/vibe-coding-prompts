@@ -15,3 +15,5 @@ Optional but recommended: `pip install pre-commit && pre-commit install` sets up
 ## Filing issues
 
 Use the issue tracker for defects in prompts (label: `prompt-review`) and for new prompt proposals. Reference the prompt's `name` and `version` so reports are unambiguous.
+
+Issue forms live in `.github/ISSUE_TEMPLATE/`. What a ready ticket must contain is defined once, in [docs/guides/ticket-standards.md](./docs/guides/ticket-standards.md); area labels are listed in [docs/guides/labels.md](./docs/guides/labels.md). A section that does not apply to a content change (E2E tests, personal data) is answered N/A with a one-line reason.

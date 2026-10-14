@@ -63,7 +63,7 @@ For prompt-length limits per platform, see the [Prompt Engineering Guide](./docs
 
 ## A note on this repository's own standards
 
-Several prompts here define standards for target software projects (a standardized `/docs/` structure, test suites, CI/CD pipelines). This repository itself is a content library, not a software project: its `/docs/` holds concept guides, its tests cover the index tooling in `scripts/`, and the documentation standards its prompts enforce apply to the projects you run them on, not to this repo.
+Several prompts here define standards for target software projects (a standardized `/docs/` structure, test suites, CI/CD pipelines). This repository itself is a content library, not a software project: its `/docs/` holds concept guides (plus `docs/guides/` for issue-tracker standards), its tests cover the index tooling in `scripts/`, and the documentation standards its prompts enforce apply to the projects you run them on, not to this repo.
 
 ## Contributing
 

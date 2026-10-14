@@ -1,0 +1,221 @@
+name: Feature Request
+description: Propose a new feature or enhancement
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        <!-- template-version: 6 -->
+        ## Feature Request
+        Please fill in all required fields. This template ensures alignment with architecture,
+        security, and privacy requirements before implementation begins.
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What does this feature do and why is it needed?
+      placeholder: "One paragraph describing the feature and its value."
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options:
+        - P0 - Critical (blocks release or safety-impacting)
+        - P1 - High (important for current milestone)
+        - P2 - Medium (should do, not blocking)
+        - P3 - Low (nice to have)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: areas
+    attributes:
+      label: Affected areas
+      description: Which areas does this touch? If 3+, consider splitting into separate tickets.
+      multiple: true
+      options:
+        - Prompts (prompts/)
+        - Docs (docs/ concept guides, root README)
+        - Tooling (scripts/: index generator, version-bump gate, leak scanners)
+        - Governance (issue templates, labels, ticket standards)
+    validations:
+      required: true
+
+  - type: textarea
+    id: files
+    attributes:
+      label: Files to create/modify
+      description: List all files that will be created or changed.
+      placeholder: |
+        - `prompts/example-prompt.md` - new prompt
+        - `README.md` - regenerated prompt index
+    validations:
+      required: false
+
+  - type: textarea
+    id: implementation
+    attributes:
+      label: Implementation details
+      description: How should this be implemented? Include code snippets if helpful.
+    validations:
+      required: false
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: What must be true for this feature to be considered complete?
+      placeholder: |
+        - [ ] Criterion 1
+        - [ ] Criterion 2
+    validations:
+      required: true
+
+  - type: textarea
+    id: personal_data
+    attributes:
+      label: Personal data handling
+      description: How does this change handle personal data? Name your privacy regime if you have one; the defaults below are regime-agnostic.
+      value: |
+        - **Personal-data fields affected:**
+        - **Storage location and encryption at rest:**
+        - **Erasure, including cascading deletion:**
+        - **Portability (export on request):**
+        - **Minimisation and retention:**
+        - **Legal basis:**
+        - **Cross-border transfer:**
+    validations:
+      required: true
+
+  - type: textarea
+    id: security
+    attributes:
+      label: Security considerations
+      description: Auth, validation, data exposure, rate limiting.
+      value: |
+        - **Authentication:** required / public (justify if public)
+        - **Input validation:** validation schema specified?
+        - **Data exposure:** any sensitive fields in response?
+        - **Rate limiting:** needed? what limit?
+    validations:
+      required: true
+
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies
+      description: Other issues that must be completed before this one.
+      placeholder: "Depends on: #54, #55"
+    validations:
+      required: false
+
+  - type: textarea
+    id: scenarios
+    attributes:
+      label: Test scenarios (Given / When / Then)
+      description: |
+        One positive and one negative scenario per condition being added. For features with
+        multiple independent conditions, repeat the block for each.
+      placeholder: |
+        **Condition: [name the condition]**
+
+        Positive
+        - Given: [valid starting state]
+        - When: [action is performed]
+        - Then: [expected correct result]
+
+        Negative
+        - Given: [invalid or edge-case state]
+        - When: [action is performed]
+        - Then: [expected error / rejection message]
+    validations:
+      required: true
+
+  - type: textarea
+    id: unit_tests
+    attributes:
+      label: Unit tests
+      description: |
+        Specific test cases. State file path, input, and expected output for each case.
+      placeholder: |
+        - [ ] Positive: `tests/unit/[file].test.ts` - call with [valid input] -> [expected output / field value]
+        - [ ] Negative: `tests/unit/[file].test.ts` - call with [bad input] -> error code "[CODE]" / message contains "[text]"
+        - [ ] Unit test suite passes
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: agent_reviews
+    attributes:
+      label: Required reviews (mandatory)
+      description: |
+        The gate runs its mechanical checks plus one critic, with the security lens joining by label.
+        The gate must return PASS before implementation begins.
+      options:
+        - label: "**ticket-gate** - mandatory before implementation. Mechanical checks + one critic (plus the security lens by label). Must return PASS."
+          required: true
+
+  - type: textarea
+    id: qa_security
+    attributes:
+      label: QA & Security testing
+      description: Security and quality assurance requirements for this feature.
+      value: |
+        ### Security tests
+        - [ ] **Auth bypass:** Tested without session / with expired session / with wrong user's session
+        - [ ] **Injection:** Tested with SQL injection, XSS, and command injection payloads in all string inputs
+        - [ ] **IDOR:** Verified users cannot access/modify other users' resources
+        - [ ] **Malformed input:** Tested with empty body, wrong Content-Type, oversized payload, unexpected fields
+        - [ ] **Rate limiting:** Confirmed rate limits are enforced on this endpoint
+
+        ### QA tests
+        - [ ] **Unit tests:** Pure function logic covered
+        - [ ] **Integration tests:** Full request to DB to response round-trip for happy + error paths
+        - [ ] **Error responses:** All error codes return `{ error, code }` format - no stack traces
+        - [ ] **Edge cases:** Null/undefined inputs, boundary values, concurrent requests
+    validations:
+      required: true
+
+  - type: textarea
+    id: e2e_tests
+    attributes:
+      label: E2E test scenarios
+      description: |
+        List specific E2E test cases for this feature - both happy and unhappy paths.
+        Every new UI feature MUST have automated E2E tests. API-only features can mark this N/A.
+      placeholder: |
+        ### Happy path
+        - [ ] User navigates to screen, sees expected content
+        - [ ] User performs action, sees expected result
+
+        ### Unhappy path
+        - [ ] API returns 500 -> error state with retry button shown
+        - [ ] Network offline -> offline banner shown
+        - [ ] API returns empty data -> empty state shown
+    validations:
+      required: true
+
+  - type: textarea
+    id: docs_impact
+    attributes:
+      label: Documentation impact
+      description: Which documentation does this change affect, in the docs tree and the root README? "None" needs a reason.
+      placeholder: |
+        - **Docs affected:**
+        - **README impact:**
+        - **Why not, if none:**
+    validations:
+      required: true
+
+  - type: textarea
+    id: codebase_context
+    attributes:
+      label: Codebase Context
+      description: "Auto-populated by ticket-gate. Do not edit manually."
+      placeholder: "Populated automatically when you run /gate-ticket"
+    validations:
+      required: false
