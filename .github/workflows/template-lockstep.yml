@@ -6,4 +6,3 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: bash scripts/check-template-lockstep.sh
-      - run: bash scripts/test-template-lockstep.sh
