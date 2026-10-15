@@ -66,3 +66,10 @@
   color: "d0c6e0"
   description: Templates, labels, ticket standards, the roadmap and the docs that carry them
 
+- name: prompt-review
+  color: "5319e7"
+  description: Critical review of a prompt file
+
+- name: prompt-proposal
+  color: "0e8a16"
+  description: Proposal for a new prompt in the collection
